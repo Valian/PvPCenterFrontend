@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}PvP Center{% endblock %}</title>
+  {% assets "libs_css" %}
+  <link rel="stylesheet" href="{{ ASSET_URL }}"/>
+  {% endassets %}
+  {% assets "css" %}
+  <link rel="stylesheet" href="{{ ASSET_URL }}"/>
+  {% endassets %}
+  {% assets "libs_js" %}
+   <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+  {% assets "main_js" %}
+   <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+</head>
+<body>
+{% block outer_content %}{% endblock %}
+{% if config['DEBUG'] %}
+<script src="//localhost:35729/livereload.js"></script>
+{% endif %}
+</body>
+</html>

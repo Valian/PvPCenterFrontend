@@ -1,0 +1,22 @@
+{
+  "name": "PvPCenterFrontend",
+  "version": "0.1.0",
+  "homepage": "https://github.com/Valian/PvPCenterFrontend",
+  "authors": [
+    "Valian <jakub.skalecki@gmail.com>"
+  ],
+  "main": "run_app.py",
+  "license": "undefined",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5",
+    "owlcar": "~1.3.2"
+  }
+}
