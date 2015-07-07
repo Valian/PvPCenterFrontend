@@ -6,5 +6,6 @@ Werkzeug==0.10.4
 argparse==1.2.1
 itsdangerous==0.24
 nodeenv==0.13.2
+requests==2.7.0
 webassets==0.10.1
 wsgiref==0.1.2

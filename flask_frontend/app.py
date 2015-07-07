@@ -26,10 +26,24 @@ def create_bundles(app):
     assets = Environment(app)
     static = '../static/'
     bower = '../../bower_components/'
-    js = Bundle(static + 'javascripts/*.coffee', filters=['coffeescript', 'rjsmin'], output='main.min.js')
-    libs = Bundle(bower + '*/dist/*.min.js', bower + 'owlcar/owl-carousel/*.min.js', output='libs.min.js')
-    less = Bundle(static + 'stylesheets/*.less', filters=['less'], output='styles.css')
-    css_libs = Bundle(bower + '*/dist/*.css', bower + 'owlcar/owl-carousel/*.css', output='lib_styles.css')
+    js = Bundle(
+        static + 'javascripts/*.coffee',
+        filters=['coffeescript', 'rjsmin'], output='js/main.min.js')
+    libs = Bundle(
+        bower + 'jquery/dist/jquery.min.js',
+        bower + '*/dist/**/*.min.js',
+        bower + 'owlcar/owl-carousel/*.min.js',
+        output='js/libs.min.js')
+    less = Bundle(
+        static + 'stylesheets/*.less',
+        filters=['less'], output='stylesheets/styles.css')
+    css_libs = Bundle(
+        bower + 'bootstrap/dist/css/bootstrap.css',
+        bower + 'bootstrap/dist/css/bootstrap-theme.css',
+        bower + 'components-font-awesome/css/font-awesome.css',
+        bower + 'flag-icon-css/css/flag-icon.css',
+        bower + 'owlcar/owl-carousel/*.min.css',
+        output='stylesheets/lib_styles.css')
     assets.register('main_js', js)
     assets.register('libs_js', libs)
     assets.register('css', less)

@@ -1,0 +1,32 @@
+<div id="site-header">
+  <div class="top-navbar">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 col-sm-6 col-xs-8">
+          <a class="logo" href="/"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo"></a>
+        </div>
+        <div class="top-menu col-md-8 col-sm-6 col-xs-4">
+          <a class="navbar-toggle menu-toggle" data-target="#main-menu" data-toggle="collapse" href="#">
+            <span class="glyphicon glyphicon-menu-hamburger"></span>
+          </a>
+          <a class="menu-toggle visible-xs sticky-visible tooltip-btn" href="/login" title="" data-original-title="Logowanie i rejestracja">
+            <span class="glyphicon glyphicon-log-in"></span>
+          </a>
+          <ul class="nav navbar-nav navbar-right account-menu sticky-hidden hidden-xs">
+            <li>
+              <a href="/login">
+                Logowanie
+              </a>
+            </li>
+            <li>
+              <a href="/registration">
+                Rejestracja
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include 'navbar.html' %}
+</div>

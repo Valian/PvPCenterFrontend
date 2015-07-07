@@ -5,18 +5,13 @@ default:
 dev:
   description: 'Development build'
   tasks:
-    - 'concurrent:devFirst'
-img:
-  description: 'Image tasks'
+    - static
+static:
+  description: 'Static files & images tasks'
   tasks:
-    - 'concurrent:imgFirst'
-devimg:
-  description: 'Development build and image tasks'
-  tasks:
-    - dev
-    - img
+    - 'clean'
+    - 'concurrent:static'
 prod:
   description: 'Production build'
   tasks:
-    - 'concurrent:prodFirst'
-    - img
+    - static

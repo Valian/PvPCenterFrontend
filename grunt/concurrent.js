@@ -5,18 +5,8 @@ module.exports = {
         limit: 3
     },
 
-    // Dev tasks
-    devFirst: [
-        'clean'
-    ],
-
-    // Production tasks
-    prodFirst: [
-        'clean'
-    ],
-
-    // Image tasks
-    imgFirst: [
+    static: [
+        'copy',
         'imagemin'
     ]
 };
