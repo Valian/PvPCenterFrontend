@@ -2,7 +2,7 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
 from abc import ABCMeta, abstractmethod
-from common.abstractutils import abstractstaticmethod
+from common.utils import abstractstaticmethod, to_iter
 
 
 class UnableToParseException(Exception):
@@ -74,6 +74,22 @@ class Game(ModelBase):
         return '[Game {0}:{1}]'.format(self.id, self.name)
 
 
+class User(ModelBase):
+
+    def __init__(self, id, name, email, token):
+        self.id = id
+        self.name = name
+        self.email = email
+        self.token = token
+
+    @staticmethod
+    def _from_json(json):
+        return User(json['id'], json['nickname'], json['email'], json.get('access_token'))
+
+    def __str__(self):
+        return '[User {0}: {1} - {2}]'.format(self.id, self.name, self.email)
+
+
 class Error(ModelBase):
 
     __slots__ = ('message',)
@@ -86,7 +102,7 @@ class Error(ModelBase):
         return Error(message=json)
 
     def __str__(self):
-        return '[Error {0}]'.format(self.message)
+        return '[Error: {0}]'.format(self.message)
 
 
 class Errors(ModelBase):
@@ -104,8 +120,8 @@ class Errors(ModelBase):
     @staticmethod
     def _from_json(json):
         errors = {
-            field: map(Error.from_json, errors)
-            for field, errors in json.get(Errors.FIELD_NAME, {}).iteritems()
+            field: map(Error.from_json, to_iter(errors))
+            for field, errors in json.iteritems()
         }
         return Errors(errors)
 
@@ -117,7 +133,4 @@ class Errors(ModelBase):
         return self.errors.get(field_name, [])
 
     def __str__(self):
-        return 'Errors' + ','.join(self.errors)
-
-
-
+        return 'Errors: {0}' + '; '.join(["{0}: {1}".format(k, ','.join(v)) for k, v in self.errors])

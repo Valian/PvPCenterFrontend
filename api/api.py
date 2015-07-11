@@ -6,7 +6,7 @@ import urlparse
 
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
-from models import Game, UnableToParseException, Errors, ModelList
+from models import Game, UnableToParseException, Errors, ModelList, User
 from common.logable import Logable
 
 
@@ -61,15 +61,16 @@ class ApiDispatcher(ApiDispatcherBase):
         try:
             url = self.create_url(endpoint)
             self.log_debug("Performing {0} request to {1}".format(method, url))
-            json = getattr(requests, method.lower())(url, **kwargs).json()
-            self.log_debug("Json response from {0}: {1}".format(url, json))
-            return self._convert_to_api_result(model, json)
+            response = getattr(requests, method.lower())(url, **kwargs)
+            self.log_debug("Performed {0} {1}, response code: {2}".format(url, method, response.status_code))
+            return self._convert_to_api_result(model, response)
         except (ValueError, UnableToParseException) as e:
             raise ApiException(method, endpoint, e)
 
     @staticmethod
-    def _convert_to_api_result(model, json):
-        if Errors.FIELD_NAME in json:
+    def _convert_to_api_result(model, response):
+        json = response.json()
+        if not response.ok:
             return ApiResult(errors=Errors.from_json(json))
         else:
             return ApiResult(data=model.from_json(json) if model else json)
@@ -79,6 +80,8 @@ class PvPCenterApi(object):
 
     GAMES_ENDPOINT = '/games'
     GAME_ENDPOINT = '/games/{0}'
+    USERS_ENDPOINT = '/users'
+    USER_ENDPOINT = "/users/{0}"
 
     def __init__(self, dispatcher, login, password):
         """
@@ -91,9 +94,19 @@ class PvPCenterApi(object):
         self.login = login
 
     def get_games(self):
+        endpoint = self.GAMES_ENDPOINT
         return self.dispatcher.get_request(
-            self.GAMES_ENDPOINT, model=ModelList.For(Game), auth=HTTPBasicAuth(self.login, self.password))
+            endpoint, model=ModelList.For(Game), auth=HTTPBasicAuth(self.login, self.password))
 
     def get_game(self, game_id):
         endpoint = self.GAME_ENDPOINT.format(game_id)
         return self.dispatcher.get_request(endpoint, model=Game, auth=HTTPBasicAuth(self.login, self.password))
+
+    def get_users(self):
+        endpoint = self.USERS_ENDPOINT
+        return self.dispatcher.get_request(
+            endpoint, model=ModelList.For(User), auth=HTTPBasicAuth(self.login, self.password))
+
+    def get_user(self, user_id):
+        endpoint = self.USER_ENDPOINT.format(user_id)
+        return self.dispatcher.get_request(endpoint, model=User, auth=HTTPBasicAuth(self.login, self.password))
