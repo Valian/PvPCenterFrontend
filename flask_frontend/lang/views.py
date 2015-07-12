@@ -2,12 +2,13 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import flask
 
-from flask_frontend.lang.languages import init_babel, set_locale, set_timezone
+from flask_frontend.lang.languages import init_babel, set_locale, get_locale
 
 from flask_frontend.common.utils import ConfigBlueprint
 from flask_frontend.config import keys
 
 lang_blueprint = ConfigBlueprint('lang', __name__, [keys.LANGUAGES])
+
 
 @lang_blueprint.record_once
 def on_register(state):
@@ -18,6 +19,7 @@ def on_register(state):
 @lang_blueprint.before_app_request
 def before_request():
     flask.g.languages = lang_blueprint.config[keys.LANGUAGES]
+    flask.g.current_language = get_locale()
 
 
 @lang_blueprint.route('/lang/<string:locale>')
