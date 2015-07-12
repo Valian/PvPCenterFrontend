@@ -1,0 +1,15 @@
+# -*- coding: utf-8 -*-
+# author: Jakub Skałecki (jakub.skalecki@gmail.com)
+
+SITE_ROOT = 'STATIC_ROOT'
+STATIC_FOLDER = 'DIST'
+
+BACKEND_URL = 'BACKEND_URL'
+BACKEND_LOGIN = 'BACKEND_LOGIN'
+BACKEND_PASS = 'BACKEND_PASS'
+
+DEBUG = 'DEBUG'
+
+SECRET_KEY = 'SECRET_KEY'
+
+LANGUAGES = 'LANGUAGES'
