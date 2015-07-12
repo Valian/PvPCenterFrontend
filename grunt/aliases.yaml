@@ -6,6 +6,12 @@ dev:
   description: 'Development build'
   tasks:
     - static
+    - shell:compile_lang
+update_lang:
+  description: 'Looks for changes in site and merges found translations into existing'
+  tasks:
+    - shell:extract_lang
+    - shell:update_lang
 static:
   description: 'Static files & images tasks'
   tasks:
@@ -15,3 +21,4 @@ prod:
   description: 'Production build'
   tasks:
     - static
+    - shell:compile_lang

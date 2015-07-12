@@ -1,13 +1,23 @@
 import logging
+
 from flask import Flask
 from flask_assets import Environment, Bundle
-from flask_frontend.config import get_config
+
+from flask_frontend.config import get_config, keys
+from flask_frontend.auth.views import auth_blueprint
+from flask_frontend.lang.views import lang_blueprint
 
 
-def create_app():
+def create_app(config=None):
     app = Flask(__name__)
-    app.config.from_object(get_config())
-    app.static_folder = app.config.get('STATIC_FOLDER')
+    final_conf = config or {}
+    final_conf.update(get_config())
+    app.config.update(final_conf)
+    app.static_folder = app.config.get(keys.STATIC_FOLDER)
+
+    app.register_blueprint(lang_blueprint)
+    app.register_blueprint(auth_blueprint)
+
     return app
 
 

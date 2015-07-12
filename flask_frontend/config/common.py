@@ -2,11 +2,20 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import os
 
+from flask_frontend.config import keys
 
-class CommonConfig(object):
-    SITE_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    STATIC_FOLDER = 'dist'
+CommonConfig = {
+    keys.SITE_ROOT: os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+    keys.STATIC_FOLDER: 'dist',
 
-    BACKEND_URL = 'url'
-    BACKEND_LOGIN = 'login'
-    BACKEND_PASS = 'pass'
+    keys.BACKEND_URL: 'url',
+    keys.BACKEND_LOGIN: 'login',
+    keys.BACKEND_PASS: 'pass',
+
+    keys.SECRET_KEY: 'secrettttt',
+
+    keys.LANGUAGES: {
+        'pl': 'Polski',
+        'en': 'English'
+    }
+}

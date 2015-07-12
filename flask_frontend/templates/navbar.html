@@ -5,7 +5,7 @@
       <ul class="nav navbar-nav">
         <li class="dropdown hidden-xs hidden-sm">
           <a aria-expanded="false" href="/games">
-            Gry
+            {{ gettext('Games') }}
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu">
@@ -71,24 +71,14 @@
             <span class="flag-icon flag-icon-pl"></span>
           </a>
           <ul class="dropdown-menu">
+            {% for lang, langname in g.languages.iteritems() %}
             <li>
-              <a href="/lang/en">
-                <span class="flag-icon flag-icon-en"></span>
-                English
+              <a href="/lang/{{ lang }}">
+                <span class="flag-icon flag-icon-{{ lang }}"></span>
+                {{ langname }}
               </a>
             </li>
-            <li>
-              <a href="/lang/es">
-                <span class="flag-icon flag-icon-es"></span>
-                Español
-              </a>
-            </li>
-            <li>
-              <a href="/lang/pl">
-                <span class="flag-icon flag-icon-pl"></span>
-                Polski
-              </a>
-            </li>
+            {% endfor %}
           </ul>
         </li>
         <li class="search-input">
