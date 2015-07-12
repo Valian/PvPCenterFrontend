@@ -43,38 +43,38 @@
         </li>
         <li class="visible-xs-block visible-sm-block">
           <a href="#">
-            Gry
+            {{ gettext('Games') }}
           </a>
         </li>
         <li>
           <a href="#">
-            Rynek transferowy
+            {{ gettext('Transfer market') }}
           </a>
         </li>
         <li>
           <a href="#">
-            Media
+            {{ gettext('Media')}}
           </a>
         </li>
         <li>
           <a href="#">
-            Sklep
+            {{ gettext('Shop') }}
           </a>
         </li>
         <li>
           <a href="#">
-            <span class="translation_missing" title="translation missing: pl.menu.forum">Forum</span>
+            {{ gettext('Forum')}}
           </a>
         </li>
         <li class="dropdown">
           <a aria-expanded="false" class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <span class="flag-icon flag-icon-pl"></span>
+            <span class="flag-icon flag-icon-{{ g.current_language if g.current_language != 'en' else 'gb' }}"></span>
           </a>
           <ul class="dropdown-menu">
             {% for lang, langname in g.languages.iteritems() %}
             <li>
               <a href="/lang/{{ lang }}">
-                <span class="flag-icon flag-icon-{{ lang }}"></span>
+                <span class="flag-icon flag-icon-{{ lang if lang != 'en' else 'gb'}}"></span>
                 {{ langname }}
               </a>
             </li>
