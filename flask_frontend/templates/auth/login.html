@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+{% block content %}
+{% if g.user.is_authenticated() %}
+<div>{{ g.user.name }} is logged in!</div>
+{% else %}
+<div>Log in</div>
+<form> method="POST" action="{{ url_for('auth.login') }}">
+  <input name="email">
+  <input name="password">
+  <input type="submit">Submit</input>
+</form>
+{% endif %}
+{% endblock content %}
