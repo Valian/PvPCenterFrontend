@@ -2,7 +2,7 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
 from abc import ABCMeta, abstractmethod
-from common.utils import abstractstaticmethod, to_iter
+from common.utils import abstractclassmethod, to_iter
 
 
 class UnableToParseException(Exception):
@@ -23,8 +23,8 @@ class ModelBase(object):
         except (TypeError, AttributeError, KeyError) as e:
             raise UnableToParseException(cls, e)
 
-    @abstractstaticmethod
-    def _from_json(json):
+    @abstractclassmethod
+    def _from_json(cls, json):
         raise NotImplementedError
 
     @abstractmethod
@@ -66,9 +66,9 @@ class Game(ModelBase):
         self.id = id
         self.name = name
 
-    @staticmethod
-    def _from_json(json):
-        return Game(json['id'], json['name'])
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json['id'], json['name'])
 
     def __str__(self):
         return '[Game {0}:{1}]'.format(self.id, self.name)
@@ -82,9 +82,9 @@ class User(ModelBase):
         self.email = email
         self.token = token
 
-    @staticmethod
-    def _from_json(json):
-        return User(json['id'], json['nickname'], json['email'], json.get('access_token'))
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json['id'], json['nickname'], json['email'], json.get('access_token'))
 
     def __str__(self):
         return '[User {0}: {1} - {2}]'.format(self.id, self.name, self.email)
@@ -97,12 +97,15 @@ class Error(ModelBase):
     def __init__(self, message):
         self.message = message
 
-    @staticmethod
-    def _from_json(json):
-        return Error(message=json)
+    @classmethod
+    def _from_json(cls, json):
+        return cls(message=json)
 
     def __str__(self):
-        return '[Error: {0}]'.format(self.message)
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        return u'{0}'.format(self.message)
 
 
 class Errors(ModelBase):
@@ -117,13 +120,16 @@ class Errors(ModelBase):
         """
         self.errors = errors or {}
 
-    @staticmethod
-    def _from_json(json):
+    def __len__(self):
+        return len(self.errors)
+
+    @classmethod
+    def _from_json(cls, json):
         errors = {
             field: map(Error.from_json, to_iter(errors))
             for field, errors in json.iteritems()
         }
-        return Errors(errors)
+        return cls(errors)
 
     def get_errors_for_field(self, field_name):
         """

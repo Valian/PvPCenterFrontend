@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
+import json
 
 import requests
 import urlparse
@@ -22,7 +23,7 @@ class ApiResult(object):
     def __init__(self, data=None, errors=None):
         self.errors = errors
         self.data = data
-        self.ok = not self.errors or errors.count == 0
+        self.ok = not self.errors or len(errors) == 0
 
 
 class ApiDispatcherBase(Logable):
@@ -82,6 +83,7 @@ class PvPCenterApi(object):
     GAME_ENDPOINT = '/games/{0}'
     USERS_ENDPOINT = '/users'
     USER_ENDPOINT = "/users/{0}"
+    LOGIN_ENDPOINT = '/users/login'
 
     def __init__(self, dispatcher, login, password):
         """
@@ -93,20 +95,26 @@ class PvPCenterApi(object):
         self.password = password
         self.login = login
 
-    def get_games(self):
+    def get_games(self, model=ModelList.For(Game)):
         endpoint = self.GAMES_ENDPOINT
         return self.dispatcher.get_request(
-            endpoint, model=ModelList.For(Game), auth=HTTPBasicAuth(self.login, self.password))
+            endpoint, model=model, auth=HTTPBasicAuth(self.login, self.password))
 
-    def get_game(self, game_id):
+    def get_game(self, game_id, model=Game):
         endpoint = self.GAME_ENDPOINT.format(game_id)
-        return self.dispatcher.get_request(endpoint, model=Game, auth=HTTPBasicAuth(self.login, self.password))
+        return self.dispatcher.get_request(endpoint, model=model, auth=HTTPBasicAuth(self.login, self.password))
 
     def get_users(self):
         endpoint = self.USERS_ENDPOINT
         return self.dispatcher.get_request(
             endpoint, model=ModelList.For(User), auth=HTTPBasicAuth(self.login, self.password))
 
-    def get_user(self, user_id):
+    def get_user(self, user_id, model=User):
         endpoint = self.USER_ENDPOINT.format(user_id)
-        return self.dispatcher.get_request(endpoint, model=User, auth=HTTPBasicAuth(self.login, self.password))
+        return self.dispatcher.get_request(endpoint, model=model, auth=HTTPBasicAuth(self.login, self.password))
+
+    def login_user(self, email, password, model=User):
+        endpoint = self.LOGIN_ENDPOINT
+        data = {'email': email, 'password': password}
+        return self.dispatcher.post_request(
+            endpoint, model=model, data=data, auth=HTTPBasicAuth(self.login, self.password))

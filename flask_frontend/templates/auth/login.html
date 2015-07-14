@@ -2,13 +2,26 @@
 
 {% block content %}
 {% if g.user.is_authenticated() %}
+
 <div>{{ g.user.name }} is logged in!</div>
+
 {% else %}
-<div>Log in</div>
-<form> method="POST" action="{{ url_for('auth.login') }}">
-  <input name="email">
-  <input name="password">
-  <input type="submit">Submit</input>
+{% from 'auth/macros.html' import render_field %}
+
+<h1>{{ gettext('Please log in') }}</h1>
+<form method="POST" action="{{ url_for('auth.login') }}">
+  {{ form.hidden_tag() }}
+  {% for error in form.server_errors %}
+  <div class="label label-danger">
+    {{ error }}
+  </div>
+  {% endfor %}
+  {{ render_field(form.email) }}
+  {{ render_field(form.password) }}
+  <button type="submit" class="btn btn-default">
+    {{ gettext('Log in') }}
+  </button>
 </form>
+
 {% endif %}
 {% endblock content %}

@@ -3,7 +3,7 @@
 
 
 def to_iter(obj):
-    if obj.__iter__ or obj:
+    if hasattr(obj, '__iter__'):
         return obj
     return [obj]
 

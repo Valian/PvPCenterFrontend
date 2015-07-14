@@ -22,4 +22,4 @@ class ApiBlueprint(ConfigBlueprint):
     def register(self, app, options, first_registration=False):
         super(ApiBlueprint, self).register(app, options, first_registration)
         disp = ApiDispatcher(self.config[conf_const.BACKEND_URL])
-        self.api = PvPCenterApi(disp, self.config[conf_const.BACKEND_URL], self.config[conf_const.BACKEND_URL])
+        self.api = PvPCenterApi(disp, self.config[conf_const.BACKEND_LOGIN], self.config[conf_const.BACKEND_PASS])
