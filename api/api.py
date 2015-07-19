@@ -8,7 +8,7 @@ import urlparse
 
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
-from models import Game, UnableToParseException, Errors, ModelList, User, Error
+from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel
 from common.logable import Logable
 
 
@@ -32,21 +32,27 @@ class ApiDispatcherBase(Logable):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, base_url):
+    def __init__(self, base_url, additional_params=None):
         self.base_url = base_url
+        self.additional_params = additional_params or {}
+
+    def add_additional_params(self, **kwargs):
+        self.additional_params.update(kwargs)
 
     def create_url(self, endpoint):
         return urlparse.urljoin(self.base_url, endpoint)
 
-    def _make_request(self, method, endpoint, model, **kwargs):
+    def make_request(self, method, endpoint, model, **kwargs):
         try:
             url = self.create_url(endpoint)
+            params = dict(self.additional_params)
+            params.update(kwargs)
             self.log_debug("Performing {0} request to {1}".format(method, url))
-            response = self._send_request(method, url, **kwargs)
+            response = self._send_request(method, url, **params)
             self.log_debug("Performed {0} {1}, response code: {2}".format(url, method, response.status_code))
             return self._convert_to_api_result(model, response)
         except (UnableToParseException, RequestException, ValueError) as e:
-            return ApiResult(errors=Errors({'connection_error': Error(str(e))}))
+            raise ApiException(endpoint, method, e)
 
     @staticmethod
     def _convert_to_api_result(model, response):
@@ -56,21 +62,6 @@ class ApiDispatcherBase(Logable):
         else:
             return ApiResult(data=model.from_json(json) if model else json)
 
-    def get_request(self, endpoint, model=None, **kwargs):
-        return self._make_request('GET', endpoint, model, **kwargs)
-
-    def post_request(self, endpoint, model=None, **kwargs):
-        return self._make_request('POST', endpoint, model, **kwargs)
-
-    def patch_request(self, endpoint, model=None, **kwargs):
-        return self._make_request('PATCH', endpoint, model, **kwargs)
-
-    def put_request(self, endpoint, model=None, **kwargs):
-        return self._make_request('PUT', endpoint, model, **kwargs)
-
-    def delete_request(self, endpoint, model=None, **kwargs):
-        return self._make_request('DELETE', endpoint, model, **kwargs)
-
     @abstractmethod
     def _send_request(self, method, url, **kwargs):
         raise NotImplementedError
@@ -79,16 +70,77 @@ class ApiDispatcherBase(Logable):
 class ApiDispatcher(ApiDispatcherBase):
 
     def _send_request(self, method, url, **kwargs):
-        return getattr(requests, method.lower())(url, **kwargs)
+        method = getattr(requests, method.lower())
+        return method(url, **kwargs)
+
+
+class Resource(object):
+
+    __metaclass__ = ABCMeta
+
+    def __init__(self, dispatcher, url):
+        self.dispatcher = dispatcher
+        self.url = url
+
+    def create_url(self, **kwargs):
+        return self.url.format(**kwargs)
+
+    def _get_request(self, endpoint, model=None, **kwargs):
+        return self.dispatcher.make_request('GET', endpoint, model, **kwargs)
+
+    def _post_request(self, endpoint, model=None, **kwargs):
+        return self.dispatcher.make_request('POST', endpoint, model, **kwargs)
+
+    def _patch_request(self, endpoint, model=None, **kwargs):
+        return self.dispatcher.make_request('PATCH', endpoint, model, **kwargs)
+
+    def _put_request(self, endpoint, model=None, **kwargs):
+        return self.dispatcher.make_request('PUT', endpoint, model, **kwargs)
+
+    def _delete_request(self, endpoint, model=None, **kwargs):
+        return self.dispatcher.make_request('DELETE', endpoint, model, **kwargs)
+
+
+class Games(Resource):
+
+    def get(self, model=ModelList.For(GameModel)):
+        endpoint = self.create_url()
+        return self._get_request(endpoint, model=model)
+
+
+class Game(Resource):
+
+    def get(self, game_id, model=GameModel):
+        endpoint = self.create_url(game_id=game_id)
+        return self._get_request(endpoint, model=model)
+
+
+class Users(Resource):
+
+    def get(self, model=ModelList.For(UserModel)):
+        endpoint = self.create_url()
+        return self._get_request(endpoint, model=model)
+
+
+class User(Resource):
+
+    def get(self, user_id, model=UserModel):
+        endpoint = self.create_url(user_id=user_id)
+        return self._get_request(endpoint, model=model)
+
+
+class Login(Resource):
+
+    def post(self, email, password, model=UserModel):
+        endpoint = self.create_url()
+        data = {'email': email, 'password': password}
+        return self._post_request(endpoint, model=model, data=data)
 
 
 class PvPCenterApi(object):
 
     GAMES_ENDPOINT = '/games'
-    GAME_ENDPOINT = '/games/{0}'
     USERS_ENDPOINT = '/users'
-    USER_ENDPOINT = "/users/{0}"
-    LOGIN_ENDPOINT = '/users/login'
 
     def __init__(self, dispatcher, login, password):
         """
@@ -96,30 +148,9 @@ class PvPCenterApi(object):
         :type login: str
         :type password: str
         """
-        self.dispatcher = dispatcher
-        self.password = password
-        self.login = login
-
-    def get_games(self, model=ModelList.For(Game)):
-        endpoint = self.GAMES_ENDPOINT
-        return self.dispatcher.get_request(
-            endpoint, model=model, auth=HTTPBasicAuth(self.login, self.password))
-
-    def get_game(self, game_id, model=Game):
-        endpoint = self.GAME_ENDPOINT.format(game_id)
-        return self.dispatcher.get_request(endpoint, model=model, auth=HTTPBasicAuth(self.login, self.password))
-
-    def get_users(self):
-        endpoint = self.USERS_ENDPOINT
-        return self.dispatcher.get_request(
-            endpoint, model=ModelList.For(User), auth=HTTPBasicAuth(self.login, self.password))
-
-    def get_user(self, user_id, model=User):
-        endpoint = self.USER_ENDPOINT.format(user_id)
-        return self.dispatcher.get_request(endpoint, model=model, auth=HTTPBasicAuth(self.login, self.password))
-
-    def login_user(self, email, password, model=User):
-        endpoint = self.LOGIN_ENDPOINT
-        data = {'email': email, 'password': password}
-        return self.dispatcher.post_request(
-            endpoint, model=model, data=data, auth=HTTPBasicAuth(self.login, self.password))
+        dispatcher.add_additional_params(auth=HTTPBasicAuth(login, password))
+        self.game = Game(dispatcher, self.GAMES_ENDPOINT + '/{game_id}')
+        self.games = Games(dispatcher, self.GAMES_ENDPOINT)
+        self.users = Users(dispatcher, self.USERS_ENDPOINT)
+        self.user = User(dispatcher, self.USERS_ENDPOINT + '/{user_id}')
+        self.login = Login(dispatcher, self.USERS_ENDPOINT + '/login')
