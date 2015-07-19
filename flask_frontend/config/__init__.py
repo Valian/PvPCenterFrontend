@@ -1,10 +1,25 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 from flask_frontend.config.common import CommonConfig
-from flask_frontend.config.local import LocalConfig
 
 
-def get_config():
-    config = dict(CommonConfig)
-    config.update(LocalConfig)
-    return config
+def get_local_config(config=None):
+    from flask_frontend.config.local import LocalConfig
+    return _create_config(CommonConfig, LocalConfig, config)
+
+
+def get_production_config(config=None):
+    from flask_frontend.config.production import ProductionConfig
+    return _create_config(CommonConfig, ProductionConfig, config)
+
+
+def get_test_config(config=None):
+    from flask_frontend.config.test import TestConfig
+    return _create_config(CommonConfig, TestConfig, config)
+
+
+def _create_config(*args):
+    conf = dict(args[0]) if len(args) > 0 else {}
+    for i in xrange(1, len(args)):
+        conf.update(args[i] or {})
+    return conf

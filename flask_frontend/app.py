@@ -2,21 +2,24 @@ import logging
 
 from flask import Flask
 from flask_assets import Environment, Bundle
-
-from flask_frontend.config import get_config, keys
+from flask_frontend.views import create_main_views
+from flask_frontend.config import keys
 from flask_frontend.auth.views import auth_blueprint
 from flask_frontend.lang.views import lang_blueprint
 
 
 def create_app(config=None):
     app = Flask(__name__)
-    final_conf = config or {}
-    final_conf.update(get_config())
-    app.config.update(final_conf)
+    config = config or {}
+    app.config.update(config)
     app.static_folder = app.config.get(keys.STATIC_FOLDER)
 
     app.register_blueprint(lang_blueprint)
     app.register_blueprint(auth_blueprint)
+
+    create_logger(app)
+    create_bundles(app)
+    create_main_views(app)
 
     return app
 
@@ -31,6 +34,7 @@ def create_logger(app):
         logger.addHandler(stderr_handler)
 
     return logger
+
 
 def create_bundles(app):
     assets = Environment(app)
@@ -58,9 +62,3 @@ def create_bundles(app):
     assets.register('libs_js', libs)
     assets.register('css', less)
     assets.register('libs_css', css_libs)
-
-app = create_app()
-create_bundles(app)
-logger = create_logger(app)
-
-from flask_frontend.views import *
