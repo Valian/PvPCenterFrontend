@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
-import json
+
+from requests import RequestException
 
 import requests
 import urlparse
 
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
-from models import Game, UnableToParseException, Errors, ModelList, User
+from models import Game, UnableToParseException, Errors, ModelList, User, Error
 from common.logable import Logable
 
 
@@ -17,6 +18,7 @@ class ApiException(Exception):
         super(ApiException, self).__init__('error while performing {0} {1}, more info: {2}'.format(url, method, e))
         self.url = url
         self.method = method
+
 
 class ApiResult(object):
 
@@ -33,9 +35,26 @@ class ApiDispatcherBase(Logable):
     def __init__(self, base_url):
         self.base_url = base_url
 
-    @abstractmethod
+    def create_url(self, endpoint):
+        return urlparse.urljoin(self.base_url, endpoint)
+
     def _make_request(self, method, endpoint, model, **kwargs):
-        raise NotImplementedError
+        try:
+            url = self.create_url(endpoint)
+            self.log_debug("Performing {0} request to {1}".format(method, url))
+            response = self._send_request(method, url, **kwargs)
+            self.log_debug("Performed {0} {1}, response code: {2}".format(url, method, response.status_code))
+            return self._convert_to_api_result(model, response)
+        except (UnableToParseException, RequestException, ValueError) as e:
+            return ApiResult(errors=Errors({'connection_error': Error(str(e))}))
+
+    @staticmethod
+    def _convert_to_api_result(model, response):
+        json = response.json()
+        if not response.ok:
+            return ApiResult(errors=Errors.from_json(json))
+        else:
+            return ApiResult(data=model.from_json(json) if model else json)
 
     def get_request(self, endpoint, model=None, **kwargs):
         return self._make_request('GET', endpoint, model, **kwargs)
@@ -52,29 +71,15 @@ class ApiDispatcherBase(Logable):
     def delete_request(self, endpoint, model=None, **kwargs):
         return self._make_request('DELETE', endpoint, model, **kwargs)
 
+    @abstractmethod
+    def _send_request(self, method, url, **kwargs):
+        raise NotImplementedError
+
 
 class ApiDispatcher(ApiDispatcherBase):
 
-    def create_url(self, endpoint):
-        return urlparse.urljoin(self.base_url, endpoint)
-
-    def _make_request(self, method, endpoint, model, **kwargs):
-        try:
-            url = self.create_url(endpoint)
-            self.log_debug("Performing {0} request to {1}".format(method, url))
-            response = getattr(requests, method.lower())(url, **kwargs)
-            self.log_debug("Performed {0} {1}, response code: {2}".format(url, method, response.status_code))
-            return self._convert_to_api_result(model, response)
-        except (ValueError, UnableToParseException) as e:
-            raise ApiException(method, endpoint, e)
-
-    @staticmethod
-    def _convert_to_api_result(model, response):
-        json = response.json()
-        if not response.ok:
-            return ApiResult(errors=Errors.from_json(json))
-        else:
-            return ApiResult(data=model.from_json(json) if model else json)
+    def _send_request(self, method, url, **kwargs):
+        return getattr(requests, method.lower())(url, **kwargs)
 
 
 class PvPCenterApi(object):

@@ -116,7 +116,7 @@ class Errors(ModelBase):
 
     def __init__(self, errors):
         """
-        :type errors: dict[Error]
+        :type errors: dict[str, Error]
         """
         self.errors = errors or {}
 
