@@ -122,6 +122,11 @@ class Users(Resource):
         endpoint = self.create_url()
         return self._get_request(endpoint, model=model)
 
+    def post(self, login, email, password, model=UserModel):
+        endpoint = self.create_url()
+        data = {'login': login, 'email': email, 'password': password}
+        return self._post_request(endpoint, data=data, model=model)
+
 
 class User(Resource):
 

@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
-from api.api import PvPCenterApi
-from flask_frontend.common.utils import ConfigBlueprint
+import flask_wtf
 import flask_frontend.config.keys as conf_const
+
+from abc import ABCMeta, abstractmethod
+from flask.ext.babel import gettext
+from api.api import PvPCenterApi, ApiException
+from flask_frontend.common.utils import ConfigBlueprint
 
 
 class ApiBlueprint(ConfigBlueprint):
@@ -29,3 +33,47 @@ class ApiBlueprint(ConfigBlueprint):
             from api.mock import ApiDispatcherMock
             disp = ApiDispatcherMock(self.config[conf_const.BACKEND_URL])
         self.api = PvPCenterApi(disp, self.config[conf_const.BACKEND_LOGIN], self.config[conf_const.BACKEND_PASS])
+
+
+class ApiForm(flask_wtf.Form):
+
+    def __init__(self, api, *args, **kwargs):
+        """
+        :type api: PvPCenterApi
+        """
+        super(ApiForm, self).__init__(*args, **kwargs)
+        self._api = api
+        self.result = None
+        self.server_errors = []
+
+    def validate(self):
+        rv = super(ApiForm, self).validate()
+        if not rv:
+            return False
+        rv = self._additional_validation()
+        if not rv:
+            return False
+        return self.validate_api_response()
+
+    def validate_api_response(self):
+        try:
+            api_result = self._make_request()
+            if api_result.ok:
+                self.result = api_result.data
+                return True
+            self._handle_errors(api_result.errors)
+            return False
+        except ApiException as e:
+            self.server_errors = [gettext("Server error, try again later")]
+            return False
+
+    def _additional_validation(self):
+        return True
+
+    @abstractmethod
+    def _handle_errors(self, errors):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def _make_request(self):
+        raise NotImplementedError()

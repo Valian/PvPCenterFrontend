@@ -13,16 +13,31 @@
             <span class="glyphicon glyphicon-log-in"></span>
           </a>
           <ul class="nav navbar-nav navbar-right account-menu sticky-hidden hidden-xs">
+            {% if not g.user.is_authenticated() %}
             <li>
-              <a href="/login">
+              <a href="{{ url_for('auth.login') }}">
                 {{ gettext('Login') }}
               </a>
             </li>
             <li>
-              <a href="/registration">
+              <a href="{{ url_for('auth.register') }}">
                 {{ gettext('Register') }}
               </a>
             </li>
+            {% else  %}
+            <li>
+            <form action="{{ url_for('auth.logout') }}" method="post">
+              <button type="submit">
+                {{ gettext('Logged as %(username)s', username=g.user.name) }}
+              </button>
+            </form>
+            </li>
+            <li>
+              <a href="#">
+                {{ gettext('Profile') }}
+              </a>
+            </li>
+            {% endif %}
           </ul>
         </div>
       </div>

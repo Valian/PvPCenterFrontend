@@ -6,7 +6,7 @@ from flask.ext.babel import gettext
 import flask_login
 import flask
 
-from flask_frontend.auth.forms import LoginForm
+from flask_frontend.auth.forms import LoginForm, RegisterForm
 from flask_frontend.auth.user import User
 from flask_frontend.common.api_helper import ApiBlueprint
 
@@ -22,10 +22,13 @@ def init(state):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return auth_blueprint.api.user.get(user_id, model=User)
+        response = auth_blueprint.api.user.get(user_id, model=User)
+        if response.ok:
+            return response.data
+        return None
 
 
-@auth_blueprint.before_request
+@auth_blueprint.before_app_request
 def before_app_request():
     flask.g.user = flask_login.current_user
 
@@ -34,10 +37,9 @@ def before_app_request():
 def login():
     login_form = LoginForm(auth_blueprint.api)
     if login_form.validate_on_submit():
-        flask_login.login_user(login_form.user)
+        flask_login.login_user(login_form.result)
         return flask.redirect(flask.url_for('index'))
 
-    flask.flash(gettext('Unable to login'), category='error')
     return flask.render_template("login.html", form=login_form)
 
 
@@ -45,4 +47,14 @@ def login():
 def logout():
     if flask_login.current_user.is_authenticated():
         flask_login.logout_user()
-        flask.flash()
+    return flask.redirect(flask.url_for('auth.login'))
+
+
+@auth_blueprint.route("/register", methods=['POST', 'GET'])
+def register():
+    register_form = RegisterForm(auth_blueprint.api)
+    if register_form.validate_on_submit():
+        flask_login.login_user(register_form.result)
+        return flask.redirect(flask.url_for('index'))
+
+    return flask.render_template("register.html", form=register_form)
