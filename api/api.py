@@ -39,8 +39,12 @@ class ApiDispatcherBase(Logable):
     def add_additional_params(self, **kwargs):
         self.additional_params.update(kwargs)
 
-    def create_url(self, endpoint):
-        return urlparse.urljoin(self.base_url, endpoint)
+    @abstractmethod
+    def make_request(self, method, endpoint, model, **kwargs):
+        raise NotImplementedError
+
+
+class ApiDispatcher(ApiDispatcherBase):
 
     def make_request(self, method, endpoint, model, **kwargs):
         try:
@@ -54,6 +58,14 @@ class ApiDispatcherBase(Logable):
         except (UnableToParseException, RequestException, ValueError) as e:
             raise ApiException(endpoint, method, e)
 
+    def create_url(self, endpoint):
+        return urlparse.urljoin(self.base_url, endpoint)
+
+    @staticmethod
+    def _send_request(method, url, **kwargs):
+        method = getattr(requests, method.lower())
+        return method(url, **kwargs)
+
     @staticmethod
     def _convert_to_api_result(model, response):
         json = response.json()
@@ -61,17 +73,6 @@ class ApiDispatcherBase(Logable):
             return ApiResult(errors=Errors.from_json(json))
         else:
             return ApiResult(data=model.from_json(json) if model else json)
-
-    @abstractmethod
-    def _send_request(self, method, url, **kwargs):
-        raise NotImplementedError
-
-
-class ApiDispatcher(ApiDispatcherBase):
-
-    def _send_request(self, method, url, **kwargs):
-        method = getattr(requests, method.lower())
-        return method(url, **kwargs)
 
 
 class Resource(object):

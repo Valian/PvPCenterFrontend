@@ -6,7 +6,7 @@
 <div>{{ g.user.name }} is logged in!</div>
 
 {% else %}
-{% from 'auth/macros.html' import render_field %}
+{% from 'macros.html' import render_field %}
 
 <h1>{{ gettext('Please log in') }}</h1>
 <form method="POST" action="{{ url_for('auth.login') }}">

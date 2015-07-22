@@ -28,6 +28,10 @@ class ModelBase(object):
         raise NotImplementedError
 
     @abstractmethod
+    def to_json(self):
+        raise NotImplementedError
+
+    @abstractmethod
     def __str__(self):
         return super(ModelBase, self).__str__()
 
@@ -70,6 +74,9 @@ class Game(ModelBase):
     def _from_json(cls, json):
         return cls(json['id'], json['name'])
 
+    def to_json(self):
+        return {'id': self.id, 'name': self.name}
+
     def __str__(self):
         return '[Game {0}:{1}]'.format(self.id, self.name)
 
@@ -86,6 +93,9 @@ class User(ModelBase):
     def _from_json(cls, json):
         return cls(json['id'], json['nickname'], json['email'], json.get('access_token'))
 
+    def to_json(self):
+        return {'id': self.id, 'nickname': self.name, 'email': self.email, 'access_token': self.token}
+
     def __str__(self):
         return '[User {0}: {1} - {2}]'.format(self.id, self.name, self.email)
 
@@ -100,6 +110,9 @@ class Error(ModelBase):
     @classmethod
     def _from_json(cls, json):
         return cls(message=json)
+
+    def to_json(self):
+        return {}
 
     def __str__(self):
         return str(self.__unicode__())
@@ -122,6 +135,9 @@ class Errors(ModelBase):
 
     def __len__(self):
         return len(self.errors)
+
+    def to_json(self):
+        return {'erorrs': ['mock']}
 
     @classmethod
     def _from_json(cls, json):

@@ -13,7 +13,7 @@ CommonConfig = {
     keys.BACKEND_PASS: 'pass',
 
     keys.SECRET_KEY: 'secrettttt',
-
+    keys.MOCK_API: False,
     keys.LANGUAGES: {
         'pl': 'Polski',
         'en': 'English'

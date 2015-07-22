@@ -29,9 +29,8 @@ class LoginForm(flask_wtf.Form):
         rv = super(LoginForm, self).validate()
         if not rv:
             return False
-
         try:
-            api_result = self._api.login_user(self.email.data, self.password.data, model=User)
+            api_result = self._api.login.post(self.email.data, self.password.data, model=User)
             if api_result.ok:
                 self.user = api_result.data
                 return True

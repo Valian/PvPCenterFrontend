@@ -10,7 +10,7 @@ from flask_frontend.auth.forms import LoginForm
 from flask_frontend.auth.user import User
 from flask_frontend.common.api_helper import ApiBlueprint
 
-auth_blueprint = ApiBlueprint('auth', __name__)
+auth_blueprint = ApiBlueprint('auth', __name__, template_folder='templates')
 
 
 @auth_blueprint.record_once
@@ -22,7 +22,7 @@ def init(state):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return auth_blueprint.api.get_user(user_id, model=User)
+        return auth_blueprint.api.user.get(user_id, model=User)
 
 
 @auth_blueprint.before_request
@@ -38,7 +38,7 @@ def login():
         return flask.redirect(flask.url_for('index'))
 
     flask.flash(gettext('Unable to login'), category='error')
-    return flask.render_template("auth/login.html", form=login_form)
+    return flask.render_template("login.html", form=login_form)
 
 
 @auth_blueprint.route("/logout", methods=['POST'])

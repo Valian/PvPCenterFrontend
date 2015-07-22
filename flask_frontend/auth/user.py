@@ -3,6 +3,7 @@
 
 from api.models import User as ApiUser
 
+
 class User(ApiUser):
 
     def is_authenticated(self):
