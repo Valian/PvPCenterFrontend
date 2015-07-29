@@ -9,36 +9,11 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu">
-            <li>
-              <a href="/games/1">game1</a>
-            </li>
-            <li>
-              <a href="/games/2">game2</a>
-            </li>
-            <li>
-              <a href="/games/3">game3</a>
-            </li>
-            <li>
-              <a href="/games/4">game4</a>
-            </li>
-            <li>
-              <a href="/games/5">game5</a>
-            </li>
-            <li>
-              <a href="/games/6">game6</a>
-            </li>
-            <li>
-              <a href="/games/7">game7</a>
-            </li>
-            <li>
-              <a href="/games/8">game8</a>
-            </li>
-            <li>
-              <a href="/games/9">game9</a>
-            </li>
-            <li>
-              <a href="/games/10">game10</a>
-            </li>
+            {% for game in g.games %}
+              <li>
+                <a href="{{ url_for('games.game_view', game_id = game.id) }}">{{ game.name }}</a>
+              </li>
+            {%  endfor %}
           </ul>
         </li>
         <li class="visible-xs-block visible-sm-block">

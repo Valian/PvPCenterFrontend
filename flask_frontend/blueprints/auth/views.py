@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
-from flask.ext.babel import gettext
-
 import flask_login
 import flask
 
-from flask_frontend.auth.forms import LoginForm, RegisterForm
-from flask_frontend.auth.user import User
-from flask_frontend.common.api_helper import ApiBlueprint
-
-auth_blueprint = ApiBlueprint('auth', __name__, template_folder='templates')
+from .forms import LoginForm, RegisterForm
+from .user import User
+from . import auth_blueprint
 
 
 @auth_blueprint.record_once

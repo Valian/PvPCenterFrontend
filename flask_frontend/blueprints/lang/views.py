@@ -2,12 +2,9 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import flask
 
-from flask_frontend.lang.languages import init_babel, set_locale, get_locale
-
-from flask_frontend.common.utils import ConfigBlueprint
+from flask.ext.frontend.blueprints.lang.languages import init_babel, set_locale, get_locale
 from flask_frontend.config import keys
-
-lang_blueprint = ConfigBlueprint('lang', __name__, [keys.LANGUAGES])
+from . import lang_blueprint
 
 
 @lang_blueprint.record_once

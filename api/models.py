@@ -36,10 +36,10 @@ class ModelBase(object):
         return super(ModelBase, self).__str__()
 
 
-class ModelList(object):
+class ModelList(list):
 
     def __init__(self, data, total):
-        self.data = data
+        super(ModelList, self).__init__(data)
         self.total = total
 
     class For(object):

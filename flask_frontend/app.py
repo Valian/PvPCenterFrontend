@@ -2,10 +2,12 @@ import logging
 
 from flask import Flask
 from flask_assets import Environment, Bundle
+
 from flask_frontend.views import create_main_views
 from flask_frontend.config import keys
-from flask_frontend.auth.views import auth_blueprint
-from flask_frontend.lang.views import lang_blueprint
+from flask_frontend.blueprints.games import games_blueprint
+from flask_frontend.blueprints.auth import auth_blueprint
+from flask_frontend.blueprints.lang.views import lang_blueprint
 
 
 def create_app(config=None):
@@ -16,6 +18,7 @@ def create_app(config=None):
 
     app.register_blueprint(lang_blueprint)
     app.register_blueprint(auth_blueprint)
+    app.register_blueprint(games_blueprint)
 
     create_logger(app)
     create_bundles(app)

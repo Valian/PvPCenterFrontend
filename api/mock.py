@@ -8,16 +8,17 @@ import factory
 import factory.fuzzy as fuzzy
 from faker import Factory as FakerFactory
 import re
-from models import User, Game, ModelList
-from api import ApiDispatcherBase, ApiResult
+from models import User, Game, ModelList, UnableToParseException
+from api import ApiDispatcherBase, ApiResult, ApiException
 
 faker = FakerFactory.create()
 
 
 def create_mock_for(model, **kwargs):
     if isinstance(model, ModelList.For):
-        fac = find_factory_in_inheritance_chain(model.model)
-        data = [model.from_json(fac(**kwargs).to_json()) for _ in xrange(random.randint(3, 6))]
+        underlying_model = model.model
+        fac = find_factory_in_inheritance_chain(underlying_model)
+        data = [underlying_model.from_json(fac(**kwargs).to_json()) for _ in xrange(random.randint(3, 6))]
         return ModelList(data, len(data))
     fac = find_factory_in_inheritance_chain(model)
     return model.from_json(fac(**kwargs).to_json())

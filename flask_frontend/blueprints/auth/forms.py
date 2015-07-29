@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
-
-import flask_wtf
 import wtforms
 
 from flask_babel import gettext
 from wtforms.validators import Length, Email, Regexp
-from flask.ext.frontend.common.api_helper import ApiForm
-from flask_frontend.auth.user import User
+
+from .user import User
+from flask_frontend.common.api_helper import ApiForm
 
 
 class LoginForm(ApiForm):

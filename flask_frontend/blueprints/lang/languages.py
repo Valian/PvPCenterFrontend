@@ -10,6 +10,7 @@ TIMEZONE = 'timezone'
 
 babel = Babel()
 
+
 def init_babel(app):
     babel.init_app(app)
     babel.locale_selector_func = get_locale

@@ -1,38 +1,55 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
-
+import flask
 import flask_wtf
-import flask_frontend.config.keys as conf_const
-
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from flask.ext.babel import gettext
+
+from common.logable import Logable
+import flask_frontend.config.keys as conf_const
 from api.api import PvPCenterApi, ApiException
 from flask_frontend.common.utils import ConfigBlueprint
 
 
-class ApiBlueprint(ConfigBlueprint):
+def get_api_instance(config):
+    if not config[conf_const.MOCK_API]:
+        from api.api import ApiDispatcher
+        disp = ApiDispatcher(config[conf_const.BACKEND_URL])
+    else:
+        from api.mock import ApiDispatcherMock
+        disp = ApiDispatcherMock(config[conf_const.BACKEND_URL])
+    return PvPCenterApi(disp, config[conf_const.BACKEND_LOGIN], config[conf_const.BACKEND_PASS])
+
+
+def get_or_none(func, *args, **kwargs):
+    try:
+        result = func(*args, **kwargs)
+        return result.data
+    except ApiException:
+        return None
+
+
+def get_or_404(func, *args, **kwargs):
+    result = get_or_none(func, *args, **kwargs)
+    if result is None:
+        flask.abort(404)
+    return result
+
+
+class ApiBlueprint(ConfigBlueprint, Logable):
     """:type api: PvPCenterApi"""
 
     def __init__(self, name, import_name, config_keys=None, *args, **kwargs):
         """
         :type config_keys: list
         """
-        config_keys = config_keys or []
-        config_keys.extend([
-            conf_const.BACKEND_URL, conf_const.BACKEND_LOGIN, conf_const.BACKEND_PASS, conf_const.MOCK_API])
         super(ApiBlueprint, self).__init__(name, import_name, config_keys, *args, **kwargs)
 
         self.api = None
 
     def register(self, app, options, first_registration=False):
         super(ApiBlueprint, self).register(app, options, first_registration)
-        if not self.config[conf_const.MOCK_API]:
-            from api.api import ApiDispatcher
-            disp = ApiDispatcher(self.config[conf_const.BACKEND_URL])
-        else:
-            from api.mock import ApiDispatcherMock
-            disp = ApiDispatcherMock(self.config[conf_const.BACKEND_URL])
-        self.api = PvPCenterApi(disp, self.config[conf_const.BACKEND_LOGIN], self.config[conf_const.BACKEND_PASS])
+        self.api = get_api_instance(app.config)
 
 
 class ApiForm(flask_wtf.Form):
@@ -77,3 +94,4 @@ class ApiForm(flask_wtf.Form):
     @abstractmethod
     def _make_request(self):
         raise NotImplementedError()
+
