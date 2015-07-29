@@ -2,6 +2,7 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
 from abc import ABCMeta, abstractmethod
+
 from common.utils import abstractclassmethod, to_iter
 
 
@@ -81,23 +82,47 @@ class Game(ModelBase):
         return '[Game {0}:{1}]'.format(self.id, self.name)
 
 
+class UserGameOwnership(ModelBase):
+
+    def __init__(self, id, nickname, game):
+        self.id = id
+        self.nickname = nickname
+        self.game = game
+
+    def to_json(self):
+        return {'id': self.id, 'nickname': self.nickname, 'game': self.game.to_json()}
+
+    @classmethod
+    def _from_json(cls, json):
+        game = Game.from_json(json['game'])
+        return cls(json['id'], json.get('nickname'), game)
+
+    def __str__(self):
+        return '[UserGameOwnership {0}:{1} {2}]'.format(self.id, self.nickname, self.game)
+
+
 class User(ModelBase):
 
-    def __init__(self, id, name, email, token):
+    def __init__(self, id, name, email, token, game_ownerships):
         self.id = id
         self.name = name
         self.email = email
         self.token = token
+        self.game_ownerships = game_ownerships
 
     @classmethod
     def _from_json(cls, json):
-        return cls(json['id'], json['nickname'], json['email'], json.get('access_token'))
+        game_ownerships = [UserGameOwnership.from_json(go) for go in json.get('game_ownerships', [])]
+        return cls(json['id'], json['nickname'], json['email'], json.get('access_token'), game_ownerships)
 
     def to_json(self):
-        return {'id': self.id, 'nickname': self.name, 'email': self.email, 'access_token': self.token}
+        game_ownerships = [go.to_json() for go in self.game_ownerships]
+        return {
+            'id': self.id, 'nickname': self.name, 'email': self.email, 'access_token': self.token,
+            'game_ownerships': game_ownerships}
 
     def __str__(self):
-        return '[User {0}: {1} - {2}]'.format(self.id, self.name, self.email)
+        return '[User {0}: {1} - {2}, owned games: {3}]'.format(self.id, self.name, self.email, self.game_ownerships)
 
 
 class Error(ModelBase):

@@ -1,4 +1,5 @@
 {% macro render_field(field, container_class='form-group', field_class='form-control') %}
+
   <div class="{{ label_class }}">
     {{ field.label }}
     {{ field(class=field_class)|safe }}
@@ -10,4 +11,33 @@
     </ul>
   {% endif %}
   </div>
+
+{% endmacro %}
+
+{% macro user_basic_info(user) %}
+
+  <div>
+    <h1>{{ user.name }}</h1>
+  </div>
+  <div>
+    <h2>{{ user.email }}</h2>
+  </div>
+
+{% endmacro %}
+
+{% macro user_game_ownerships(user) %}
+
+  <table class="table table-striped">
+    <tr>
+      <th class="col">Game</th>
+      <th class="col">Nickname</th>
+    </tr>
+    {% for game_ownership in user.game_ownerships %}
+      <tr>
+        <td>{{ game_ownership.game.name }}</td>
+        <td>{{ game_ownership.nickname }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
 {% endmacro %}

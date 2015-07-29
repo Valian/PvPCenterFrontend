@@ -16,9 +16,9 @@ def create_app(config=None):
     app.config.update(config)
     app.static_folder = app.config.get(keys.STATIC_FOLDER)
 
-    app.register_blueprint(lang_blueprint)
-    app.register_blueprint(auth_blueprint)
-    app.register_blueprint(games_blueprint)
+    app.register_blueprint(lang_blueprint, url_prefix='/lang')
+    app.register_blueprint(auth_blueprint, url_prefix='/users')
+    app.register_blueprint(games_blueprint, url_prefix='/games')
 
     create_logger(app)
     create_bundles(app)

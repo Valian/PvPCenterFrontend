@@ -4,21 +4,24 @@ import random
 
 import sys
 import inspect
+
 import factory
 import factory.fuzzy as fuzzy
-from faker import Factory as FakerFactory
 import re
-from models import User, Game, ModelList, UnableToParseException
-from api import ApiDispatcherBase, ApiResult, ApiException
+from faker import Factory as FakerFactory
+
+from models import User, Game, ModelList, UserGameOwnership
+from api import ApiDispatcherBase, ApiResult
+
 
 faker = FakerFactory.create()
 
 
-def create_mock_for(model, **kwargs):
+def create_mock_for(model, list_count=5, **kwargs):
     if isinstance(model, ModelList.For):
         underlying_model = model.model
         fac = find_factory_in_inheritance_chain(underlying_model)
-        data = [underlying_model.from_json(fac(**kwargs).to_json()) for _ in xrange(random.randint(3, 6))]
+        data = [underlying_model.from_json(fac(**kwargs).to_json()) for _ in xrange(list_count)]
         return ModelList(data, len(data))
     fac = find_factory_in_inheritance_chain(model)
     return model.from_json(fac(**kwargs).to_json())
@@ -46,6 +49,24 @@ class ApiDispatcherMock(ApiDispatcherBase):
         return params
 
 
+class GameFactory(factory.Factory):
+    class Meta:
+        model = Game
+
+    id = factory.Sequence(lambda x: x)
+    name = factory.LazyAttribute(lambda x: faker.word())
+
+
+class UserGameOwnershipFactory(factory.Factory):
+    class Meta:
+        model = UserGameOwnership
+
+    id = factory.Sequence(lambda x: x)
+    nickname = factory.LazyAttribute(
+        lambda x: random_with_seed(faker.provider('faker.providers.person').first_names, x.id))
+    game = factory.SubFactory(GameFactory)
+
+
 class UserFactory(factory.Factory):
     class Meta:
         model = User
@@ -54,14 +75,7 @@ class UserFactory(factory.Factory):
     name = factory.LazyAttribute(lambda x: random_with_seed(faker.provider('faker.providers.person').first_names, x.id))
     email = factory.LazyAttribute(lambda o: '{0}@mock.com'.format(o.name.replace(' ', '_')))
     token = fuzzy.FuzzyText(length=15)
-
-
-class GameFactory(factory.Factory):
-    class Meta:
-        model = Game
-
-    id = factory.Sequence(lambda x: x)
-    name = factory.LazyAttribute(lambda x: faker.word())
+    game_ownerships = factory.List([factory.SubFactory(UserGameOwnershipFactory) for _ in xrange(random.randint(2, 5))])
 
 
 def random_with_seed(array, seed):

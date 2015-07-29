@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+
+{% block content %}
+{%  from 'macros.html' import user_basic_info, user_game_ownerships %}
+
+<div class="col-md-6">
+  {{ user_basic_info(g.user) }}
+  {{ user_game_ownerships(g.user) }}
+</div>
+
+{% endblock content %}

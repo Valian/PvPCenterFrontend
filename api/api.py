@@ -8,7 +8,8 @@ import urlparse
 
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
-from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel
+from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel, \
+    UserGameOwnership
 from common.logable import Logable
 
 
@@ -143,10 +144,18 @@ class Login(Resource):
         return self._post_request(endpoint, model=model, data=data)
 
 
+class GameOwnerships(Resource):
+
+    def get(self, id, token, model=ModelList.For(UserGameOwnership)):
+        endpoint = self.create_url(user_id=id, token=token)
+        return self._get_request(endpoint, model=model)
+
+
 class PvPCenterApi(object):
 
     GAMES_ENDPOINT = '/games'
     USERS_ENDPOINT = '/users'
+    GAME_OWNERSHIPS_ENDPOINT = '/game_ownerships'
 
     def __init__(self, dispatcher, login, password):
         """
@@ -160,3 +169,6 @@ class PvPCenterApi(object):
         self.users = Users(dispatcher, self.USERS_ENDPOINT)
         self.user = User(dispatcher, self.USERS_ENDPOINT + '/{user_id}')
         self.login = Login(dispatcher, self.USERS_ENDPOINT + '/login')
+        self.game_ownerships = GameOwnerships(
+            dispatcher, self.GAME_OWNERSHIPS_ENDPOINT + '?access_token={token}&user_id={user_id}')
+

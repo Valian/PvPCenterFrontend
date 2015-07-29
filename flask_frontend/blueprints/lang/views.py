@@ -19,7 +19,7 @@ def before_request():
     flask.g.current_language = get_locale()
 
 
-@lang_blueprint.route('/lang/<string:locale>')
+@lang_blueprint.route('/<string:locale>')
 def change_language(locale):
     if locale in lang_blueprint.config[keys.LANGUAGES]:
         set_locale(locale)
