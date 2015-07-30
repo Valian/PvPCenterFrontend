@@ -40,16 +40,24 @@
         <p class="welcome">Skorzystaj z formularza albo zarejestruj się przez jeden z poniższych serwisów.</p>
         <div class="social-registration row">
           <div class="col-xs-3">
-            <a href="#" class="steam-registration tooltip-btn" title="Zarejestruj przez Steam"><img src="img/steam.png" /></a>
+            <a href="#" class="steam-registration tooltip-btn" title="Zarejestruj przez Steam">
+              <img src="{{  url_for('static', filename='images/steam.png') }}" />
+            </a>
           </div>
           <div class="col-xs-3">
-            <a href="#" class="origin-registration tooltip-btn" title="Zarejestruj przez Origin"><img src="img/origin.png" /></a>
+            <a href="#" class="origin-registration tooltip-btn" title="Zarejestruj przez Origin">
+              <img src="{{  url_for('static', filename='images/origin.png') }}" />
+            </a>
           </div>
           <div class="col-xs-3">
-            <a href="#" class="facebook-registration tooltip-btn" title="Zarejestruj przez Facebook"><img src="img/facebook.png" /></a>
+            <a href="#" class="facebook-registration tooltip-btn" title="Zarejestruj przez Facebook">
+              <img src="{{  url_for('static', filename='images/facebook.png') }}" />
+            </a>
           </div>
           <div class="col-xs-3">
-            <a href="#" class="twitter-registration tooltip-btn" title="Zarejestruj przez Twitter"><img src="img/twitter.png" /></a>
+            <a href="#" class="twitter-registration tooltip-btn" title="Zarejestruj przez Twitter">
+              <img src="{{  url_for('static', filename='images/twitter.png') }}" />
+            </a>
           </div>
         </div>
       </div>
