@@ -7,23 +7,54 @@
 
 {% else %}
 {% from 'macros.html' import render_field %}
+<div id="registration">
+  <div class="container">
+    <h1>{{ gettext('Register new account') }}</h1>
+    <div class="row">
+      <div class="col-sm-7">
+        <form method="POST" action="{{ url_for('auth.register') }}">
+          {{ form.hidden_tag() }}
+          {% for error in form.server_errors %}
+          <div class="alert alert-danger">
+            {{ error }}
+          </div>
+          {% endfor %}
+          {{ render_field(form.login) }}
+          {{ render_field(form.email) }}
+          {{ render_field(form.password) }}
+          {{ render_field(form.password_again) }}
+          <div class="row">
+            <div class="checkbox col-md-6 col-xs-7">
+              <label><input type="checkbox"> Wyrażam zgodę na <a href="#">regulamin</a></label><br/>
+              <label><input type="checkbox"> Chcę spam na maila</label>
+            </div>
+            <div class="submit col-md-6 col-xs-5">
+                <button type="submit" class="btn btn-default btn-lg pull-right">{{ gettext('Register') }}</button>
+              </div>
+          </div>
+        </form>
 
-<h1>{{ gettext('Register new account') }}</h1>
-<form method="POST" action="{{ url_for('auth.register') }}">
-  {{ form.hidden_tag() }}
-  {% for error in form.server_errors %}
-  <div class="label label-danger">
-    {{ error }}
+      </div>
+      <div class="col-sm-5">
+        <p class="welcome">Załóż konto, aby móc walczyć z wieloma graczami z całego świata o niesamowite nagrody w organizowanych przez nas ligach i turniejach.</p>
+        <p class="welcome">Skorzystaj z formularza albo zarejestruj się przez jeden z poniższych serwisów.</p>
+        <div class="social-registration row">
+          <div class="col-xs-3">
+            <a href="#" class="steam-registration tooltip-btn" title="Zarejestruj przez Steam"><img src="img/steam.png" /></a>
+          </div>
+          <div class="col-xs-3">
+            <a href="#" class="origin-registration tooltip-btn" title="Zarejestruj przez Origin"><img src="img/origin.png" /></a>
+          </div>
+          <div class="col-xs-3">
+            <a href="#" class="facebook-registration tooltip-btn" title="Zarejestruj przez Facebook"><img src="img/facebook.png" /></a>
+          </div>
+          <div class="col-xs-3">
+            <a href="#" class="twitter-registration tooltip-btn" title="Zarejestruj przez Twitter"><img src="img/twitter.png" /></a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  {% endfor %}
-  {{ render_field(form.login) }}
-  {{ render_field(form.email) }}
-  {{ render_field(form.password) }}
-  {{ render_field(form.password_again) }}
-  <button type="submit" class="btn btn-default">
-    {{ gettext('Register') }}
-  </button>
-</form>
-
+</div>
 {% endif %}
 {% endblock content %}

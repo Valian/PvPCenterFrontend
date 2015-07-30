@@ -1,6 +1,6 @@
 {% macro render_field(field, container_class='form-group', field_class='form-control') %}
 
-  <div class="{{ label_class }}">
+  <div class="{{ container_class }}">
     {{ field.label }}
     {{ field(class=field_class)|safe }}
     {% if field.errors %}
