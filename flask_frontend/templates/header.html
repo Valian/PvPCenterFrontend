@@ -9,11 +9,16 @@
           <a class="navbar-toggle menu-toggle" data-target="#main-menu" data-toggle="collapse" href="#">
             <span class="glyphicon glyphicon-menu-hamburger"></span>
           </a>
-          <a class="menu-toggle visible-xs sticky-visible tooltip-btn" href="/login" title="" data-original-title="Logowanie i rejestracja">
+          <a href="#" class="menu-toggle visible-xs visible-sm sticky-visible tooltip-btn" data-toggle="modal" data-target="#myModal" title="Logowanie i rejestracja">
             <span class="glyphicon glyphicon-log-in"></span>
           </a>
-          <ul class="nav navbar-nav navbar-right account-menu sticky-hidden hidden-xs">
+          <ul class="nav navbar-nav navbar-right account-menu sticky-hidden hidden-xs hidden-sm">
             {% if not g.user.is_authenticated() %}
+            <li>
+              <a href="#" data-toggle="modal" data-target="#myModal">
+                {{ gettext('Login') }}
+              </a>
+            </li>
             <li>
               <a href="{{ url_for('auth.login') }}">
                 {{ gettext('Login') }}
