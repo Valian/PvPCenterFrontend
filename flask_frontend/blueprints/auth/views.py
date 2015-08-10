@@ -27,16 +27,16 @@ def init(state):
 @auth_blueprint.before_app_request
 def before_app_request():
     flask.g.user = flask_login.current_user
+    flask.g.login_form = LoginForm(auth_blueprint.api)
 
 
 @auth_blueprint.route("/login", methods=['GET', 'POST'])
 def login():
-    login_form = LoginForm(auth_blueprint.api)
-    if login_form.validate_on_submit():
-        flask_login.login_user(login_form.result)
+    if flask.g.login_form.validate_on_submit():
+        flask_login.login_user(flask.g.login_form.result)
         return flask.redirect(flask.url_for('index'))
 
-    return flask.render_template("login.html", form=login_form)
+    return flask.render_template("login.html", form=flask.g.login_form)
 
 
 @auth_blueprint.route("/logout", methods=['POST'])

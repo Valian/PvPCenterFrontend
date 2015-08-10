@@ -1,0 +1,17 @@
+{% from 'macros.html' import render_field %}
+
+<div class="hidden">
+  <form method="POST" action="{{ url_for('auth.login') }}">
+    {{ g.login_form.hidden_tag() }}
+    {% for error in form.server_errors %}
+      <div class="label label-danger">
+        {{ error }}
+      </div>
+    {% endfor %}
+    {{ render_field(g.login_form.email) }}
+    {{ render_field(g.login_form.password) }}
+    <button type="submit" class="btn btn-default">
+      {{ gettext('Log in') }}
+    </button>
+  </form>
+</div>
