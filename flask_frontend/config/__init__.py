@@ -5,7 +5,8 @@ from flask_frontend.config.common import CommonConfig
 
 def get_local_config(config=None):
     from flask_frontend.config.local import LocalConfig
-    return _create_config(CommonConfig, LocalConfig, config)
+    from flask_frontend.config.dev import DevConfig
+    return _create_config(CommonConfig, DevConfig, LocalConfig, config)
 
 
 def get_production_config(config=None):

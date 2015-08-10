@@ -3,9 +3,7 @@
 
 from flask_frontend.config import keys
 
-TestConfig = {
-    keys.TESTING: True,
-    "WTF_CSRF_ENABLED": False,
-    "LOGIN_DISABLED": False,
+DevConfig = {
+    keys.DEBUG: "TRUE",
     keys.MOCK_API: True
 }
