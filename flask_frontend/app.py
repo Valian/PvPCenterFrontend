@@ -8,6 +8,7 @@ from flask_frontend.config import keys
 from flask_frontend.blueprints.games import games_blueprint
 from flask_frontend.blueprints.auth import auth_blueprint
 from flask_frontend.blueprints.lang.views import lang_blueprint
+from flask_frontend.blueprints.users import users_blueprint
 
 
 def create_app(config=None):
@@ -17,7 +18,8 @@ def create_app(config=None):
     app.static_folder = app.config.get(keys.STATIC_FOLDER)
 
     app.register_blueprint(lang_blueprint, url_prefix='/lang')
-    app.register_blueprint(auth_blueprint, url_prefix='/users')
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    app.register_blueprint(users_blueprint, url_prefix='/users')
     app.register_blueprint(games_blueprint, url_prefix='/games')
 
     create_logger(app)

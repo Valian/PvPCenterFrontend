@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+{% block content %}
+{%  from 'user_macros.html' import user_basic_info, user_game_ownerships %}
+
+<div class="col-md-6">
+  {{ user_basic_info(g.user) }}
+  <a href="{{ url_for('users.edit_profile_view') }}" role="button" class="btn btn-primary">
+    {{ gettext('Edit profile') }}
+  </a>
+  {{ user_game_ownerships(g.user) }}
+</div>
+
+{% endblock content %}

@@ -4,7 +4,7 @@
   </option>
   <option name="httpMethod" value="GET" />
   <option name="urlBase" value="http://pvpc-core.herokuapp.com" />
-  <option name="urlPath" value="/public/users/2" />
+  <option name="urlPath" value="/users/2" />
   <option name="headers">
     <list>
       <KeyValuePair>
@@ -28,6 +28,6 @@
   <option name="haveTextToSend" value="false" />
   <option name="haveFileToSend" value="false" />
   <option name="isFileUpload" value="false" />
-  <option name="textToSend" value="" />
+  <option name="textToSend" value="{     &quot;user&quot;: {         &quot;email&quot;: &quot;dupa@dupa.com&quot;,          &quot;nickname&quot;: &quot;ja&quot;,          &quot;password&quot;: &quot;testtest&quot;      } }" />
   <option name="filesToSend" value="" />
 </RestClientRequest>

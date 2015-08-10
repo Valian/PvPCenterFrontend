@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
-from urlparse import urlparse
 
 import mock
 from flask import url_for
@@ -13,14 +12,6 @@ from .user import User
 
 
 class AuthTests(AppTestCase):
-
-    def login_user(self, api_mock, data=None):
-        return_user = create_mock_for(User)
-        api_mock.login.post.return_value = ApiResult(data=return_user)
-        api_mock.user.get.return_value = ApiResult(data=return_user)
-        data = data or {'email': "dupa@dupa.com", 'password': "password"}
-        response = self.client.post(url_for('auth.login'), follow_redirects=True, data=data)
-        return response, return_user
 
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_login(self, api_mock):
@@ -64,19 +55,3 @@ class AuthTests(AppTestCase):
         data = {'email': "dupa@dupa.com", 'password': "password", 'password_again': 'password', 'login': 'loggggin'}
         self.client.post(url_for('auth.register'), data=data)
         self.assertTrue(api_mock.users.post.called)
-
-    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
-    def test_user_profile(self, api_mock):
-        return_user = create_mock_for(User)
-        api_mock.user.get.return_value = ApiResult(data=return_user)
-        self.client.get(url_for('auth.profile_view', user_id=1))
-        self.assertTrue(api_mock.user.get.called)
-
-    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
-    def test_my_profile_error_without_login(self, api_mock):
-        return_user = create_mock_for(User)
-        api_mock.user.get.return_value = ApiResult(data=return_user)
-        response = self.client.get(url_for('auth.my_profile_view'), follow_redirects=False)
-        self.assertEqual(response.status_code, 302)
-        self.assertFalse(api_mock.user.get.called)
-
