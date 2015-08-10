@@ -40,6 +40,6 @@ def edit_profile_view():
         edit_profile_form.email.data = flask_login.current_user.email
 
     if edit_profile_form.validate_on_submit():
-        flask.flash(gettext('Profile data successfully updated'))
+        flask.flash(gettext('Profile data successfully updated'), "success")
 
     return flask.render_template("edit_profile.html", form=edit_profile_form)

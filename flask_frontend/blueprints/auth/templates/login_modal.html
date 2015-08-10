@@ -3,7 +3,7 @@
 <div class="hidden">
   <form method="POST" action="{{ url_for('auth.login') }}">
     {{ g.login_form.hidden_tag() }}
-    {% for error in form.server_errors %}
+    {% for error in g.login_form.server_errors %}
       <div class="label label-danger">
         {{ error }}
       </div>
