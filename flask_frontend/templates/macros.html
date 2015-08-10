@@ -1,18 +1,59 @@
-{% macro render_field(field, container_class='form-group', field_class='form-control') %}
+{% macro render_field(field, with_label=True, outer_class='form-group', class_='form-control') -%}
+  {% set placeholder = '' %}
+  {% if not with_label %}
+    {% set placeholder = field.label.text %}
+  {% endif %}
+  {% set outer_class = outer_class + (' error' if field.errors else '') %}
+  {% set outer_class = outer_class + (' checkbox' if field.type == 'BooleanField' else '') %}
+  {% set class_ = class_ + (' required' if field.flags.required else '') %}
+  {% set class_ = class_ + (' input-file' if field.type == 'FileField' else '') %}
+  <div{% if outer_class.strip() %} class="{{ outer_class.strip() }}"{% endif %}>
+    {% if field.type != 'HiddenField' and field.type !='CSRFTokenField' and field.type != 'BooleanField' and with_label %}
+      <label for="{{ field.id }}" class="control-label">
+        {{ field.label.text }}{% if field.flags.required %} *{% endif %}:
+      </label>
+    {% endif %}
 
-  <div class="{{ container_class }}">
-    {{ field.label }}
-    {{ field(class=field_class)|safe }}
+    {% if field.type == 'BooleanField' %}
+      <label>
+        {{ field(class_=class_, **kwargs) }}
+        {{ field.label.text|safe }}
+      </label>
+    {% else %}
+      {% if field.type == 'SelectField' %}
+        {{ field(class_=class_, **kwargs) }}
+      {% else %}
+        {{ field(class_=class_, placeholder=placeholder, **kwargs) }}
+      {% endif %}
+    {% endif %}
     {% if field.errors %}
-      <ul class="errors">
-        {% for error in field.errors %}
-          <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
+      <span class="error help-inline">{{ field.errors|join(', ') }}</span>
+    {% endif %}
+    {% if field.description %}
+      <p class="help-block">{{ field.description|safe }}</p>
     {% endif %}
   </div>
+{%- endmacro %}
 
-{% endmacro %}
+{% macro render_form(form, action_url='', action_text='Submit', class_='', btn_class='btn btn-default submit', with_labels=True) -%}
+  <form method="POST" action="{{ action_url }}" role="form" class="{{ class_ }}">
+    {{ form.hidden_tag() if form.hidden_tag }}
+    {% for error in form.server_errors %}
+      <div class="alert alert-danger">
+        {{ error }}
+      </div>
+    {% endfor %}
+    {% if caller %}
+      {{ caller() }}
+    {% else %}
+      {% for f in form %}
+        {{ render_field(f, with_label=with_labels) }}
+      {% endfor %}
+      <button type="submit" class="{{ btn_class }}">{{ action_text }} </button>
+    {% endif %}
+  </form>
+{%- endmacro %}
+
 
 {% macro flash_messages() %}
   {% with messages = get_flashed_messages(with_categories=true) %}

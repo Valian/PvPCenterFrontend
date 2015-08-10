@@ -6,33 +6,27 @@
 <div>{{ g.user.name }} is logged in!</div>
 
 {% else %}
-{% from 'macros.html' import render_field %}
+{% from 'macros.html' import render_form, render_field %}
 <div id="registration">
   <div class="container">
     <h1>{{ gettext('Register new account') }}</h1>
     <div class="row">
       <div class="col-sm-7">
-        <form method="POST" action="{{ url_for('auth.register') }}">
-          {{ form.hidden_tag() }}
-          {% for error in form.server_errors %}
-          <div class="alert alert-danger">
-            {{ error }}
+        {%  call render_form(form, action_url=url_for('auth.register'), action_text=gettext('Register')) %}
+        {{ render_field(form.login) }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.password) }}
+        {{ render_field(form.password_again) }}
+        <div class="row">
+          <div class="col-md-6 col-xs-7">
+            {{ render_field(form.rules, class_='', outer_class='') }}
+            {{ render_field(form.spam, class_='', outer_class='') }}
           </div>
-          {% endfor %}
-          {{ render_field(form.login) }}
-          {{ render_field(form.email) }}
-          {{ render_field(form.password) }}
-          {{ render_field(form.password_again) }}
-          <div class="row">
-            <div class="checkbox col-md-6 col-xs-7">
-              <label><input type="checkbox"> Wyrażam zgodę na <a href="#">regulamin</a></label><br/>
-              <label><input type="checkbox"> Chcę spam na maila</label>
-            </div>
-            <div class="submit col-md-6 col-xs-5">
-                <button type="submit" class="btn btn-default btn-lg pull-right">{{ gettext('Register') }}</button>
-              </div>
+          <div class="submit col-md-6 col-xs-5">
+            <button type="submit" class="btn btn-default btn-lg pull-right">{{ gettext('Register') }}</button>
           </div>
-        </form>
+        </div>
+      {% endcall %}
 
       </div>
       <div class="col-sm-5">
