@@ -68,6 +68,7 @@ ready = ->
 searchWidth = ->
   $('#main-menu .nav').width() - $('.search-toggle').width() - 5 - ($('.search-input input').outerWidth(true) - $('.search-input input').width())
 
+
 stickyNav = ->
   if window.pageYOffset >= 80
     $('#site-header').addClass 'sticky'
@@ -80,4 +81,3 @@ $(window).scroll ->
   stickyNav()
 $(document).on 'click', '.search-toggle a', ->
   $('.search-input input').width searchWidth()
-  #console.log(searchWidth());

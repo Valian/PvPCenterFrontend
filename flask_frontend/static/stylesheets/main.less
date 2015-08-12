@@ -109,7 +109,7 @@ textarea {
 		> li {
 			float: none;
 
-			>a {
+			> a {
 				padding-top: 10px;
 				padding-bottom: 10px;
 				line-height: 25px;
@@ -137,11 +137,20 @@ body {
 		> li {
 			float: left;
 
-			> a {
+			> a, > form {
 				padding: 15px 10px;
 
 				@media (min-width: 992px) {
 					padding: 15px 15px;
+				}
+			}
+
+			> form {
+				button {
+					border: none;
+					padding: 0;
+
+					&:extend(a all);
 				}
 			}
 		}
@@ -211,11 +220,18 @@ body {
 
 	.menu-toggle {
 		font-size: 17px;
+		line-height: 17px;
 		float: right;
 		margin: 30px 10px;
 		border: none;
 		border-radius: 0;
 		padding: 0;
+
+		> form {
+			button {
+				&:extend(#site-header .account-menu.logged-in > li > form button all);
+			}
+		}
 	}
 }
 
@@ -338,6 +354,14 @@ body {
 	.open > a:hover,
 	.open > a:focus {
 		background-color: transparent;
+	}
+}
+
+.navbar-nav {
+	> li {
+		> a {
+			line-height: 25px;
+		}
 	}
 }
 
@@ -815,7 +839,7 @@ body {
 
 	> .row > .content, 
 	> .content {
-		width: calc(100% - 150px);
+		width: calc(~"100% - 150px");
 		padding: 0;
 		position: relative;
 

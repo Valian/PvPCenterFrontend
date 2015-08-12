@@ -4,7 +4,7 @@
 import wtforms
 
 from flask_babel import gettext
-from wtforms.validators import Length, Email, Regexp
+from wtforms.validators import Length, Email, Regexp, DataRequired, EqualTo
 
 from .user import User
 from flask_frontend.common.api_helper import ApiForm
@@ -30,17 +30,15 @@ class RegisterForm(ApiForm):
     login = wtforms.StringField(gettext('Login'), validators=[
         Length(8, message=gettext('Min %(num)d characters', num=8)),
         Regexp(r'^[\w_]+$', message=gettext("Only alphanumeric characters!"))])
-    email = wtforms.StringField(gettext('Email'), validators=[Email(message=gettext('Invalid email'))])
+    email = wtforms.StringField(gettext('Email'), validators=[
+        Email(message=gettext('Invalid email'))])
     password = wtforms.PasswordField(gettext('Password'), validators=[
         Length(8, message=gettext('Min %(num)d characters', num=8))])
     password_again = wtforms.PasswordField(gettext('Repeat password'), validators=[
-        Length(8, message=gettext('Min %(num)d characters', num=8))])
-
-    def _additional_validation(self):
-        if self.password.data != self.password_again.data:
-            self.password_again.errors.append(gettext('Passwords do not match!'))
-            return False
-        return True
+        EqualTo('password', message=gettext('Passwords must match'))])
+    rules = wtforms.BooleanField(gettext("Do you accept our rules"), validators=[
+        DataRequired('')])
+    spam = wtforms.BooleanField(gettext("Do you want spam"))
 
     def _handle_errors(self, errors):
         pass

@@ -1,19 +1,56 @@
 {% macro user_basic_info(user) %}
+  <h3>Nickname</h3>
+  <p>{{ user.name }}</p>
 
-  <div>
-    <img src="{{ user.email | gravatar }}">
-  </div>
-  <div>
-    <h1>{{ user.name }}</h1>
-  </div>
-  <div>
-    <h2>{{ user.email }}</h2>
+  <h3>Nickname</h3>
+  <p>{{ user.email }}</p>
+
+  <h3>Ranking</h3>
+  <p>#123</p>
+
+  <h3>Narodowość</h3>
+  <p>Polska</p>
+
+  <h3>Płeć</h3>
+  <p>Mężczyzna</p>
+
+  <h3>Wiek</h3>
+  <p>25</p>
+
+  <h3>O sobie</h3>
+  <p>Jestem pro elo elo</p>
+
+  <h3>Zdobyte odznaki</h3>
+  <div class="row icons">
+    <div class="col-md-2"><a href="#"><img src="{{ url_for('static', filename='images/badge.jpg') }}"></a></div>
+    <div class="col-md-2"><a href="#"><img src="{{ url_for('static', filename='images/badge.jpg') }}"></a></div>
+    <div class="col-md-2"><a href="#"><img src="{{ url_for('static', filename='images/badge.jpg') }}"></a></div>
+    <div class="col-md-2"><a href="#"><img src="{{ url_for('static', filename='images/badge.jpg') }}"></a></div>
   </div>
 
+  <h3>Gry</h3>
+  {{ user_game_ownerships(g.user) }}
+
+  <h3>Dodatkowe informacje</h3>
+  <div class="moreinfo">
+    <h4>Facebook</h4>
+    <a href="#">facebook.com/fnatic</a>
+    <h4>Twitch.tv</h4>
+    <a href="#">twitch.tv/fnatic</a>
+    <h4>Steam</h4>
+    <a href="#">steam.com/fnatic</a>
+    <h4>Januszowo</h4>
+    <a href="#">januszowo.cebula/fnatic</a>
+  </div>
 {% endmacro %}
 
 {% macro user_game_ownerships(user) %}
-
+  <!-- <div class="row icons">
+    <div class="col-md-2"><a href="#"><img src="assets/lol-icon.png"></a></div>
+    <div class="col-md-2"><a href="#"><img src="assets/cod-icon.png"></a></div>
+    <div class="col-md-2"><a href="#"><img src="assets/hearthstone-icon.png"></a></div>
+    <div class="col-md-2"><a href="#"><img src="assets/csgo-icon.png"></a></div>
+  </div> -->
   <table class="table table-striped">
     <tr>
       <th class="col">Game</th>

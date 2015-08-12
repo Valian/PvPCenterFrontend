@@ -1,12 +1,41 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
 {%  from 'user_macros.html' import user_basic_info, user_game_ownerships %}
-<div class="col-md-6">
-  {{  user_basic_info(user) }}
-  {{ user_game_ownerships(g.user) }}
+
+<div class="profile player col-md-9">
+	<div class="row">
+		<div class="menu">
+			<div class="logo">
+				<img class="avatar" src="{{ g.user.email | gravatar }}" alt="" />
+				<img class="flag" src="{{ url_for('static', filename='images/flag.png') }}" alt="" />
+				<h3>{{ g.user.name }}</h3>
+			</div>
+			<ul>
+				<li><a href="player.html" class="active">Profil</a></li>
+				<li><a href="player-friends.html">Znajomi</a></li>
+				<li><a href="player-match.html">Mecze</a></li>
+				<li><a href="player-leaguesandtournaments.html">Ligi i turnieje</a></li>
+				<li><hr></li>
+				<li><a href="team.html">Fnatic</a></li>
+			</ul>
+		</div>
+		<div class="content">
+		  <h1 class="name">
+		    <span>Profil użytkownika {{g.user.name}}</span>
+		    <small class="watch">
+		      <a href="#">
+		        <i class="fa fa-eye"></i>
+		        13
+		      </a>
+		    </small>
+		  </h1>
+		  <div class="extra-menu">
+				<a href="#" class="fight"><img src="{{ url_for('static', filename='images/challenge.png') }}"></a>
+			</div>
+			
+			{{ user_basic_info(g.user) }}
+		</div>
+	</div>
 </div>
-
-
 {% endblock content %}
