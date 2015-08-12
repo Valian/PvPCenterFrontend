@@ -10,7 +10,7 @@ import factory.fuzzy as fuzzy
 import re
 from faker import Factory as FakerFactory
 
-from models import User, Game, ModelList, UserGameOwnership
+from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule
 from api import ApiDispatcherBase, ApiResult
 
 
@@ -49,12 +49,29 @@ class ApiDispatcherMock(ApiDispatcherBase):
         return params
 
 
+class GameRuleEntryFactory(factory.Factory):
+    class Meta:
+        model = GameRuleEntry
+
+    key = factory.fuzzy.FuzzyChoice(['Main rule', 'Secondary rule', 'Fucking rule', 'Undefined', 'Krystiansoon'])
+    value = factory.Iterator(['Blah', 'Bleh', 'Shiet'])
+
+
+class GameRuleFactory(factory.Factory):
+    class Meta:
+        model = GameRule
+
+    name = factory.Iterator(['Basic info', 'Gamer experience', 'Allowed map', 'Special'])
+    entries = factory.List([factory.SubFactory(GameRuleEntryFactory) for _ in xrange(3)])
+
+
 class GameFactory(factory.Factory):
     class Meta:
         model = Game
 
-    id = factory.Sequence(lambda x: x)
-    name = factory.LazyAttribute(lambda x: faker.word())
+    id = factory.Iterator([1, 2, 3, 4, 5])
+    name = factory.LazyAttribute(lambda o: ['League of Legends', 'Dota', 'CS:GO', 'Minecraft', 'Worms'][o.id % 5])
+    rules = factory.List([factory.SubFactory(GameRuleFactory) for _ in xrange(3)])
 
 
 class UserGameOwnershipFactory(factory.Factory):

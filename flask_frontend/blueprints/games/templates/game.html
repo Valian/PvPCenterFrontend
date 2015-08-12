@@ -32,35 +32,24 @@
 
 			  <!-- Nav tabs -->
 			  <ul class="nav nav-stacked col-sm-4" role="tablist">
-			    <li role="presentation" class="active"><a href="#lol-rules-1" aria-controls="lol-rules-1" role="tab" data-toggle="tab">Lol rules 1</a></li>
-					<li role="presentation"><a href="#lol-rules-2" aria-controls="lol-rules-2" role="tab" data-toggle="tab">Lol rules 2</a></li>
-					<li role="presentation"><a href="#lol-rules-3" aria-controls="lol-rules-3" role="tab" data-toggle="tab">Lol rules 3</a></li>
-					<li role="presentation"><a href="#lol-rules-4" aria-controls="lol-rules-4" role="tab" data-toggle="tab">Lol rules 4</a></li>
-					<li role="presentation"><a href="#lol-rules-5" aria-controls="lol-rules-5" role="tab" data-toggle="tab">Lol rules 5</a></li>
-					<li role="presentation"><a href="#lol-rules-6" aria-controls="lol-rules-6" role="tab" data-toggle="tab">Lol rules 6</a></li>
+                {% for rule in game.rules %}
+                  <li role="presentation" {{ 'class=active' if loop.first else '' }}>
+                    <a href="#rules-{{ loop.index }}" aria-controls="lol-rules-{{ loop.index }}" role="tab" data-toggle="tab">{{ rule.name }}</a>
+                  </li>
+                {% endfor %}
 			  </ul>
 
 			  <!-- Tab panes -->
 			  <div class="tab-content col-sm-8">
-			    <div role="tabpanel" class="tab-pane active" id="lol-rules-1">
-			    	<h4>Mapa</h4>
-			    	<p>Howling Abyss</p>
-
-			    	<h4>Gracze</h4>
-			    	<p>1 vs 1</p>
-
-			    	<h4>Play Mode</h4>
-			    	<p>BO1</p>
-
-			    	<h4>Pick Mode</h4>
-			    	<p>Blind Pick</p>
-			    </div>
-			    <div role="tabpanel" class="tab-pane" id="lol-rules-2">2</div>
-			    <div role="tabpanel" class="tab-pane" id="lol-rules-3">3</div>
-			    <div role="tabpanel" class="tab-pane" id="lol-rules-4">4</div>
-			    <div role="tabpanel" class="tab-pane" id="lol-rules-5">5</div>
-			    <div role="tabpanel" class="tab-pane" id="lol-rules-6">6</div>
-			  </div>
+                  {% for rule in game.rules %}
+                  <div role="tabpanel" class="tab-pane {{ 'active' if loop.first else '' }}" id="rules-{{ loop.index }}">
+                      {% for entry in rule.entries %}
+                        <h4>{{ entry.key }}</h4>
+                        <p>{{ entry.value }}</p>
+                      {% endfor %}
+                  </div>
+                  {% endfor %}
+                </div>
 
 			</div>
 			

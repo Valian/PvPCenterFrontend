@@ -23,6 +23,15 @@ class AuthTests(AppTestCase):
         self.assertEqual(user, logged_user)
         self.assertTrue(logged_user.is_authenticated())
 
+    @mock.patch('flask_frontend.blueprints.auth.views.flask_login')
+    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
+    def test_login_remember_me(self, api_mock, flask_login_mock):
+        response, user = self.login_user(api_mock, remember=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(api_mock.login.post.called)
+        self.assertTrue(flask_login_mock.login_user.called)
+        self.assertEqual(mock.call(user, remember=True), flask_login_mock.login_user.call_args)
+
     @parameterized.expand([
         ({'email': "dupadupa.com", 'password': "password"}, 'Invalid'),
         ({'email': "dupa@dupa", 'password': "password"}, 'Invalid'),

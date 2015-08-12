@@ -63,20 +63,63 @@ class ModelList(list):
                 raise UnableToParseException(ModelList, e)
 
 
+class GameRuleEntry(ModelBase):
+
+    __slots__ = ('key', 'value')
+
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json['key'], json['value'])
+
+    def __str__(self):
+        return '{0} - {1}'.format(self.key, self.value)
+
+    def to_json(self):
+        return {'key': self.key, 'value': self.value}
+
+
+class GameRule(ModelBase):
+
+    __slots__ = ('name', 'entries')
+
+    def __init__(self, name, entries):
+        self.name = name
+        self.entries = entries
+
+    @classmethod
+    def _from_json(cls, json):
+        entries = map(GameRuleEntry.from_json, json['entries'])
+        return cls(json['name'], entries)
+
+    def __str__(self):
+        return 'Rule {0}: {1}'.format(self.name, ', '.join(map(str, self.entries)))
+
+    def to_json(self):
+        entries_json = map(GameRuleEntry.to_json, self.entries)
+        return {'name': self.name, 'entries': entries_json}
+
+
 class Game(ModelBase):
 
     __slots__ = ('id', 'name')
 
-    def __init__(self, id, name):
+    def __init__(self, id, name, rules):
         self.id = id
         self.name = name
+        self.rules = rules
 
     @classmethod
     def _from_json(cls, json):
-        return cls(json['id'], json['name'])
+        rules = map(GameRule.from_json, json.get('rules', []))
+        return cls(json['id'], json['name'], rules)
 
     def to_json(self):
-        return {'id': self.id, 'name': self.name}
+        rules = map(GameRule.to_json, self.rules)
+        return {'id': self.id, 'name': self.name, 'rules': rules}
 
     def __str__(self):
         return '[Game {0}:{1}]'.format(self.id, self.name)
