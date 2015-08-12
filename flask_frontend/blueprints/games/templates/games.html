@@ -1,5 +1,22 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
+<div class="games col-md-9">
+	<h1>{{ gettext("Games") }}</h1>
+	<div class="row">
+	{% for game in g.games %}
+		<div class="col-sm-6 col-md-4 game">
+			<a href="{{ url_for('games.game_view', game_id = game.id) }}" style="background-image: url({{ url_for('static', filename='images/game.jpg') }});">
+				<div class="info">
+					<h3>{{ game.name }}</h3>
+					<div class="row">
+						<div class="col-xs-6"><i class="fa fa-calendar"></i> 5</div>
+						<div class="col-xs-6"><i class="fa fa-trophy"></i> 7</div>
+					</div>
+				</div>
+			</a>
+		</div>
+  {%  endfor %}
+	</div>
+</div>
 {% endblock content %}

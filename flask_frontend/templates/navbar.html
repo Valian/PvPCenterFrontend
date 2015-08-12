@@ -4,7 +4,7 @@
     <nav class="navigation collapse navbar-collapse" id="main-menu">
       <ul class="nav navbar-nav">
         <li class="dropdown hidden-xs hidden-sm">
-          <a aria-expanded="false" href="/games">
+          <a aria-expanded="false" href="{{ url_for('games.games_view') }}">
             {{ gettext('Games') }}
             <span class="caret"></span>
           </a>
@@ -17,7 +17,7 @@
           </ul>
         </li>
         <li class="visible-xs-block visible-sm-block">
-          <a href="#">
+          <a href="{{ url_for('games.games_view') }}">
             {{ gettext('Games') }}
           </a>
         </li>

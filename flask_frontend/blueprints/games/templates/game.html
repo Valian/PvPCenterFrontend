@@ -1,5 +1,72 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<div class="profile game col-md-9">
+	<div class="row">
+		<div class="menu">
+			<div class="logo">
+				<img class="avatar" src="{{ url_for('static', filename='images/lol-icon.png') }}" alt="" />
+			</div>
+			<ul>
+				<li><a href="#" class="active">Informacje</a></li>
+				<li><a href="#">Ligi i turnieje</a></li>
+				<li><a href="#">Media</a></li>
+			</ul>
+		</div>
+		<div class="content">
+			<h1 class="name">
+				<span>{{ game.name }}</span>
+				<small class="watch">
+					<a href="#">
+						<i class="fa fa-users"></i>
+						666
+					</a>
+				</small>
+			</h1>
+
+			<h3>Opis gry</h3>
+			<p>Butcher locavore vegan chillwave fingerstache. Post-ironic meditation artisan Wes Anderson polaroid. Fap tofu High Life seitan raw denim. Readymade 90's keytar, viral kale chips gastropub pork belly Portland hoodie paleo. Slow-carb bicycle rights tilde, bespoke leggings kitsch health goth meditation brunch trust fund Vice cardigan polaroid whatever Neutra. Meh PBR&B before they sold out art party polaroid quinoa, Wes Anderson sartorial ennui skateboard Schlitz. Direct trade before they sold out biodiesel flannel, asymmetrical Echo Park swag salvia.</p>
+
+			<h3>Zasady</h3>
+			<div role="tabpanel" class="row rules">
+
+			  <!-- Nav tabs -->
+			  <ul class="nav nav-stacked col-sm-4" role="tablist">
+			    <li role="presentation" class="active"><a href="#lol-rules-1" aria-controls="lol-rules-1" role="tab" data-toggle="tab">Lol rules 1</a></li>
+					<li role="presentation"><a href="#lol-rules-2" aria-controls="lol-rules-2" role="tab" data-toggle="tab">Lol rules 2</a></li>
+					<li role="presentation"><a href="#lol-rules-3" aria-controls="lol-rules-3" role="tab" data-toggle="tab">Lol rules 3</a></li>
+					<li role="presentation"><a href="#lol-rules-4" aria-controls="lol-rules-4" role="tab" data-toggle="tab">Lol rules 4</a></li>
+					<li role="presentation"><a href="#lol-rules-5" aria-controls="lol-rules-5" role="tab" data-toggle="tab">Lol rules 5</a></li>
+					<li role="presentation"><a href="#lol-rules-6" aria-controls="lol-rules-6" role="tab" data-toggle="tab">Lol rules 6</a></li>
+			  </ul>
+
+			  <!-- Tab panes -->
+			  <div class="tab-content col-sm-8">
+			    <div role="tabpanel" class="tab-pane active" id="lol-rules-1">
+			    	<h4>Mapa</h4>
+			    	<p>Howling Abyss</p>
+
+			    	<h4>Gracze</h4>
+			    	<p>1 vs 1</p>
+
+			    	<h4>Play Mode</h4>
+			    	<p>BO1</p>
+
+			    	<h4>Pick Mode</h4>
+			    	<p>Blind Pick</p>
+			    </div>
+			    <div role="tabpanel" class="tab-pane" id="lol-rules-2">2</div>
+			    <div role="tabpanel" class="tab-pane" id="lol-rules-3">3</div>
+			    <div role="tabpanel" class="tab-pane" id="lol-rules-4">4</div>
+			    <div role="tabpanel" class="tab-pane" id="lol-rules-5">5</div>
+			    <div role="tabpanel" class="tab-pane" id="lol-rules-6">6</div>
+			  </div>
+
+			</div>
+			
+		</div>
+	</div>
+</div>
+
 
 {% endblock content %}
