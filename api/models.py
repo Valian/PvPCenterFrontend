@@ -146,23 +146,46 @@ class UserGameOwnership(ModelBase):
 
 class User(ModelBase):
 
-    def __init__(self, id, name, email, token, game_ownerships):
+    def __init__(self, id, name, email, token, ranking, nationality, sex, age, description, game_ownerships):
+        self.ranking = ranking
         self.id = id
         self.name = name
         self.email = email
         self.token = token
         self.game_ownerships = game_ownerships
+        self.description = description
+        self.age = age
+        self.sex = sex
+        self.nationality = nationality
 
     @classmethod
     def _from_json(cls, json):
         game_ownerships = [UserGameOwnership.from_json(go) for go in json.get('game_ownerships', [])]
-        return cls(json['id'], json['nickname'], json['email'], json.get('access_token'), game_ownerships)
+        return cls(
+            id=json['id'],
+            name=json['nickname'],
+            email=json['email'],
+            token=json.get('access_token'),
+            ranking=json['ranking'],
+            nationality=json.get('country'),
+            sex=json.get('sex'),
+            age=json.get('age'),
+            description=json.get('description'),
+            game_ownerships=game_ownerships)
 
     def to_json(self):
         game_ownerships = [go.to_json() for go in self.game_ownerships]
         return {
-            'id': self.id, 'nickname': self.name, 'email': self.email, 'access_token': self.token,
-            'game_ownerships': game_ownerships}
+            'id': self.id,
+            'nickname': self.name,
+            'email': self.email,
+            'access_token': self.token,
+            'game_ownerships': game_ownerships,
+            'country': self.nationality,
+            'sex': self.sex,
+            'age': self.age,
+            'description': self.description,
+            'ranking': self.ranking}
 
     def __str__(self):
         return '[User {0}: {1} - {2}, owned games: {3}]'.format(self.id, self.name, self.email, self.game_ownerships)

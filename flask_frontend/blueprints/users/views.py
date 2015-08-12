@@ -3,12 +3,20 @@
 import flask
 import flask_login
 import flask_gravatar
-
 from flask_babel import gettext
 
 from . import users_blueprint
+from flask_frontend.common.const import SEX
 from flask_frontend.blueprints.users.forms import EditProfileForm
 from flask_frontend.common.api_helper import get_or_404
+
+
+def sex_to_text(value):
+    if value == SEX.MALE:
+        return gettext('Male')
+    if value == SEX.FEMALE:
+        return gettext('Female')
+    return 'Not specified'
 
 
 @users_blueprint.record_once
@@ -16,11 +24,13 @@ def init(state):
     app = state.app
     gravatar = flask_gravatar.Gravatar()
     gravatar.init_app(app)
+    app.jinja_env.filters['sex'] = sex_to_text
 
 
 @users_blueprint.route("/<int:user_id>")
 def profile_view(user_id):
     user = get_or_404(users_blueprint.api.user.get, user_id)
+
     return flask.render_template("user_profile.html", user=user)
 
 

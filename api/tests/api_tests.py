@@ -35,13 +35,15 @@ class ModelTests(TestCase):
             "email": "test@test.com",
             "nickname": "testtest",
             "settings_mask": 0,
-            "access_token": "Ttq3SYiy-zVsy7Wm8nv4"
+            "access_token": "Ttq3SYiy-zVsy7Wm8nv4",
+            "ranking": 125
         }
         user = User.from_json(data)
         self.assertEqual(data['id'], user.id)
         self.assertEqual(data['nickname'], user.name)
         self.assertEqual(data['email'], user.email)
         self.assertEqual(data['access_token'], user.token)
+        self.assertEqual(data['ranking'], user.ranking)
 
     @parameterized.expand([(None,), ([],), ({},), ({'test': 'test'},)])
     def test_bad_data(self, data):

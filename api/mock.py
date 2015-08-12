@@ -92,6 +92,11 @@ class UserFactory(factory.Factory):
     name = factory.LazyAttribute(lambda x: random_with_seed(faker.provider('faker.providers.person').first_names, x.id))
     email = factory.LazyAttribute(lambda o: '{0}@mock.com'.format(o.name.replace(' ', '_')))
     token = fuzzy.FuzzyText(length=15)
+    nationality = factory.LazyAttribute(lambda o: ['pl', 'en'][o.id % 2])
+    sex = factory.LazyAttribute(lambda o: [None, 1, 2][o.id % 3])
+    age = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 20 + 10)
+    description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
+    ranking = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 100 + 30)
     game_ownerships = factory.List([factory.SubFactory(UserGameOwnershipFactory) for _ in xrange(random.randint(2, 5))])
 
 

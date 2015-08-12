@@ -1,26 +1,26 @@
 {% macro user_basic_info(user) %}
-  <h3>Nickname</h3>
+  <h3>{{ gettext('Nickname') }}</h3>
   <p>{{ user.name }}</p>
 
-  <h3>Nickname</h3>
+  <h3>{{ gettext('Email') }}</h3>
   <p>{{ user.email }}</p>
 
-  <h3>Ranking</h3>
-  <p>#123</p>
+  <h3>{{ gettext('Ranking') }}</h3>
+  <p>#{{ user.ranking }}</p>
 
-  <h3>Narodowość</h3>
-  <p>Polska</p>
+  <h3>{{ gettext('Nationality') }}</h3>
+  <p>{{ user.nationality }}</p>
 
-  <h3>Płeć</h3>
-  <p>Mężczyzna</p>
+  <h3>{{ gettext('Sex') }}</h3>
+  <p>{{ user.sex | sex }}</p>
 
-  <h3>Wiek</h3>
-  <p>25</p>
+  <h3>{{ gettext('Age') }}</h3>
+  <p>{{ user.age }}</p>
 
-  <h3>O sobie</h3>
-  <p>Jestem pro elo elo</p>
+  <h3>{{ gettext('About me') }}</h3>
+  <p>{{ user.description if user.description else gettext('No description') }}</p>
 
-  <h3>Zdobyte odznaki</h3>
+  <h3>{{ gettext('Badges') }}</h3>
   <div class="row icons">
     <div class="col-md-2"><a href="#"><img src="{{ url_for('static', filename='images/badge.jpg') }}"></a></div>
     <div class="col-md-2"><a href="#"><img src="{{ url_for('static', filename='images/badge.jpg') }}"></a></div>
