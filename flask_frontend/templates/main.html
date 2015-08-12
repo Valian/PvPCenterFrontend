@@ -3,10 +3,7 @@
 {% block outer_content %}
 {% include 'header.html' %}
 
-{% if not g.user.is_authenticated() %}
-{% include 'login.html' %}
 
-{% endif %}
 
 <div class="content">
   <div class="container">

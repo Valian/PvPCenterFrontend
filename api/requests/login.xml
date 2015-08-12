@@ -2,9 +2,9 @@
   <option name="biscuits">
     <list />
   </option>
-  <option name="httpMethod" value="GET" />
+  <option name="httpMethod" value="POST" />
   <option name="urlBase" value="http://pvpc-core.herokuapp.com" />
-  <option name="urlPath" value="/users" />
+  <option name="urlPath" value="/users/login" />
   <option name="headers">
     <list>
       <KeyValuePair>
@@ -19,15 +19,19 @@
         <option name="key" value="Authorization" />
         <option name="value" value="Basic cHZwYzpwZWZhbHBlOTg3" />
       </KeyValuePair>
+      <KeyValuePair>
+        <option name="key" value="Content-Type" />
+        <option name="value" value="application/json" />
+      </KeyValuePair>
     </list>
   </option>
   <option name="parameters">
     <list />
   </option>
   <option name="parametersEnabled" value="true" />
-  <option name="haveTextToSend" value="false" />
+  <option name="haveTextToSend" value="true" />
   <option name="haveFileToSend" value="false" />
   <option name="isFileUpload" value="false" />
-  <option name="textToSend" value="{     &quot;user&quot;: {         &quot;email&quot;: &quot;dupa@dupa.com&quot;,          &quot;nickname&quot;: &quot;ja&quot;,          &quot;password&quot;: &quot;testtest&quot;      } }" />
+  <option name="textToSend" value="{&quot;email&quot;: &quot;dupa@dupa.com&quot;, &quot;password&quot;: &quot;testtest&quot;}" />
   <option name="filesToSend" value="" />
 </RestClientRequest>

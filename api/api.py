@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
+import urllib
 
 from requests import RequestException
 
@@ -84,8 +85,11 @@ class Resource(object):
         self.dispatcher = dispatcher
         self.url = url
 
-    def create_url(self, **kwargs):
-        return self.url.format(**kwargs)
+    def create_url(self, params=None, **kwargs):
+        url = self.url.format(**kwargs)
+        if params:
+            url = url + '?{0}'.format(urllib.urlencode(params))
+        return url
 
     def _get_request(self, endpoint, model=None, **kwargs):
         return self.dispatcher.make_request('GET', endpoint, model, **kwargs)
@@ -135,6 +139,12 @@ class User(Resource):
         endpoint = self.create_url(user_id=user_id)
         return self._get_request(endpoint, model=model)
 
+    def patch(self, user_id, token, nickname, email, model=UserModel):
+        params = {"access_token": token}
+        data = {"nickname": nickname, "email": email}
+        endpoint = self.create_url(params=params, user_id=user_id)
+        return self._patch_request(endpoint, model=model, data=data)
+
 
 class Login(Resource):
 
@@ -147,7 +157,8 @@ class Login(Resource):
 class GameOwnerships(Resource):
 
     def get(self, id, token, model=ModelList.For(UserGameOwnership)):
-        endpoint = self.create_url(user_id=id, token=token)
+        params = {"user_id": id, "access_token": token}
+        endpoint = self.create_url(params=params)
         return self._get_request(endpoint, model=model)
 
 
@@ -169,6 +180,5 @@ class PvPCenterApi(object):
         self.users = Users(dispatcher, self.USERS_ENDPOINT)
         self.user = User(dispatcher, self.USERS_ENDPOINT + '/{user_id}')
         self.login = Login(dispatcher, self.USERS_ENDPOINT + '/login')
-        self.game_ownerships = GameOwnerships(
-            dispatcher, self.GAME_OWNERSHIPS_ENDPOINT + '?access_token={token}&user_id={user_id}')
+        self.game_ownerships = GameOwnerships(dispatcher, self.GAME_OWNERSHIPS_ENDPOINT)
 

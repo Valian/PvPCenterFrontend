@@ -1,21 +1,8 @@
-{% macro render_field(field, container_class='form-group', field_class='form-control') %}
-
-  <div class="{{ container_class }}">
-    {{ field.label }}
-    {{ field(class=field_class)|safe }}
-    {% if field.errors %}
-    <ul class=errors>
-    {% for error in field.errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-  </div>
-
-{% endmacro %}
-
 {% macro user_basic_info(user) %}
 
+  <div>
+    <img src="{{ user.email | gravatar }}">
+  </div>
   <div>
     <h1>{{ user.name }}</h1>
   </div>

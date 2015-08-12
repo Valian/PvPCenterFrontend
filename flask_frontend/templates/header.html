@@ -14,6 +14,7 @@
           </a>
           <ul class="nav navbar-nav navbar-right account-menu sticky-hidden hidden-xs hidden-sm">
             {% if not g.user.is_authenticated() %}
+            {% include 'login_modal.html' %}
             <li>
               <a href="#" data-toggle="modal" data-target="#myModal">
                 {{ gettext('Login') }}
@@ -38,7 +39,7 @@
             </form>
             </li>
             <li>
-              <a href="{{ url_for('auth.my_profile_view') }}">
+              <a href="{{ url_for('users.my_profile_view') }}">
                 {{ gettext('Profile') }}
               </a>
             </li>

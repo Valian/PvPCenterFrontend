@@ -4,7 +4,6 @@
 import flask_login
 import flask
 
-from flask_frontend.common.api_helper import get_or_404
 from .forms import LoginForm, RegisterForm
 from .user import User
 from . import auth_blueprint
@@ -28,16 +27,16 @@ def init(state):
 @auth_blueprint.before_app_request
 def before_app_request():
     flask.g.user = flask_login.current_user
+    flask.g.login_form = LoginForm(auth_blueprint.api)
 
 
 @auth_blueprint.route("/login", methods=['GET', 'POST'])
 def login():
-    login_form = LoginForm(auth_blueprint.api)
-    if login_form.validate_on_submit():
-        flask_login.login_user(login_form.result)
+    if flask.g.login_form.validate_on_submit():
+        flask_login.login_user(flask.g.login_form.result)
         return flask.redirect(flask.url_for('index'))
 
-    return flask.render_template("login.html", form=login_form)
+    return flask.render_template("login.html", form=flask.g.login_form)
 
 
 @auth_blueprint.route("/logout", methods=['POST'])
@@ -55,15 +54,3 @@ def register():
         return flask.redirect(flask.url_for('index'))
 
     return flask.render_template("register.html", form=register_form)
-
-
-@auth_blueprint.route("/<int:user_id>")
-def profile_view(user_id):
-    user = get_or_404(auth_blueprint.api.user.get, user_id)
-    return flask.render_template("user_profile.html", user=user)
-
-
-@auth_blueprint.route("/my_profile")
-@flask_login.login_required
-def my_profile_view():
-    return flask.render_template("my_profile.html")
