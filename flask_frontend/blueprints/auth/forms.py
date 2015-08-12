@@ -15,6 +15,7 @@ class LoginForm(ApiForm):
     email = wtforms.StringField(gettext('Email'), validators=[Email(message=gettext('Invalid email'))])
     password = wtforms.PasswordField(gettext('Password'), validators=[
         Length(8, message=gettext('Min %(num)d characters', num=8))])
+    remember_me = wtforms.BooleanField(gettext('Remember me'), default=False)
 
     def _handle_errors(self, errors):
         self.email.errors.extend(errors.get_errors_for_field('email'))

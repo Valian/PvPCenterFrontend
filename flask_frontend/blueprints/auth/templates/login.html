@@ -1,9 +1,9 @@
 {% extends 'main.html' %}
 
 {% block content %}
-{% if g.user.is_authenticated() %}
+{% if current_user.is_authenticated() %}
 
-<div>{{ g.user.name }} is logged in!</div>
+<div>{{ current_user.name }} is logged in!</div>
 
 {% else %}
 {% from 'macros.html' import render_form %}

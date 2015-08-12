@@ -21,19 +21,19 @@ class UsersTests(AppTestCase):
 
     def test_my_profile_error_without_login(self, api_mock):
         self.login_user(api_mock)
-        response = self.client.get(url_for('users.my_profile_view'), follow_redirects=False)
+        response = self.client.get(url_for('users.my_profile_view'))
         self.assertEqual(response.status_code, 200)
 
     def test_my_profile_pass_when_logged(self, api_mock):
         return_user = create_mock_for(User)
         api_mock.user.get.return_value = ApiResult(data=return_user)
-        response = self.client.get(url_for('users.my_profile_view'), follow_redirects=False)
+        response = self.client.get(url_for('users.my_profile_view'))
         self.assertEqual(response.status_code, 302)
 
     def test_my_profile_edit_fails_without_login(self, api_mock):
         return_user = create_mock_for(User)
         api_mock.user.get.return_value = ApiResult(data=return_user)
-        response = self.client.get(url_for('users.edit_profile_view'), follow_redirects=False)
+        response = self.client.get(url_for('users.edit_profile_view'))
         self.assertEqual(response.status_code, 302)
 
     def test_my_profile_edit_pass_when_logged(self, api_mock):
@@ -48,7 +48,7 @@ class UsersTests(AppTestCase):
         nick = "testtest"
         email = "test@test.com"
         data = {"nickname": nick, "email": email}
-        response = self.client.post(url_for('users.edit_profile_view'), data=data)
+        response = self.client.post(url_for('users.edit_profile_view'), params=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(api_mock.user.patch.call_count, 1)
         self.assertEqual(api_mock.user.patch.call_args, mock.call(user.id, user.token, nick, email))

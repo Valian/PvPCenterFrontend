@@ -1,7 +1,7 @@
 <div id="site-header">
 	<div class="top-navbar">
 		<div class="container">
-		{% if not g.user.is_authenticated() %}
+		{% if not current_user.is_authenticated() %}
 			<div class="row">
 				<div class="col-md-4 col-sm-6 col-xs-8">
 					<a class="logo" href="/"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo"></a>
@@ -47,8 +47,8 @@
 					<ul class="nav navbar-nav navbar-right account-menu logged-in">
 						<li>
 							<a href="{{ url_for('users.my_profile_view') }}" class="navbar-avatar">
-								<img src="{{ g.user.email | gravatar }}" />
-								<span class="sticky-hidden hidden-xs">{{ g.user.name }}</span>
+								<img src="{{ current_user.email | gravatar }}" />
+								<span class="sticky-hidden hidden-xs">{{ current_user.name }}</span>
 							</a>
 						</li>
 						<li>
@@ -63,19 +63,19 @@
 							<ul class="dropdown-menu" role="menu">
 								<li class="nav-message navbar-avatar"><a href="#">
 									<span class="time">10:21</span>
-									<img src="assets/member-icon.png" />
+									<img src="{{  url_for('static', filename='images/member-icon.png') }}" />
 									<span>PashaBiceps</span>
 									<p>Fingerstache health goth direct trade meditation, wayfarers twee Neutra bespoke sriracha mumblecore meggings Vice 3 wolf moon Intelligentsia four dollar toast. Asymmetrical kogi banh mi, iPhone fingerstache semiotics salvia jean shorts swag skateboard trust fund farm-to-table. McSweeney's keffiyeh ugh, plaid chia PBR banh mi small batch ethical selfies synth vinyl wolf retro. Jean shorts 90's +1 hashtag typewriter pug, synth Pinterest Pitchfork Kickstarter. Authentic street art banjo, biodiesel slow-carb typewriter kitsch wolf mustache swag four dollar toast flexitarian Blue Bottle put a bird on it mixtape. Butcher McSweeney's kogi, hoodie Bushwick Williamsburg selfies lo-fi DIY. Listicle XOXO selfies occupy cold-pressed +1.</p>
 								</a></li>
 								<li class="nav-message navbar-avatar"><a href="#">
 									<span class="time">07:21</span>
-									<img src="assets/member-icon.png" />
+									<img src="{{  url_for('static', filename='images/member-icon.png') }}" />
 									<span>PashaBiceps</span> 
 									<p>Lorem ipsum dolor pierdu pierdu</p>
 								</a></li>
 								<li class="nav-message navbar-avatar"><a href="#">
 									<span class="time">Wczoraj</span>
-									<img src="assets/member-icon.png" />
+									<img src="{{  url_for('static', filename='images/member-icon.png') }}" />
 									<span>PashaBiceps</span> 
 									<p>Lorem ipsum dolor pierdu pierdu</p>
 								</a></li>
@@ -89,19 +89,19 @@
 							<ul class="dropdown-menu" role="menu">
 								<li class="nav-message navbar-avatar"><a href="#">
 									<span class="time">10:21</span>
-									<img src="assets/lol-icon.png" />
+									<img src="{{  url_for('static', filename='images/lol-icon.png') }}" />
 									<span>League of Legends</span>
 									<p>Jutro o 21 startuje turniej w którym bierzesz udział</p>
 								</a></li>
 								<li class="nav-message navbar-avatar"><a href="#">
 									<span class="time">10:21</span>
-									<img src="assets/member-icon.png" />
+									<img src="{{  url_for('static', filename='images/member-icon.png') }}" />
 									<span>PashaBiceps</span>
 									<p>Fingerstache health goth direct trade meditation, wayfarers twee Neutra bespoke sriracha mumblecore meggings Vice 3 wolf moon Intelligentsia four dollar toast. Asymmetrical kogi banh mi, iPhone fingerstache semiotics salvia jean shorts swag skateboard trust fund farm-to-table. McSweeney's keffiyeh ugh, plaid chia PBR banh mi small batch ethical selfies synth vinyl wolf retro. Jean shorts 90's +1 hashtag typewriter pug, synth Pinterest Pitchfork Kickstarter. Authentic street art banjo, biodiesel slow-carb typewriter kitsch wolf mustache swag four dollar toast flexitarian Blue Bottle put a bird on it mixtape. Butcher McSweeney's kogi, hoodie Bushwick Williamsburg selfies lo-fi DIY. Listicle XOXO selfies occupy cold-pressed +1.</p>
 								</a></li>
 								<li class="nav-message navbar-avatar"><a href="#">
 									<span class="time">10:21</span>
-									<img src="assets/member-icon.png" />
+									<img src="{{  url_for('static', filename='images/member-icon.png') }}" />
 									<span>PashaBiceps</span>
 									<p>Fingerstache health goth direct trade meditation, wayfarers twee Neutra bespoke sriracha mumblecore meggings Vice 3 wolf moon Intelligentsia four dollar toast. Asymmetrical kogi banh mi, iPhone fingerstache semiotics salvia jean shorts swag skateboard trust fund farm-to-table. McSweeney's keffiyeh ugh, plaid chia PBR banh mi small batch ethical selfies synth vinyl wolf retro. Jean shorts 90's +1 hashtag typewriter pug, synth Pinterest Pitchfork Kickstarter. Authentic street art banjo, biodiesel slow-carb typewriter kitsch wolf mustache swag four dollar toast flexitarian Blue Bottle put a bird on it mixtape. Butcher McSweeney's kogi, hoodie Bushwick Williamsburg selfies lo-fi DIY. Listicle XOXO selfies occupy cold-pressed +1.</p>
 								</a></li>

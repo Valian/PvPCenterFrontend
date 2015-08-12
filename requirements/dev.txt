@@ -5,3 +5,4 @@ mock==1.2.0
 nose-parameterized==0.5.0
 factory-boy==2.5.2
 fake-factory==0.5.2
+Flask-WebTest==0.0.7

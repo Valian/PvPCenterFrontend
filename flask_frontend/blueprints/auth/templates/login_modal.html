@@ -13,19 +13,19 @@
 				<h3 class="login-register-link"><a href="{{ url_for('auth.register') }}">Nie masz konta? Zarejestruj się!</a></h3>
 
 				{% from 'macros.html' import render_form %}
-  			{{ render_form(g.login_form, url_for('auth.login'), action_text=gettext('Log in')) }}
-				
-				<!-- TODO: Dodać pola zapamiętaj mnie i zapomniałem hasła -->
-				<!-- <div class="row">
-					<div class="col-xs-6 checkbox">
-						<label>
-					    	<input type="checkbox" checked> Zapamiętaj mnie
-					    </label>
-					</div>
-					<div class="col-xs-6">
-						<a href="#" class="lost-password">Zapomniałem hasła</a>
-					</div>
-				</div> -->
+  			    {% call render_form(g.login_form, url_for('auth.login')) %}
+                    {{ render_field(g.login_form.email) }}
+                    {{ render_field(g.login_form.password) }}
+                    <div class="row">
+                        <div class="col-xs-6">
+                          {{ render_field(g.login_form.remember_me) }}
+                        </div>
+                        <div class="col-xs-6">
+                            <a href="#" class="lost-password">Zapomniałem hasła</a>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-default submit">{{ gettext('Log in') }}</button>
+                {%  endcall %}
 			</div>
 		</div>
 	</div>

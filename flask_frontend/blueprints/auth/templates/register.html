@@ -1,9 +1,9 @@
 {% extends 'main.html' %}
 
 {% block content %}
-{% if g.user.is_authenticated() %}
+{% if current_user.is_authenticated() %}
 
-<div>{{ g.user.name }} is logged in!</div>
+<div>{{ current_user.name }} is logged in!</div>
 
 {% else %}
 {% from 'macros.html' import render_form, render_field %}
@@ -19,8 +19,8 @@
         {{ render_field(form.password_again) }}
         <div class="row">
           <div class="col-md-6 col-xs-7">
-            {{ render_field(form.rules, class_='', outer_class='') }}
-            {{ render_field(form.spam, class_='', outer_class='') }}
+            {{ render_field(form.rules) }}
+            {{ render_field(form.spam) }}
           </div>
           <div class="submit col-md-6 col-xs-5">
             <button type="submit" class="btn btn-default btn-lg pull-right">{{ gettext('Register') }}</button>

@@ -16,10 +16,12 @@ class AuthTests(AppTestCase):
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_login(self, api_mock):
         response, user = self.login_user(api_mock)
-        self.assertTrue(api_mock.login.post.called)
-        self.assertIn('Logged', response.data)
-        self.assertIn(user.name, response.data)
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(api_mock.login.post.called)
+        self.assertIn('Logout', response.body)
+        logged_user = response.context['current_user']
+        self.assertEqual(user, logged_user)
+        self.assertTrue(logged_user.is_authenticated())
 
     @parameterized.expand([
         ({'email': "dupadupa.com", 'password': "password"}, 'Invalid'),
@@ -33,19 +35,19 @@ class AuthTests(AppTestCase):
     def test_invalid_email(self, data, error_message, api_mock):
         response, user = self.login_user(api_mock, data=data)
         self.assertFalse(api_mock.login.post.called)
-        self.assertNotIn('Logged', response.data)
-        self.assertIn(error_message, response.data)
+        self.assertNotIn('Logout', response.body)
+        self.assertIn(error_message, response.body)
 
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_logout(self, api_mock):
-        response = self.client.get(url_for('index'), follow_redirects=True)
-        self.assertIn('Login', response.data)
+        response = self.client.get(url_for('index'))
+        self.assertFalse(response.context['current_user'].is_authenticated())
         self.assertEqual(response.status_code, 200)
         response, user = self.login_user(api_mock)
-        self.assertIn('Logged', response.data)
+        self.assertTrue(response.context['current_user'].is_authenticated())
         self.assertEqual(response.status_code, 200)
         response = self.client.post(url_for('auth.logout'), follow_redirects=True)
-        self.assertIn('Login', response.data)
+        self.assertFalse(response.context['current_user'].is_authenticated())
         self.assertEqual(response.status_code, 200)
 
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
@@ -53,5 +55,5 @@ class AuthTests(AppTestCase):
         return_user = create_mock_for(User)
         api_mock.users.post.return_value = ApiResult(data=return_user)
         data = {'email': "dupa@dupa.com", 'password': "password", 'password_again': 'password', 'login': 'loggggin'}
-        self.client.post(url_for('auth.register'), data=data)
+        self.client.post(url_for('auth.register'), params=data)
         self.assertTrue(api_mock.users.post.called)

@@ -5,6 +5,7 @@
   {% endif %}
   {% set outer_class = outer_class + (' error' if field.errors else '') %}
   {% set outer_class = outer_class + (' checkbox' if field.type == 'BooleanField' else '') %}
+  {% set class_ = class_ if field.type != 'BooleanField' or class_ != 'form-control' else '' %}
   {% set class_ = class_ + (' required' if field.flags.required else '') %}
   {% set class_ = class_ + (' input-file' if field.type == 'FileField' else '') %}
   <div{% if outer_class.strip() %} class="{{ outer_class.strip() }}"{% endif %}>
