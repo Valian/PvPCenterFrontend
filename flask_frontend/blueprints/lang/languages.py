@@ -3,6 +3,7 @@
 
 from flask import session, request
 from flask_babel import Babel
+from flask_frontend.blueprints.lang import lang_blueprint
 from flask_frontend.config import keys
 
 LOCALE = 'locale'
@@ -28,9 +29,10 @@ def set_timezone(timezone):
 
 def get_locale():
     locale = session.get(LOCALE)
-    if locale is not None:
+    available_langs = lang_blueprint.config[keys.LANGUAGES].keys()
+    if locale in available_langs:
         return locale
-    return request.accept_languages.best_match(babel.app.config[keys.LANGUAGES].keys())
+    return request.accept_languages.best_match(available_langs)
 
 
 def get_timezone():
