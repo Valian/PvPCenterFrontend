@@ -146,7 +146,7 @@ class UserGameOwnership(ModelBase):
 
 class User(ModelBase):
 
-    def __init__(self, id, name, email, token, ranking, nationality, sex, age, description, game_ownerships):
+    def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships):
         self.ranking = ranking
         self.id = id
         self.name = name
@@ -154,7 +154,7 @@ class User(ModelBase):
         self.token = token
         self.game_ownerships = game_ownerships
         self.description = description
-        self.age = age
+        self.birthdate = birthdate
         self.sex = sex
         self.nationality = nationality
 
@@ -169,7 +169,7 @@ class User(ModelBase):
             ranking=json['ranking'],
             nationality=json.get('country'),
             sex=json.get('sex'),
-            age=json.get('age'),
+            birthdate=json.get('birthdate'),
             description=json.get('description'),
             game_ownerships=game_ownerships)
 
@@ -183,7 +183,7 @@ class User(ModelBase):
             'game_ownerships': game_ownerships,
             'country': self.nationality,
             'sex': self.sex,
-            'age': self.age,
+            'birthdate': self.birthdate,
             'description': self.description,
             'ranking': self.ranking}
 

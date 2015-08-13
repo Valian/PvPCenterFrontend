@@ -14,6 +14,9 @@ from models import Game as GameModel, Error, UnableToParseException, Errors, Mod
 from common.logable import Logable
 
 
+undefined = object()
+
+
 class ApiException(Exception):
 
     def __init__(self, url, method, e):
@@ -139,11 +142,21 @@ class User(Resource):
         endpoint = self.create_url(user_id=user_id)
         return self._get_request(endpoint, model=model)
 
-    def patch(self, user_id, token, nickname, email, model=UserModel):
+    def patch(self, user_id, token, email=undefined, nationality=undefined, sex=undefined, birthdate=undefined,
+              description=undefined, model=UserModel):
         params = {"access_token": token}
-        data = {"nickname": nickname, "email": email}
+        data = self._create_data(
+            email=email, nationality=nationality, sex=sex, birthdate=birthdate, description=description)
         endpoint = self.create_url(params=params, user_id=user_id)
         return self._patch_request(endpoint, model=model, data=data)
+
+    @staticmethod
+    def _create_data(**kwargs):
+        data = {}
+        for key, value in kwargs.items():
+            if value is not undefined:
+                data[key] = value
+        return data
 
 
 class Login(Resource):

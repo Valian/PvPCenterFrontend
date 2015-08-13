@@ -15,7 +15,7 @@
   <p>{{ user.sex | sex }}</p>
 
   <h3>{{ gettext('Age') }}</h3>
-  <p>{{ user.age }}</p>
+  <p>{{ user.birthdate }}</p>
 
   <h3>{{ gettext('About me') }}</h3>
   <p>{{ user.description if user.description else gettext('No description') }}</p>

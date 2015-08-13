@@ -10,6 +10,6 @@ class FLASH_TYPES(object):
 
 
 class SEX:
-    UNDEFINED = None
+    UNDEFINED = 0
     MALE = 1
     FEMALE = 2

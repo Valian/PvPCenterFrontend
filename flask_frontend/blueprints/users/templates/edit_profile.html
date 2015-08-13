@@ -40,7 +40,8 @@
 		  </div>
 			{% from 'macros.html' import render_form, flash_messages %}
 		  {{ flash_messages() }}
-		  {{ render_form(form, url_for('users.edit_profile_view'), action_text=gettext('Save profile')) }}
+		  {{ render_form(basic_form, url_for('users.change_basic'), action_text=gettext('Save profile')) }}
+          {{ render_form(email_form, url_for('users.change_email'), action_text=gettext('Change email')) }}
 		</div>
 	</div>
 </div>

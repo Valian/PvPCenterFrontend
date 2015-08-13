@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
-import random
 
+import random
 import sys
 import inspect
+import datetime
 
 import factory
 import factory.fuzzy as fuzzy
 import re
+import logging
 from faker import Factory as FakerFactory
 
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule
@@ -15,7 +17,8 @@ from api import ApiDispatcherBase, ApiResult
 
 
 faker = FakerFactory.create()
-
+logger = logging.getLogger('factory')
+logger.setLevel(logging.INFO)
 
 def create_mock_for(model, list_count=5, **kwargs):
     if isinstance(model, ModelList.For):
@@ -94,7 +97,7 @@ class UserFactory(factory.Factory):
     token = fuzzy.FuzzyText(length=15)
     nationality = factory.LazyAttribute(lambda o: ['pl', 'en'][o.id % 2])
     sex = factory.LazyAttribute(lambda o: [None, 1, 2][o.id % 3])
-    age = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 20 + 10)
+    birthdate = factory.LazyAttribute(lambda o: datetime.date(1992, 12, 03))
     description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
     ranking = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 100 + 30)
     game_ownerships = factory.List([factory.SubFactory(UserGameOwnershipFactory) for _ in xrange(random.randint(2, 5))])
