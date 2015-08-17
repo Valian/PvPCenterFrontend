@@ -8,7 +8,7 @@ from flask_babel import gettext
 from . import users_blueprint
 from flask_frontend.common.const import SEX
 from flask_frontend.blueprints.users.forms import ChangeEmailForm, ChangeBasicDataForm
-from flask_frontend.common.api_helper import get_or_404
+from flask_frontend.common.api_helper import get_or_404, get_or_none
 
 
 def sex_to_text(value):
@@ -30,7 +30,6 @@ def init(state):
 @users_blueprint.route("/<int:user_id>")
 def profile_view(user_id):
     user = get_or_404(users_blueprint.api.user.get, user_id)
-
     return flask.render_template("user_profile.html", user=user)
 
 
@@ -38,6 +37,13 @@ def profile_view(user_id):
 @flask_login.login_required
 def my_profile_view():
     return flask.render_template("my_profile.html")
+
+
+@users_blueprint.route("/my_profile/friends")
+@flask_login.login_required
+def my_friends_view():
+    friends = get_or_none(users_blueprint.api.users.get, friends_of_user_id=flask_login.current_user.id) or []
+    return flask.render_template("my_friends.html", friends=friends)
 
 
 @users_blueprint.route("/my_profile/edit")

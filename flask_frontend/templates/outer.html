@@ -15,7 +15,10 @@
   {% assets "main_js" %}
    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}
+  <link rel="shortcut icon" href="http://sstatic.net/stackoverflow/img/favicon.ico">
   <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
 
   <!-- Google Fonts -->
   <link href='http://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>

@@ -20,6 +20,7 @@ faker = FakerFactory.create()
 logger = logging.getLogger('factory')
 logger.setLevel(logging.INFO)
 
+
 def create_mock_for(model, list_count=5, **kwargs):
     if isinstance(model, ModelList.For):
         underlying_model = model.model
@@ -45,7 +46,7 @@ class ApiDispatcherMock(ApiDispatcherBase):
 
     @staticmethod
     def find_props(url):
-        obj_id = re.match(r'.*(\d+)$', url)
+        obj_id = re.match(r'.*/(\d+)$', url)
         params = {}
         if obj_id:
             params['id'] = int(obj_id.group(1))

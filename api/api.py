@@ -16,6 +16,13 @@ from common.logable import Logable
 
 undefined = object()
 
+def dict_of_defined_keys(**kwargs):
+    data = {}
+    for key, value in kwargs.items():
+        if value is not undefined:
+            data[key] = value
+    return data
+
 
 class ApiException(Exception):
 
@@ -126,8 +133,12 @@ class Game(Resource):
 
 class Users(Resource):
 
-    def get(self, model=ModelList.For(UserModel)):
-        endpoint = self.create_url()
+    def get(self, friends_of_user_id=undefined, nickname=undefined, strangers_to_user_id=undefined,
+            model=ModelList.For(UserModel)):
+        params = dict_of_defined_keys(
+            friends_of_user_id=friends_of_user_id, strangers_to_user_id=strangers_to_user_id, nickname=nickname)
+        endpoint = self.create_url(params=params)
+
         return self._get_request(endpoint, model=model)
 
     def post(self, login, email, password, model=UserModel):
@@ -145,18 +156,10 @@ class User(Resource):
     def patch(self, user_id, token, email=undefined, nationality=undefined, sex=undefined, birthdate=undefined,
               description=undefined, model=UserModel):
         params = {"access_token": token}
-        data = self._create_data(
+        data = dict_of_defined_keys(
             email=email, nationality=nationality, sex=sex, birthdate=birthdate, description=description)
         endpoint = self.create_url(params=params, user_id=user_id)
         return self._patch_request(endpoint, model=model, data=data)
-
-    @staticmethod
-    def _create_data(**kwargs):
-        data = {}
-        for key, value in kwargs.items():
-            if value is not undefined:
-                data[key] = value
-        return data
 
 
 class Login(Resource):

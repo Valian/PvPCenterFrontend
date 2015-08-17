@@ -1,9 +1,9 @@
 import logging
 
 from flask import Flask
-from flask_assets import Environment, Bundle
 
 from flask_frontend.views import create_main_views
+from flask_frontend.bundles import create_bundles
 from flask_frontend.config import keys
 from flask_frontend.blueprints.games import games_blueprint
 from flask_frontend.blueprints.auth import auth_blueprint
@@ -40,30 +40,3 @@ def create_logger(app):
 
     return logger
 
-
-def create_bundles(app):
-    assets = Environment(app)
-    static = '../static/'
-    bower = '../../bower_components/'
-    js = Bundle(
-        static + 'javascripts/*.coffee',
-        filters=['coffeescript', 'rjsmin'], output='js/main.min.js')
-    libs = Bundle(
-        bower + 'jquery/dist/jquery.min.js',
-        bower + '*/dist/**/*.min.js',
-        bower + 'owlcar/owl-carousel/*.min.js',
-        output='js/libs.min.js')
-    less = Bundle(
-        static + 'stylesheets/*.less',
-        filters=['less'], output='stylesheets/styles.css')
-    css_libs = Bundle(
-        bower + 'bootstrap/dist/css/bootstrap.css',
-        bower + 'bootstrap/dist/css/bootstrap-theme.css',
-        bower + 'components-font-awesome/css/font-awesome.css',
-        bower + 'flag-icon-css/css/flag-icon.css',
-        bower + 'owlcar/owl-carousel/*.min.css',
-        output='stylesheets/lib_styles.css')
-    assets.register('main_js', js)
-    assets.register('libs_js', libs)
-    assets.register('css', less)
-    assets.register('libs_css', css_libs)

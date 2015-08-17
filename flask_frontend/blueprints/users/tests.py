@@ -43,8 +43,21 @@ class UsersTests(AppTestCase):
         response = self.client.get(url_for('users.edit_profile_view'))
         self.assertEqual(response.status_code, 200)
 
+    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
+    def test_my_friends_calls_api(self, auth_api_mock, api_mock):
+        data = [create_mock_for(User) for _ in xrange(3)]
+        api_mock.users.get.return_value = ApiResult(data=data)
+        _, user = self.login_user(auth_api_mock)
+        response = self.client.get(url_for('users.my_friends_view'))
+        self.assertEqual(api_mock.users.get.call_count, 1)
+        call_kwargs = api_mock.users.get.call_args[1]
+        self.assertIn('friends_of_user_id', call_kwargs)
+        self.assertEqual(call_kwargs['friends_of_user_id'], user.id)
+        self.assertIn('friends', response.context)
+        self.assertIsInstance(response.context['friends'], list)
 
-class EditUserTests(AppTestCase):
+
+class UsersWithAuthTests(AppTestCase):
 
     @parameterized.expand([
         ({'email': "dupa@dupa.com", 'repeat': "other"}, False),

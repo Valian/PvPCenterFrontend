@@ -1,49 +1,24 @@
-{% extends 'main.html' %}
+{% extends 'my_profile_base.html' %}
 
-{% block content %}
+{% block profile_content %}
 
-<div class="profile player col-md-9">
-	<div class="row">
-		<div class="menu">
-			<div class="logo">
-				<img class="avatar" src="{{ current_user.email | gravatar }}" alt="" />
-				<img class="flag" src="{{ url_for('static', filename='images/flag.png') }}" alt="" />
-				<h3>{{ current_user.name }}</h3>
-			</div>
-			<ul>
-				<li><a href="player.html" class="active">Profil</a></li>
-				<li><a href="player-friends.html">Znajomi</a></li>
-				<li><a href="player-messages.html">Wiadomości</a></li>
-				<li><a href="player-match.html">Mecze</a></li>
-				<li><a href="player-challenges.html">Wyzwania</a></li>
-				<li><a href="player-leaguesandtournaments.html">Ligi i turnieje</a></li>
-				<li><a href="player-settings.html">Ustawienia</a></li>
-				<li><a href="player-teams.html">Drużyny</a></li>
-				<li><hr></li>
-				<li><a href="team.html">Fnatic</a></li>
-			</ul>
-		</div>
-		<div class="content">
-		  <h1 class="name">
-		    <span>Profil użytkownika {{current_user.name}}</span>
-		    <small class="watch">
-		      <a href="#">
-		        <i class="fa fa-eye"></i>
-		        13
-		      </a>
-		    </small>
-		  </h1>
-		  <div class="extra-menu">
-		    <a href="{{ url_for('users.edit_profile_view') }}">
-		      <i class="fa fa-pencil-square-o"></i>
-		    </a>
-		  </div>
-			{% from 'macros.html' import render_form, flash_messages %}
-		  {{ flash_messages() }}
-		  {{ render_form(basic_form, url_for('users.change_basic'), action_text=gettext('Save profile')) }}
-          {{ render_form(email_form, url_for('users.change_email'), action_text=gettext('Change email')) }}
-		</div>
-	</div>
-</div>
+  <h1 class="name">
+    <span>Profil użytkownika {{current_user.name}}</span>
+    <small class="watch">
+      <a href="#">
+        <i class="fa fa-eye"></i>
+        13
+      </a>
+    </small>
+  </h1>
+  <div class="extra-menu">
+    <a href="{{ url_for('users.edit_profile_view') }}">
+      <i class="fa fa-pencil-square-o"></i>
+    </a>
+  </div>
+  {% from 'macros.html' import render_form, flash_messages %}
+  {{ flash_messages() }}
+  {{ render_form(basic_form, url_for('users.change_basic'), action_text=gettext('Save profile')) }}
+  {{ render_form(email_form, url_for('users.change_email'), action_text=gettext('Change email')) }}
 
-{% endblock content %}
+{% endblock profile_content %}
