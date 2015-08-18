@@ -8,7 +8,13 @@
   <div>
     <ul>
       {% for friend in friends %}
-        <li><a href="{{ url_for('users.profile_view', user_id=friend.id) }}">{{ friend.name }}</a></li>
+        <li>
+          <div>
+            <img class="avatar" src="{{ friend.email | gravatar(size=20) }}" alt="" />
+            <a href="{{ url_for('users.profile_view', user_id=friend.id) }}">{{ friend.name }}</a>
+            <a href="#">(Send message)</a>
+          </div>
+        </li>
       {% endfor %}
     </ul>
   </div>
