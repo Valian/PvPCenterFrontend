@@ -8,9 +8,9 @@
 				<img class="avatar" src="{{ url_for('static', filename='images/lol-icon.png') }}" alt="" />
 			</div>
 			<ul>
-				<li><a href="#" class="active">Informacje</a></li>
-				<li><a href="#">Ligi i turnieje</a></li>
-				<li><a href="#">Media</a></li>
+				<li><a href="#" class="active">{{ gettext('Info') }}</a></li>
+				<li><a href="#">{{ gettext('Leagues and tournaments') }}</a></li>
+				<li><a href="#">{{ gettext('Media') }}</a></li>
 			</ul>
 		</div>
 		<div class="content">
@@ -24,10 +24,10 @@
 				</small>
 			</h1>
 
-			<h3>Opis gry</h3>
+			<h3>{{ gettext('Game description') }}</h3>
 			<p>Butcher locavore vegan chillwave fingerstache. Post-ironic meditation artisan Wes Anderson polaroid. Fap tofu High Life seitan raw denim. Readymade 90's keytar, viral kale chips gastropub pork belly Portland hoodie paleo. Slow-carb bicycle rights tilde, bespoke leggings kitsch health goth meditation brunch trust fund Vice cardigan polaroid whatever Neutra. Meh PBR&B before they sold out art party polaroid quinoa, Wes Anderson sartorial ennui skateboard Schlitz. Direct trade before they sold out biodiesel flannel, asymmetrical Echo Park swag salvia.</p>
 
-			<h3>Zasady</h3>
+			<h3>{{ gettext('Rules') }}</h3>
 			<div role="tabpanel" class="row rules">
 
 			  <!-- Nav tabs -->

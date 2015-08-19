@@ -3,7 +3,7 @@
 {% block profile_content %}
 
   <h1 class="name">
-    <span>Profil użytkownika {{current_user.name}}</span>
+    <span>{{ gettext('Profil of %(name)s', name=current_user.name) }}</span>
     <small class="watch">
       <a href="#">
         <i class="fa fa-eye"></i>
