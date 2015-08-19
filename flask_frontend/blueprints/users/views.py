@@ -6,6 +6,7 @@ import flask_gravatar
 from flask_babel import gettext
 
 from . import users_blueprint
+from flask.ext.frontend.blueprints.users.helpers import only_current_user
 from flask_frontend.common.const import SEX
 from flask_frontend.blueprints.users.forms import ChangeEmailForm, ChangeBasicDataForm
 from flask_frontend.common.api_helper import get_or_404, get_or_none
@@ -40,20 +41,17 @@ def profile_subview(user_id):
 
 
 @users_blueprint.route("/<int:user_id>/friends")
+@only_current_user
 @flask_login.login_required
 def friends_subview(user_id):
-    if user_id != flask_login.current_user.id:
-        flask.abort(403)
     friends = get_or_none(users_blueprint.api.users.get, friends_of_user_id=flask_login.current_user.id) or []
     return flask.render_template("user_friends.html", friends=friends, user=flask_login.current_user)
 
 
 @users_blueprint.route("/<int:user_id>/edit")
+@only_current_user
 @flask_login.login_required
 def edit_profile_subview(user_id):
-    if user_id != flask_login.current_user.id:
-        flask.abort(403)
-
     change_email_form = ChangeEmailForm(users_blueprint.api, flask_login.current_user)
     change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
     change_basic_form.set_data(flask_login.current_user)
@@ -62,11 +60,9 @@ def edit_profile_subview(user_id):
 
 
 @users_blueprint.route("/<int:user_id>/edit_email", methods=["POST"])
+@only_current_user
 @flask_login.login_required
 def change_email(user_id):
-    if user_id != flask_login.current_user.id:
-        flask.abort(403)
-
     change_email_form = ChangeEmailForm(users_blueprint.api, flask_login.current_user)
     change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
     change_basic_form.set_data(flask_login.current_user)
@@ -79,11 +75,9 @@ def change_email(user_id):
 
 
 @users_blueprint.route("/<int:user_id>/edit_basic", methods=["POST"])
+@only_current_user
 @flask_login.login_required
 def change_basic(user_id):
-    if user_id != flask_login.current_user.id:
-        flask.abort(403)
-
     change_email_form = ChangeEmailForm(users_blueprint.api, flask_login.current_user)
     change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
 
