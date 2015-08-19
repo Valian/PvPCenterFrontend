@@ -10,7 +10,7 @@
 				</h4>
 			</div>
 			<div class="modal-body">
-				<h3 class="login-register-link"><a href="{{ url_for('auth.register') }}">Nie masz konta? Zarejestruj się!</a></h3>
+				<h3 class="login-register-link"><a href="{{ url_for('auth.register') }}">{{ gettext('Nie masz konta? Zarejestruj się!') }}</a></h3>
 
 				{% from 'macros.html' import render_form %}
   			    {% call render_form(g.login_form, url_for('auth.login')) %}
@@ -21,7 +21,7 @@
                           {{ render_field(g.login_form.remember_me) }}
                         </div>
                         <div class="col-xs-6">
-                            <a href="#" class="lost-password">Zapomniałem hasła</a>
+                            <a href="#" class="lost-password">{{ gettext('Zapomniałem hasła') }}</a>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-default submit">{{ gettext('Log in') }}</button>
