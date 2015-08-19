@@ -5,14 +5,14 @@ import random
 import sys
 import inspect
 import datetime
+import logging
 
 import factory
 import factory.fuzzy as fuzzy
 import re
-import logging
 from faker import Factory as FakerFactory
 
-from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule
+from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership
 from api import ApiDispatcherBase, ApiResult
 
 
@@ -102,6 +102,27 @@ class UserFactory(factory.Factory):
     description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
     ranking = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 100 + 30)
     game_ownerships = factory.List([factory.SubFactory(UserGameOwnershipFactory) for _ in xrange(random.randint(2, 5))])
+
+
+class TeamFactory(factory.Factory):
+    class Meta:
+        model = Team
+
+
+    id = factory.Sequence(lambda x: x)
+    name = factory.LazyAttribute(lambda x: random_with_seed(faker.provider('faker.providers.company').companies, x.id))
+    description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
+    tag = factory.LazyAttribute(lambda o: [None, 'HEY', 'ELO'][o.id % 3])
+    founder = factory.LazyAttribute(lambda o: UserFactory(id=o.id))
+
+
+class TeamMembershipFactory(factory.Factory):
+    class Meta:
+        model = TeamMembership
+
+    id = factory.Sequence(lambda x: x)
+    user = factory.SubFactory(UserFactory)
+    team = factory.SubFactory(TeamFactory)
 
 
 def random_with_seed(array, seed):

@@ -10,7 +10,7 @@ import urlparse
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
 from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel, \
-    UserGameOwnership
+    UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel
 from common.logable import Logable
 
 
@@ -178,11 +178,63 @@ class GameOwnerships(Resource):
         return self._get_request(endpoint, model=model)
 
 
+class Teams(Resource):
+
+    def get(self, model=ModelList.For(TeamModel)):
+        endpoint = self.create_url()
+        return self._get_request(endpoint, model=model)
+
+    def post(self, token, name, description, tag, founder_id, model=TeamModel):
+        endpoint = self.create_url(params={"access_token": token})
+        data = {'name': name, 'description': description, 'tag': tag, 'founder_id': founder_id}
+        return self._post_request(endpoint, model=model, data=data)
+
+
+class Team(Resource):
+
+    def get(self, team_id, model=TeamModel):
+        endpoint = self.create_url(team_id=team_id)
+        return self._get_request(endpoint, model=model)
+
+    def patch(self, team_id, token, name=undefined, description=undefined, tag=undefined, founder_id=undefined,
+              model=TeamModel):
+        endpoint = self.create_url(team_id=team_id, params={"access_token": token})
+        data = dict_of_defined_keys(name=name, description=description, tag=tag, founder_id=founder_id)
+        return self._patch_request(endpoint, model=model, data=data)
+
+
+class TeamMemberships(Resource):
+
+    def get(self, team_id=undefined, user_id=undefined, model=ModelList.For(TeamMembershipModel)):
+        params = dict_of_defined_keys(team_id=team_id, user_id=user_id)
+        endpoint = self.create_url(params=params)
+        self._get_request(endpoint, model=model)
+
+    def create(self, token, user_id, team_id, model=TeamMembershipModel):
+        data = {'user_id': user_id, 'team_id': team_id}
+        endpoint = self.create_url(params={'access_token': token})
+        return self._post_request(endpoint, model=model, data=data)
+
+
+class TeamMembership(Resource):
+
+    def get(self, team_membership_id, model=TeamMembershipModel):
+        endpoint = self.create_url(team_membership_id=team_membership_id)
+        self._get_request(endpoint, model=model)
+
+    def patch(self, token, team_membership_id, user_id=undefined, team_id=undefined, model=TeamMembershipModel):
+        data = dict_of_defined_keys(user_id=user_id, team_id=team_id)
+        endpoint = self.create_url(team_membership_id=team_membership_id, params={'access_token': token})
+        return self._patch_request(endpoint, model=model, data=data)
+
+
 class PvPCenterApi(object):
 
     GAMES_ENDPOINT = '/games'
     USERS_ENDPOINT = '/users'
     GAME_OWNERSHIPS_ENDPOINT = '/game_ownerships'
+    TEAMS_ENDPOINT = '/teams'
+    TEAM_MEMBERSHIPS_ENDPOINT = '/team_memberships'
 
     def __init__(self, dispatcher, login, password):
         """
@@ -197,4 +249,9 @@ class PvPCenterApi(object):
         self.user = User(dispatcher, self.USERS_ENDPOINT + '/{user_id}')
         self.login = Login(dispatcher, self.USERS_ENDPOINT + '/login')
         self.game_ownerships = GameOwnerships(dispatcher, self.GAME_OWNERSHIPS_ENDPOINT)
+        self.teams = Teams(dispatcher, self.TEAMS_ENDPOINT)
+        self.team = Team(dispatcher, self.TEAMS_ENDPOINT + '/{team_id}')
+        self.team_memberships = TeamMemberships(dispatcher, self.TEAM_MEMBERSHIPS_ENDPOINT)
+        self.team_membership = TeamMembership(dispatcher, self.TEAM_MEMBERSHIPS_ENDPOINT + '/{team_membership_id}')
+
 

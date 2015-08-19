@@ -191,6 +191,84 @@ class User(ModelBase):
         return '[User {0}: {1} - {2}, owned games: {3}]'.format(self.id, self.name, self.email, self.game_ownerships)
 
 
+class Division(ModelBase):
+
+    def __init__(self, id, team, game):
+        self.id = id
+        self.team = team
+        self.game = game
+
+    @classmethod
+    def _from_json(cls, json):
+        raise NotImplementedError()
+
+    def __str__(self):
+        raise NotImplementedError()
+
+    def to_json(self):
+        raise NotImplementedError()
+
+
+class Team(ModelBase):
+
+    def __init__(self, id, name, description, tag, founder):
+        """
+        :type id: long
+        :type name: str
+        :type description: str
+        :type tag: str
+        :type founder: User
+        """
+        self.id = id
+        self.name = name
+        self.description = description
+        self.tag = tag
+        self.founder = founder
+
+    @classmethod
+    def _from_json(cls, json):
+        founder = User.from_json(json['founder']) if json.has_key('founder') else None
+        return cls(json['id'], json['name'], json.get('description'), json.get('tag'), founder)
+
+    def __str__(self):
+        return 'Team {0}, founder {1}'.format(self.name, self.founder.name)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'tag': self.tag,
+            'founder': self.founder.to_json() if self.founder else ''}
+
+
+class TeamMembership(ModelBase):
+    def __init__(self, id, user, team):
+        """
+        :type id: long
+        :type user: User
+        :type team: Team
+        """
+        self.id = id
+        self.user = user
+        self.team = team
+
+    @classmethod
+    def _from_json(cls, json):
+        user = User.from_json(json['user'])
+        team = Team.from_json(json['team'])
+        return cls(json['id'], user, team)
+
+    def __str__(self):
+        return 'Membership: User {0}, Team {1}'.format(self.user.name, self.team.name)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.user.to_json(),
+            'description': self.team.to_json()}
+
+
 class Error(ModelBase):
 
     __slots__ = ('message',)
