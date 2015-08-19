@@ -9,6 +9,7 @@ bower = '../../bower_components/'
 bundles = {
     'main_js': Bundle(
         static + 'javascripts/*.coffee',
+        '../blueprints/**/javascripts/*.coffee',
         filters=['coffeescript', 'rjsmin'], output='js/main.min.js'),
     'libs_js': Bundle(
         bower + 'jquery/dist/jquery.min.js',

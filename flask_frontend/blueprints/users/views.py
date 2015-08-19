@@ -30,12 +30,18 @@ def init(state):
 @users_blueprint.route("/<int:user_id>")
 def profile_view(user_id):
     user = get_or_404(users_blueprint.api.user.get, user_id)
+    return flask.render_template("profile_base.html", user=user, view='users.profile_subview')
+
+
+@users_blueprint.route("/<int:user_id>")
+def profile_subview(user_id):
+    user = get_or_404(users_blueprint.api.user.get, user_id)
     return flask.render_template("user_profile.html", user=user)
 
 
 @users_blueprint.route("/<int:user_id>/friends")
 @flask_login.login_required
-def my_friends_view(user_id):
+def friends_subview(user_id):
     if user_id != flask_login.current_user.id:
         flask.abort(403)
     friends = get_or_none(users_blueprint.api.users.get, friends_of_user_id=flask_login.current_user.id) or []
@@ -44,7 +50,7 @@ def my_friends_view(user_id):
 
 @users_blueprint.route("/<int:user_id>/edit")
 @flask_login.login_required
-def edit_profile_view(user_id):
+def edit_profile_subview(user_id):
     if user_id != flask_login.current_user.id:
         flask.abort(403)
 

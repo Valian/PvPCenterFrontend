@@ -24,13 +24,13 @@ class UsersTests(AppTestCase):
     def test_my_profile_edit_fails_without_login(self, api_mock):
         return_user = create_mock_for(User)
         api_mock.user.get.return_value = ApiResult(data=return_user)
-        response = self.client.get(url_for('users.edit_profile_view', user_id=return_user.id))
+        response = self.client.get(url_for('users.edit_profile_subview', user_id=return_user.id))
         self.assertEqual(response.status_code, 302)
 
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_profile_edit_pass_when_logged(self, auth_api_mock, api_mock):
         _, user = self.login_user(auth_api_mock)
-        response = self.client.get(url_for('users.edit_profile_view', user_id=user.id))
+        response = self.client.get(url_for('users.edit_profile_subview', user_id=user.id))
         self.assertEqual(response.status_code, 200)
 
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
@@ -38,7 +38,7 @@ class UsersTests(AppTestCase):
         data = [create_mock_for(User) for _ in xrange(3)]
         api_mock.users.get.return_value = ApiResult(data=data)
         _, user = self.login_user(auth_api_mock)
-        response = self.client.get(url_for('users.my_friends_view', user_id=user.id))
+        response = self.client.get(url_for('users.friends_subview', user_id=user.id))
         self.assertEqual(api_mock.users.get.call_count, 1)
         call_kwargs = api_mock.users.get.call_args[1]
         self.assertIn('friends_of_user_id', call_kwargs)

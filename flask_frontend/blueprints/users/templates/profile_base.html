@@ -3,12 +3,13 @@
 {% block content %}
   {%  from 'user_macros.html' import user_basic_info, user_game_ownerships %}
 
-  {# set in user_profile.html #}
+  {% set is_my_profile = current_user.is_authenticated() and current_user.id == user.id %}
+
   {% if is_my_profile %}
 
     {% set side_menu = [
       (url_for('users.profile_view', user_id=user.id), 'profile', gettext('Profile')),
-      (url_for('users.my_friends_view', user_id=user.id), 'friends', gettext('Friends')),
+      (url_for('users.friends_subview', user_id=user.id), 'friends', gettext('Friends')),
       ('#', 'messages', gettext('Messages')),
       ('#', 'match', gettext('Matches')),
       ('#', 'challenges', gettext('Challenges')),
@@ -29,7 +30,6 @@
 
   {% endif %}
 
-
   <div class="profile player col-md-9">
     <div class="row">
       <div class="menu">
@@ -40,17 +40,22 @@
         </div>
         <ul>
           {% for url, id, text in side_menu %}
-            <li><a href="{{ url }}" id="{{ id }}" {{ 'class=active' if url == request.path else '' }}>{{ text }}</a></li>
+            <li><a href="#{{ id }}" onclick="loadMenu('{{ url }}')">{{ text }}</a></li>
           {% endfor %}
           <li><hr></li>
           <li><a href="#">Fnatic</a></li>
         </ul>
       </div>
-      <div class="content">
-        {% block profile_content %}
+      <div class="content" id="content">
 
-        {% endblock %}
       </div>
     </div>
   </div>
+
+  {% if view %}
+    <script>
+      loadMenu('{{ url_for(view, user_id = user.id) }}');
+    </script>
+  {% endif  %}
+
 {% endblock content %}
