@@ -11,7 +11,7 @@ def only_current_user(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         user = flask_login.current_user
-        if not user or user.id != kwargs.get('user_id', -1):
+        if not user.is_authenticated() or user.id != kwargs.get('user_id', -1):
             flask.abort(403)
 
         return f(*args, **kwargs)

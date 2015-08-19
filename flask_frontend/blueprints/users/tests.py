@@ -24,8 +24,8 @@ class UsersTests(AppTestCase):
     def test_my_profile_edit_fails_without_login(self, api_mock):
         return_user = create_mock_for(User)
         api_mock.user.get.return_value = ApiResult(data=return_user)
-        response = self.client.get(url_for('users.edit_profile_subview', user_id=return_user.id))
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get(url_for('users.edit_profile_subview', user_id=return_user.id), expect_errors=True)
+        self.assertEqual(response.status_code, 403)
 
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_profile_edit_pass_when_logged(self, auth_api_mock, api_mock):
