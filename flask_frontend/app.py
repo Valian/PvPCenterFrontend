@@ -1,6 +1,7 @@
 import logging
 
 from flask import Flask
+from flask.ext.frontend.blueprints.teams import teams_blueprint
 
 from flask_frontend.views import create_main_views
 from flask_frontend.bundles import create_bundles
@@ -21,6 +22,7 @@ def create_app(config=None):
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
     app.register_blueprint(users_blueprint, url_prefix='/users')
     app.register_blueprint(games_blueprint, url_prefix='/games')
+    app.register_blueprint(teams_blueprint, url_prefix='/teams')
 
     create_logger(app)
     create_bundles(app)

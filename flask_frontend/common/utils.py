@@ -3,10 +3,12 @@
 
 from flask import Blueprint
 
+
 class InvalidConfigurationException(Exception):
     def __init__(self, blueprint_name, e):
         super(InvalidConfigurationException, self).__init__(
             "Invalid configuration for blueprint {0}, error: {1}".format(blueprint_name, e))
+
 
 class ConfigBlueprint(Blueprint):
     def __init__(self, name, import_name, config_keys=None, *args, **kwargs):
@@ -23,3 +25,34 @@ class ConfigBlueprint(Blueprint):
 
         super(ConfigBlueprint, self).register(app, options, first_registration)
 
+
+from math import ceil
+
+
+class Pagination(object):
+
+    def __init__(self, page, per_page, total_count):
+        self.page = page
+        self.per_page = per_page
+        self.total_count = total_count
+
+    @property
+    def pages(self):
+        return int(ceil(self.total_count / float(self.per_page)))
+
+    @property
+    def has_prev(self):
+        return self.page > 1
+
+    @property
+    def has_next(self):
+        return self.page < self.pages
+
+    def iter_pages(self, l_edge=2, l_current=2, r_current=5, r_edge=2):
+        last = 0
+        for num in xrange(1, self.pages + 1):
+            if num <= l_edge or self.page - l_current - 1 < num < self.page + r_current or num > self.pages - r_edge:
+                if last + 1 != num:
+                    yield None
+                yield num
+                last = num

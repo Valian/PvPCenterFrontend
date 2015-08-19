@@ -12,15 +12,17 @@ def before_request():
     flask.g.games = get_or_none(games_blueprint.api.games.get) or []
 
 
-@games_blueprint.route('/games/<int:game_id>')
+@games_blueprint.route('')
+def games_view():
+    return flask.render_template('games.html')
+
+
+@games_blueprint.route('/<int:game_id>')
 def game_view(game_id):
     game = get_or_404(games_blueprint.api.game.get, game_id)
     return flask.render_template('game.html', game=game)
 
 
-@games_blueprint.route('/games')
-def games_view():
-    return flask.render_template('games.html')
 
 
 
