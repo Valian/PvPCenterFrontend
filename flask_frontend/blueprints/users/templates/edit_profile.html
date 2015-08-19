@@ -1,4 +1,4 @@
-{% extends 'my_profile_base.html' %}
+{% extends 'profile_base.html' %}
 
 {% block profile_content %}
 
@@ -12,13 +12,13 @@
     </small>
   </h1>
   <div class="extra-menu">
-    <a href="{{ url_for('users.edit_profile_view') }}">
+    <a href="{{ url_for('users.edit_profile_view', user_id=current_user.id) }}">
       <i class="fa fa-pencil-square-o"></i>
     </a>
   </div>
   {% from 'macros.html' import render_form, flash_messages %}
   {{ flash_messages() }}
-  {{ render_form(basic_form, url_for('users.change_basic'), action_text=gettext('Save profile')) }}
-  {{ render_form(email_form, url_for('users.change_email'), action_text=gettext('Change email')) }}
+  {{ render_form(basic_form, url_for('users.change_basic', user_id=user.id), action_text=gettext('Save profile')) }}
+  {{ render_form(email_form, url_for('users.change_email', user_id=user.id), action_text=gettext('Change email')) }}
 
 {% endblock profile_content %}

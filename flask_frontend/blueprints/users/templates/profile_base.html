@@ -1,0 +1,56 @@
+{% extends 'main.html' %}
+
+{% block content %}
+  {%  from 'user_macros.html' import user_basic_info, user_game_ownerships %}
+
+  {# set in user_profile.html #}
+  {% if is_my_profile %}
+
+    {% set side_menu = [
+      (url_for('users.profile_view', user_id=user.id), 'profile', gettext('Profile')),
+      (url_for('users.my_friends_view', user_id=user.id), 'friends', gettext('Friends')),
+      ('#', 'messages', gettext('Messages')),
+      ('#', 'match', gettext('Matches')),
+      ('#', 'challenges', gettext('Challenges')),
+      ('#', 'leagues', gettext('Leagues')),
+      ('#', 'settings', gettext('Settings')),
+      ('#', 'teams', gettext('Teams'))
+    ] -%}
+
+  {% else %}
+
+    {% set side_menu = [
+      (url_for('users.profile_view', user_id=user.id), 'profile', gettext('Profile')),
+      ('#', 'match', gettext('Matches')),
+      ('#', 'challenges', gettext('Challenges')),
+      ('#', 'leagues', gettext('Leagues')),
+      ('#', 'teams', gettext('Teams'))
+    ] -%}
+
+  {% endif %}
+
+
+  <div class="profile player col-md-9">
+    <div class="row">
+      <div class="menu">
+        <div class="logo">
+          <img class="avatar" src="{{ user.email | gravatar }}" alt="" />
+          <img class="flag" src="{{ url_for('static', filename='images/flag.png') }}" alt="" />
+          <h3>{{ user.name }}</h3>
+        </div>
+        <ul>
+          {% for url, id, text in side_menu %}
+            <li><a href="{{ url }}" id="{{ id }}" {{ 'class=active' if url == request.path else '' }}>{{ text }}</a></li>
+          {% endfor %}
+          <li><hr></li>
+          <li><a href="#">Fnatic</a></li>
+        </ul>
+      </div>
+      <div class="content">
+        {% block profile_content %}
+
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
