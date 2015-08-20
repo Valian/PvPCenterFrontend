@@ -1,0 +1,30 @@
+{% extends 'main.html' %}
+
+{% block content %}
+  <div class="col-md-9">
+    <h1>{{ gettext("Overview of %(team_name)s", team_name=team.name) }}</h1>
+    <div class="row">
+        <a href="{{ url_for('teams.team_view', team_id = team.id) }}">
+          <b>{{ team.name }}</b>
+          {{ team.tag }}
+          {{ team.members_count }}
+          {{ team.founder.name }}
+          <div>{{ team.description }}</div>
+        </a>
+    </div>
+    <h2>{{ gettext("Members of %(team_name)s", team_name=team.name) }}</h2>
+    <div class="row">
+      <ul>
+        {% for member in members %}
+        <li>
+          <div>
+            <img class="avatar" src="{{ member.email | gravatar(size=20) }}" alt="" />
+            <a href="{{ url_for('users.profile_view', user_id=member.id) }}">{{ member.name }}</a>
+            <a href="#">(Send message)</a>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock content %}

@@ -208,7 +208,7 @@ class TeamMemberships(Resource):
     def get(self, team_id=undefined, user_id=undefined, model=ModelList.For(TeamMembershipModel)):
         params = dict_of_defined_keys(team_id=team_id, user_id=user_id)
         endpoint = self.create_url(params=params)
-        self._get_request(endpoint, model=model)
+        return self._get_request(endpoint, model=model)
 
     def create(self, token, user_id, team_id, model=TeamMembershipModel):
         data = {'user_id': user_id, 'team_id': team_id}
@@ -220,7 +220,7 @@ class TeamMembership(Resource):
 
     def get(self, team_membership_id, model=TeamMembershipModel):
         endpoint = self.create_url(team_membership_id=team_membership_id)
-        self._get_request(endpoint, model=model)
+        return self._get_request(endpoint, model=model)
 
     def patch(self, token, team_membership_id, user_id=undefined, team_id=undefined, model=TeamMembershipModel):
         data = dict_of_defined_keys(user_id=user_id, team_id=team_id)

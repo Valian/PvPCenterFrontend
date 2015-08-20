@@ -36,6 +36,13 @@ def get_or_404(func, *args, **kwargs):
     return result
 
 
+def get_or_500(func, *args, **kwargs):
+    result = get_or_none(func, *args, **kwargs)
+    if result is None:
+        flask.abort(500)
+    return result
+
+
 class ApiBlueprint(ConfigBlueprint, Logable):
     """:type api: PvPCenterApi"""
 

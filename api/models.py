@@ -211,24 +211,26 @@ class Division(ModelBase):
 
 class Team(ModelBase):
 
-    def __init__(self, id, name, description, tag, founder):
+    def __init__(self, id, name, description, tag, founder, members_count):
         """
         :type id: long
         :type name: str
         :type description: str
         :type tag: str
         :type founder: User
+        :type members_count: int
         """
         self.id = id
         self.name = name
         self.description = description
         self.tag = tag
         self.founder = founder
+        self.members_count = members_count
 
     @classmethod
     def _from_json(cls, json):
         founder = User.from_json(json['founder']) if json.has_key('founder') else None
-        return cls(json['id'], json['name'], json.get('description'), json.get('tag'), founder)
+        return cls(json['id'], json['name'], json.get('description'), json.get('tag'), founder, json['members_count'])
 
     def __str__(self):
         return 'Team {0}, founder {1}'.format(self.name, self.founder.name)
@@ -239,7 +241,8 @@ class Team(ModelBase):
             'name': self.name,
             'description': self.description,
             'tag': self.tag,
-            'founder': self.founder.to_json() if self.founder else ''}
+            'founder': self.founder.to_json() if self.founder else '',
+            'members_count': self.members_count}
 
 
 class TeamMembership(ModelBase):
@@ -265,8 +268,8 @@ class TeamMembership(ModelBase):
     def to_json(self):
         return {
             'id': self.id,
-            'name': self.user.to_json(),
-            'description': self.team.to_json()}
+            'user': self.user.to_json(),
+            'team': self.team.to_json()}
 
 
 class Error(ModelBase):

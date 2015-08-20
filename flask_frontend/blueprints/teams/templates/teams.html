@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title></title>
-</head>
-<body>
+{% extends 'main.html' %}
 
-</body>
-</html>
+{% block content %}
+  <div class="col-md-9">
+    <h1>{{ gettext("Teams") }}</h1>
+    {# we also need searching here, it's not yet implemented but template should contain it, maybe with JS? #}
+    <div class="row">
+      <ul>
+        {% for team in teams %}
+          <li>
+            <a href="{{ url_for('teams.team_view', team_id = team.id) }}">
+                <b>{{ team.name }}</b>
+                {{ team.tag }}
+                {{ team.members_count }}
+            </a>
+          </li>
+        {%  endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock content %}
