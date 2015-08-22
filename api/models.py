@@ -166,7 +166,7 @@ class User(ModelBase):
             name=json['nickname'],
             email=json['email'],
             token=json.get('access_token'),
-            ranking=json['ranking'],
+            ranking=json.get('ranking'),
             nationality=json.get('country'),
             sex=json.get('sex'),
             birthdate=json.get('birthdate'),
@@ -189,6 +189,33 @@ class User(ModelBase):
 
     def __str__(self):
         return '[User {0}: {1} - {2}, owned games: {3}]'.format(self.id, self.name, self.email, self.game_ownerships)
+
+
+class FriendshipInvite(ModelBase):
+
+    def __init__(self, id, from_user, to_user):
+        """
+        :type id: int
+        :type from_user: User
+        :type to_user: User
+        """
+        self.id = id
+        self.from_user = from_user
+        self.to_user = to_user
+
+    @classmethod
+    def _from_json(cls, json):
+        from_user = User.from_json(json['from_user']) if json.has_key('from_user') else None
+        to_user = User.from_json(json['to_user']) if json.has_key('to_user') else None
+        return cls(json['id'], from_user, to_user)
+
+    def to_json(self):
+        to_user_json = self.to_user.to_json() if self.to_user else None
+        from_user_json = self.from_user.to_json() if self.from_user else None
+        return {'id': self.id, 'to_user': to_user_json, 'from_user': from_user_json}
+
+    def __str__(self):
+        return 'Friendship invite from user {0} to user {1}'.format(self.from_user, self.to_user)
 
 
 class Division(ModelBase):

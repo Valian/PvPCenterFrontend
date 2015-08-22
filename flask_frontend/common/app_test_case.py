@@ -50,8 +50,8 @@ class AppTestCase(TestCase):
 
     def login_user(self, api_mock, data=None, remember=False):
         return_user = create_mock_for(User)
-        api_mock.login.post.return_value = ApiResult(data=return_user)
-        api_mock.user.get.return_value = ApiResult(data=return_user)
+        api_mock.users.login.return_value = ApiResult(data=return_user)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
         data = data or {'email': "dupa@dupa.com", 'password': "password", "remember_me": remember}
         response = self.client.post(url_for('auth.login'), params=data, follow_redirects=True)
         return response, return_user

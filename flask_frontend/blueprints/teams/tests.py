@@ -28,15 +28,15 @@ class TeamTests(AppTestCase):
         team = TeamFactory()
         count = team.members_count
         memberships = [TeamMembershipFactory() for _ in xrange(count)]
-        api.team.get.return_value = ApiResult(data=team)
+        api.teams.get_single.return_value = ApiResult(data=team)
         api.team_memberships.get.return_value = ApiResult(data=memberships)
         response = self.client.get(url_for('teams.team_view', team_id=team.id))
-        self.assertEqual(api.team.get.call_count, 1)
+        self.assertEqual(api.teams.get_single.call_count, 1)
         self.assertEqual(api.team_memberships.get.call_count, 1)
         self.assertEqual(response.context['team'], team)
         self.assertEqual(response.context['members'], [m.user for m in memberships])
 
     def test_team_500_on_api_error(self, api):
-        api.team.get.side_effect = ApiException("url", "method", Exception())
+        api.teams.get_single.side_effect = ApiException("url", "method", Exception())
         api.team_memberships.get.side_effect = ApiException("url", "method", Exception())
         self.client.get(url_for('teams.team_view', team_id=1), expect_errors=True)

@@ -30,13 +30,13 @@ def init(state):
 
 @users_blueprint.route("/<int:user_id>")
 def profile_view(user_id):
-    user = get_or_404(users_blueprint.api.user.get, user_id)
+    user = get_or_404(users_blueprint.api.users.get_single, user_id)
     return flask.render_template("profile_base.html", user=user, view='users.profile_subview')
 
 
 @users_blueprint.route("/<int:user_id>")
 def profile_subview(user_id):
-    user = get_or_404(users_blueprint.api.user.get, user_id)
+    user = get_or_404(users_blueprint.api.users.get_single, user_id)
     return flask.render_template("user_profile.html", user=user)
 
 

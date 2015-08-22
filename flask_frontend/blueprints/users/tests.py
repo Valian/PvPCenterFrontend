@@ -17,13 +17,13 @@ class UsersTests(AppTestCase):
 
     def test_user_profile(self, api_mock):
         return_user = create_mock_for(User)
-        api_mock.user.get.return_value = ApiResult(data=return_user)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
         self.client.get(url_for('users.profile_view', user_id=1))
-        self.assertTrue(api_mock.user.get.called)
+        self.assertTrue(api_mock.users.get_single.called)
 
     def test_my_profile_edit_fails_without_login(self, api_mock):
         return_user = create_mock_for(User)
-        api_mock.user.get.return_value = ApiResult(data=return_user)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
         response = self.client.get(url_for('users.edit_profile_subview', user_id=return_user.id), expect_errors=True)
         self.assertEqual(response.status_code, 403)
 
@@ -58,20 +58,20 @@ class UsersWithAuthTests(AppTestCase):
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_email_edit(self, data, should_call_api, auth_api_mock, api_mock):
         _, user = self.login_user(auth_api_mock)
-        api_mock.user.patch.return_value = ApiResult(data=user)
+        api_mock.users.patch.return_value = ApiResult(data=user)
         response = self.client.post(url_for('users.change_email', user_id=user.id), params=data)
         self.assertEqual(response.status_code, 200)
         if should_call_api:
-            self.assertEqual(api_mock.user.patch.call_count, 1)
-            self.assertEqual(api_mock.user.patch.call_args, mock.call(user.id, user.token, email=data['email']))
+            self.assertEqual(api_mock.users.patch.call_count, 1)
+            self.assertEqual(api_mock.users.patch.call_args, mock.call(user.id, user.token, email=data['email']))
         else:
-            self.assertFalse(api_mock.user.patch.called)
+            self.assertFalse(api_mock.users.patch.called)
 
     @mock.patch('flask_frontend.blueprints.users.views.users_blueprint.api')
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_basic_info_edit(self, auth_api_mock, api_mock):
         _, user = self.login_user(auth_api_mock)
-        api_mock.user.patch.return_value = ApiResult(data=user)
+        api_mock.users.patch.return_value = ApiResult(data=user)
         nationality = 'en'
         birthdate = datetime.date(1992, 12, 23)
         about_me = 'Me like me'
@@ -79,7 +79,7 @@ class UsersWithAuthTests(AppTestCase):
         data = {'nationality': nationality, 'birthdate': birthdate, 'description': about_me, 'sex': sex}
         response = self.client.post(url_for('users.change_basic', user_id=user.id), params=data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(api_mock.user.patch.call_count, 1)
-        self.assertEqual(api_mock.user.patch.call_args, mock.call(
+        self.assertEqual(api_mock.users.patch.call_count, 1)
+        self.assertEqual(api_mock.users.patch.call_args, mock.call(
             user.id, user.token, nationality=nationality, sex=sex, description=about_me, birthdate=birthdate))
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
+
 import urllib
 
 from requests import RequestException
@@ -10,7 +11,7 @@ import urlparse
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
 from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel, \
-    UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel
+    UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel, FriendshipInvite as FriendshipInviteModel
 from common.logable import Logable
 
 
@@ -95,8 +96,8 @@ class Resource(object):
         self.dispatcher = dispatcher
         self.url = url
 
-    def create_url(self, params=None, **kwargs):
-        url = self.url.format(**kwargs)
+    def create_url(self, suffix="", params=None, **kwargs):
+        url = (self.url + suffix).format(**kwargs)
         if params:
             url = url + '?{0}'.format(urllib.urlencode(params))
         return url
@@ -119,19 +120,21 @@ class Resource(object):
 
 class Games(Resource):
 
+    SINGLE_ENDPOINT = "/{game_id}"
+
     def get(self, model=ModelList.For(GameModel)):
         endpoint = self.create_url()
         return self._get_request(endpoint, model=model)
 
-
-class Game(Resource):
-
-    def get(self, game_id, model=GameModel):
-        endpoint = self.create_url(game_id=game_id)
+    def get_single(self, game_id, model=GameModel):
+        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, game_id=game_id)
         return self._get_request(endpoint, model=model)
 
 
 class Users(Resource):
+
+    SINGLE_ENDPOINT = "/{user_id}"
+    LOGIN_ENDPOINT = "/login"
 
     def get(self, friends_of_user_id=undefined, nickname=undefined, strangers_to_user_id=undefined,
             model=ModelList.For(UserModel)):
@@ -146,11 +149,8 @@ class Users(Resource):
         data = {'login': login, 'email': email, 'password': password}
         return self._post_request(endpoint, data=data, model=model)
 
-
-class User(Resource):
-
-    def get(self, user_id, model=UserModel):
-        endpoint = self.create_url(user_id=user_id)
+    def get_single(self, user_id, model=UserModel):
+        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, user_id=user_id)
         return self._get_request(endpoint, model=model)
 
     def patch(self, user_id, token, email=undefined, nationality=undefined, sex=undefined, birthdate=undefined,
@@ -158,14 +158,11 @@ class User(Resource):
         params = {"access_token": token}
         data = dict_of_defined_keys(
             email=email, nationality=nationality, sex=sex, birthdate=birthdate, description=description)
-        endpoint = self.create_url(params=params, user_id=user_id)
+        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, params=params, user_id=user_id)
         return self._patch_request(endpoint, model=model, data=data)
 
-
-class Login(Resource):
-
-    def post(self, email, password, model=UserModel):
-        endpoint = self.create_url()
+    def login(self, email, password, model=UserModel):
+        endpoint = self.create_url(suffix=self.LOGIN_ENDPOINT)
         data = {'email': email, 'password': password}
         return self._post_request(endpoint, model=model, data=data)
 
@@ -180,6 +177,8 @@ class GameOwnerships(Resource):
 
 class Teams(Resource):
 
+    SINGLE_ENDPOINT = "/{team_id}"
+
     def get(self, model=ModelList.For(TeamModel)):
         endpoint = self.create_url()
         return self._get_request(endpoint, model=model)
@@ -189,25 +188,28 @@ class Teams(Resource):
         data = {'name': name, 'description': description, 'tag': tag, 'founder_id': founder_id}
         return self._post_request(endpoint, model=model, data=data)
 
-
-class Team(Resource):
-
-    def get(self, team_id, model=TeamModel):
-        endpoint = self.create_url(team_id=team_id)
+    def get_single(self, team_id, model=TeamModel):
+        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, team_id=team_id)
         return self._get_request(endpoint, model=model)
 
     def patch(self, team_id, token, name=undefined, description=undefined, tag=undefined, founder_id=undefined,
               model=TeamModel):
-        endpoint = self.create_url(team_id=team_id, params={"access_token": token})
+        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, team_id=team_id, params={"access_token": token})
         data = dict_of_defined_keys(name=name, description=description, tag=tag, founder_id=founder_id)
         return self._patch_request(endpoint, model=model, data=data)
 
 
 class TeamMemberships(Resource):
 
+    SINGLE_ENDPOINT = "/{team_membership_id}"
+
     def get(self, team_id=undefined, user_id=undefined, model=ModelList.For(TeamMembershipModel)):
         params = dict_of_defined_keys(team_id=team_id, user_id=user_id)
         endpoint = self.create_url(params=params)
+        return self._get_request(endpoint, model=model)
+
+    def get_single(self, team_membership_id, model=TeamMembershipModel):
+        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, team_membership_id=team_membership_id)
         return self._get_request(endpoint, model=model)
 
     def create(self, token, user_id, team_id, model=TeamMembershipModel):
@@ -215,17 +217,20 @@ class TeamMemberships(Resource):
         endpoint = self.create_url(params={'access_token': token})
         return self._post_request(endpoint, model=model, data=data)
 
-
-class TeamMembership(Resource):
-
-    def get(self, team_membership_id, model=TeamMembershipModel):
-        endpoint = self.create_url(team_membership_id=team_membership_id)
-        return self._get_request(endpoint, model=model)
-
     def patch(self, token, team_membership_id, user_id=undefined, team_id=undefined, model=TeamMembershipModel):
         data = dict_of_defined_keys(user_id=user_id, team_id=team_id)
-        endpoint = self.create_url(team_membership_id=team_membership_id, params={'access_token': token})
+        endpoint = self.create_url(
+            suffix=self.SINGLE_ENDPOINT, team_membership_id=team_membership_id, params={'access_token': token})
         return self._patch_request(endpoint, model=model, data=data)
+
+
+class FriendshipInvites(Resource):
+    
+    # zmergowac modele list z modelami pojedynczymi
+
+    def get(self, model=ModelList.For(FriendshipInviteModel)):
+        endpoint = self.create_url()
+        return self._get_request(endpoint, model)
 
 
 class PvPCenterApi(object):
@@ -243,15 +248,10 @@ class PvPCenterApi(object):
         :type password: str
         """
         dispatcher.add_additional_params(auth=HTTPBasicAuth(login, password))
-        self.game = Game(dispatcher, self.GAMES_ENDPOINT + '/{game_id}')
         self.games = Games(dispatcher, self.GAMES_ENDPOINT)
         self.users = Users(dispatcher, self.USERS_ENDPOINT)
-        self.user = User(dispatcher, self.USERS_ENDPOINT + '/{user_id}')
-        self.login = Login(dispatcher, self.USERS_ENDPOINT + '/login')
         self.game_ownerships = GameOwnerships(dispatcher, self.GAME_OWNERSHIPS_ENDPOINT)
         self.teams = Teams(dispatcher, self.TEAMS_ENDPOINT)
-        self.team = Team(dispatcher, self.TEAMS_ENDPOINT + '/{team_id}')
         self.team_memberships = TeamMemberships(dispatcher, self.TEAM_MEMBERSHIPS_ENDPOINT)
-        self.team_membership = TeamMembership(dispatcher, self.TEAM_MEMBERSHIPS_ENDPOINT + '/{team_membership_id}')
 
 

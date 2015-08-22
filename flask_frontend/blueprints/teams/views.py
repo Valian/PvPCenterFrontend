@@ -15,7 +15,7 @@ def teams_view():
 
 @teams_blueprint.route('/<int:team_id>')
 def team_view(team_id):
-    team = get_or_500(teams_blueprint.api.team.get, team_id=team_id)
+    team = get_or_500(teams_blueprint.api.teams.get_single, team_id=team_id)
     team_memberships = get_or_500(teams_blueprint.api.team_memberships.get, team_id=team_id)
     members = map(lambda x: x.user, team_memberships)
     return flask.render_template('team.html', team=team, members=members)
