@@ -12,7 +12,8 @@ import factory.fuzzy as fuzzy
 import re
 from faker import Factory as FakerFactory
 
-from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership
+from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
+    FriendshipInvite
 from api import ApiDispatcherBase, ApiResult
 
 
@@ -123,6 +124,15 @@ class TeamMembershipFactory(factory.Factory):
     id = factory.Sequence(lambda x: x)
     user = factory.SubFactory(UserFactory)
     team = factory.SubFactory(TeamFactory)
+
+
+class FriendshipInviteFactory(factory.Factory):
+    class Meta:
+        model = FriendshipInvite
+
+    id = factory.Sequence(lambda x: x)
+    from_user = factory.SubFactory(UserFactory)
+    to_user = factory.SubFactory(UserFactory)
 
 
 def random_with_seed(array, seed):

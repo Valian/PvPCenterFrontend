@@ -7,14 +7,12 @@ from common.utils import abstractclassmethod, to_iter
 
 
 class UnableToParseException(Exception):
-
     def __init__(self, cls, e):
         super(UnableToParseException, self).__init__(
             'Unable to create {0} object, more info: {1}'.format(cls, e))
 
 
 class ModelBase(object):
-
     __metaclass__ = ABCMeta
 
     @classmethod
@@ -38,10 +36,10 @@ class ModelBase(object):
 
 
 class ModelList(list):
-
     def __init__(self, data, total):
         super(ModelList, self).__init__(data)
         self.total = total
+
 
     class For(object):
 
@@ -64,7 +62,6 @@ class ModelList(list):
 
 
 class GameRuleEntry(ModelBase):
-
     __slots__ = ('key', 'value')
 
     def __init__(self, key, value):
@@ -83,7 +80,6 @@ class GameRuleEntry(ModelBase):
 
 
 class GameRule(ModelBase):
-
     __slots__ = ('name', 'entries')
 
     def __init__(self, name, entries):
@@ -104,7 +100,6 @@ class GameRule(ModelBase):
 
 
 class Game(ModelBase):
-
     __slots__ = ('id', 'name')
 
     def __init__(self, id, name, rules):
@@ -126,7 +121,6 @@ class Game(ModelBase):
 
 
 class UserGameOwnership(ModelBase):
-
     def __init__(self, id, nickname, game):
         self.id = id
         self.nickname = nickname
@@ -145,7 +139,6 @@ class UserGameOwnership(ModelBase):
 
 
 class User(ModelBase):
-
     def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships):
         self.ranking = ranking
         self.id = id
@@ -192,7 +185,6 @@ class User(ModelBase):
 
 
 class FriendshipInvite(ModelBase):
-
     def __init__(self, id, from_user, to_user):
         """
         :type id: int
@@ -205,8 +197,8 @@ class FriendshipInvite(ModelBase):
 
     @classmethod
     def _from_json(cls, json):
-        from_user = User.from_json(json['from_user']) if json.has_key('from_user') else None
-        to_user = User.from_json(json['to_user']) if json.has_key('to_user') else None
+        from_user = User.from_json(json['from_user']) if 'from_user' in json else None
+        to_user = User.from_json(json['to_user']) if 'to_user' in json else None
         return cls(json['id'], from_user, to_user)
 
     def to_json(self):
@@ -219,7 +211,6 @@ class FriendshipInvite(ModelBase):
 
 
 class Division(ModelBase):
-
     def __init__(self, id, team, game):
         self.id = id
         self.team = team
@@ -237,7 +228,6 @@ class Division(ModelBase):
 
 
 class Team(ModelBase):
-
     def __init__(self, id, name, description, tag, founder, members_count):
         """
         :type id: long
@@ -300,7 +290,6 @@ class TeamMembership(ModelBase):
 
 
 class Error(ModelBase):
-
     __slots__ = ('message',)
 
     def __init__(self, message):
@@ -321,7 +310,6 @@ class Error(ModelBase):
 
 
 class Errors(ModelBase):
-
     __slots__ = ('errors',)
 
     FIELD_NAME = "errors"
@@ -343,7 +331,7 @@ class Errors(ModelBase):
         errors = {
             field: map(Error.from_json, to_iter(errors))
             for field, errors in json.iteritems()
-        }
+            }
         return cls(errors)
 
     def get_errors_for_field(self, field_name):

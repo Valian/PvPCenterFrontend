@@ -226,11 +226,27 @@ class TeamMemberships(Resource):
 
 class FriendshipInvites(Resource):
     
-    # zmergowac modele list z modelami pojedynczymi
+    SINGLE_ENDPOINT = "/{friendship_invite_id}"
+    ACCEPT_ENDPOINT = "/{friendship_invite_id}/accept"
 
-    def get(self, model=ModelList.For(FriendshipInviteModel)):
-        endpoint = self.create_url()
+    def get(self, token, model=ModelList.For(FriendshipInviteModel)):
+        endpoint = self.create_url(params={'access_token': token})
         return self._get_request(endpoint, model)
+
+    def get_single(self, friendship_invite_id, token, model=FriendshipInviteModel):
+        endpoint = self.create_url(
+            suffix=self.SINGLE_ENDPOINT, friendship_invite_id=friendship_invite_id, params={'access_token': token})
+        return self._get_request(endpoint, model)
+
+    def create(self, token, from_user_id, to_user_id, model=FriendshipInviteModel):
+        data = {'from_user_id': from_user_id, 'to_user_id': to_user_id}
+        endpoint = self.create_url(params={'access_token': token})
+        return self._post_request(endpoint, model=model, data=data)
+
+    def accept(self, friendship_invite_id, token, model=FriendshipInviteModel):
+        endpoint = self.create_url(
+            suffix=self.ACCEPT_ENDPOINT, friendship_invite_id=friendship_invite_id, params={'access_token': token})
+        return self._post_request(endpoint, model, data={})
 
 
 class PvPCenterApi(object):
@@ -240,6 +256,7 @@ class PvPCenterApi(object):
     GAME_OWNERSHIPS_ENDPOINT = '/game_ownerships'
     TEAMS_ENDPOINT = '/teams'
     TEAM_MEMBERSHIPS_ENDPOINT = '/team_memberships'
+    FRIENDSHIP_INVITES_ENDPOINT = '/friendship_invites'
 
     def __init__(self, dispatcher, login, password):
         """
@@ -253,5 +270,7 @@ class PvPCenterApi(object):
         self.game_ownerships = GameOwnerships(dispatcher, self.GAME_OWNERSHIPS_ENDPOINT)
         self.teams = Teams(dispatcher, self.TEAMS_ENDPOINT)
         self.team_memberships = TeamMemberships(dispatcher, self.TEAM_MEMBERSHIPS_ENDPOINT)
+        self.friendship_invites = FriendshipInvites(dispatcher, self.FRIENDSHIP_INVITES_ENDPOINT)
+
 
 
