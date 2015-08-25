@@ -138,8 +138,65 @@ class UserGameOwnership(ModelBase):
         return '[UserGameOwnership {0}:{1} {2}]'.format(self.id, self.nickname, self.game)
 
 
+class DeleteResponse(ModelBase):
+
+    def __init__(self, success):
+        self.success = success
+
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json.get('success', True))
+
+    def __str__(self):
+        return 'delete succes: {0}'.format(self.success)
+
+    def to_json(self):
+        return {'success': self.success}
+
+
+class RELATION_TO_CURRENT_USER(object):
+    SEND_INVITE = 'SENT_FRIENDSHIP_INVITE'
+    RECEIVED_INVITE = 'RECEIVED_FRIENDSHIP_INVITE'
+    FRIEND = 'FRIEND'
+    STRANGER = 'STRANGER'
+
+
+class RelationToUser(ModelBase):
+
+    def __init__(self, type, id=None):
+        """
+        :type type: str
+        :type id: long
+        """
+        self.type = type
+        self.id = id
+
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json['type'], json.get('id'))
+
+    @property
+    def is_friend(self):
+        return self.type == RELATION_TO_CURRENT_USER.FRIEND
+
+    @property
+    def invite_send(self):
+        return self.type == RELATION_TO_CURRENT_USER.SEND_INVITE
+
+    @property
+    def invite_received(self):
+        return self.type == RELATION_TO_CURRENT_USER.RECEIVED_INVITE
+
+    def __str__(self):
+        return 'Relation {0} with id {1}'.format(self.type, self.id)
+
+    def to_json(self):
+        return {'id': self.id, 'type': self.type}
+
+
 class User(ModelBase):
-    def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships):
+    def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships,
+                 relation_to_current_user):
         self.ranking = ranking
         self.id = id
         self.name = name
@@ -150,10 +207,13 @@ class User(ModelBase):
         self.birthdate = birthdate
         self.sex = sex
         self.nationality = nationality
+        self.relation_to_current_user = relation_to_current_user
 
     @classmethod
     def _from_json(cls, json):
         game_ownerships = [UserGameOwnership.from_json(go) for go in json.get('game_ownerships', [])]
+        relation = RelationToUser.from_json(
+            json.get('relation_to_current_user', {'type': RELATION_TO_CURRENT_USER.STRANGER}))
         return cls(
             id=json['id'],
             name=json['nickname'],
@@ -162,6 +222,7 @@ class User(ModelBase):
             ranking=json.get('ranking'),
             nationality=json.get('country'),
             sex=json.get('sex'),
+            relation_to_current_user=relation,
             birthdate=json.get('birthdate'),
             description=json.get('description'),
             game_ownerships=game_ownerships)
@@ -178,10 +239,30 @@ class User(ModelBase):
             'sex': self.sex,
             'birthdate': self.birthdate,
             'description': self.description,
-            'ranking': self.ranking}
+            'ranking': self.ranking,
+            'relation_to_current_user': self.relation_to_current_user.to_json()}
 
     def __str__(self):
         return '[User {0}: {1} - {2}, owned games: {3}]'.format(self.id, self.name, self.email, self.game_ownerships)
+
+
+class Friendship(ModelBase):
+
+    def __init__(self, id, friend):
+        self.id = id
+        self.friend = friend
+
+    @classmethod
+    def _from_json(cls, json):
+        friend = User.from_json(json['friend'])
+        return cls(json['id'], friend)
+
+    def to_json(self):
+        friend_json = self.friend.to_json()
+        return {'id': self.id, 'friend': friend_json}
+
+    def __str__(self):
+        return 'Friendship {0} to user {1}'.format(self.id, str(self.friend))
 
 
 class FriendshipInvite(ModelBase):

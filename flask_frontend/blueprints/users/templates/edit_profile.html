@@ -7,11 +7,6 @@
     </a>
   </small>
 </h1>
-<div class="extra-menu">
-  <a href="{{ url_for('users.edit_profile_subview', user_id=current_user.id) }}">
-    <i class="fa fa-pencil-square-o"></i>
-  </a>
-</div>
 {% from 'macros.html' import render_form, flash_messages %}
 {{ flash_messages() }}
 {{ render_form(basic_form, url_for('users.change_basic', user_id=user.id), action_text=gettext('Save profile')) }}

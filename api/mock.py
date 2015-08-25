@@ -13,7 +13,7 @@ import re
 from faker import Factory as FakerFactory
 
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
-    FriendshipInvite
+    FriendshipInvite, Friendship, RELATION_TO_CURRENT_USER, RelationToUser, DeleteResponse
 from api import ApiDispatcherBase, ApiResult
 
 
@@ -89,6 +89,21 @@ class UserGameOwnershipFactory(factory.Factory):
     game = factory.SubFactory(GameFactory)
 
 
+class DeleteResponseFactory(factory.Factory):
+    class Meta:
+        model = DeleteResponse
+
+    success = True
+
+
+class RelationToUserFactory(factory.Factory):
+    class Meta:
+        model = RelationToUser
+
+    type = factory.LazyAttribute(lambda o: vars(RELATION_TO_CURRENT_USER).values()[o.id % 4])
+    id = factory.Sequence(lambda x: x)
+
+
 class UserFactory(factory.Factory):
     class Meta:
         model = User
@@ -103,6 +118,7 @@ class UserFactory(factory.Factory):
     description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
     ranking = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 100 + 30)
     game_ownerships = factory.List([factory.SubFactory(UserGameOwnershipFactory) for _ in xrange(random.randint(2, 5))])
+    relation_to_current_user = factory.LazyAttribute(lambda o: RelationToUserFactory(id=o.id))
 
 
 class TeamFactory(factory.Factory):
@@ -133,6 +149,14 @@ class FriendshipInviteFactory(factory.Factory):
     id = factory.Sequence(lambda x: x)
     from_user = factory.SubFactory(UserFactory)
     to_user = factory.SubFactory(UserFactory)
+
+
+class FriendshipFactory(factory.Factory):
+    class Meta:
+        model = Friendship
+
+    id = factory.Sequence(lambda x: x)
+    friend = factory.SubFactory(UserFactory)
 
 
 def random_with_seed(array, seed):

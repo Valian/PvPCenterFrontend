@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
+from _ast import Delete
 
 import urllib
 
@@ -11,11 +12,13 @@ import urlparse
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
 from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel, \
-    UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel, FriendshipInvite as FriendshipInviteModel
+    UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel, FriendshipInvite as FriendshipInviteModel, \
+    Friendship, DeleteResponse
 from common.logable import Logable
 
 
 undefined = object()
+
 
 def dict_of_defined_keys(**kwargs):
     data = {}
@@ -229,8 +232,9 @@ class FriendshipInvites(Resource):
     SINGLE_ENDPOINT = "/{friendship_invite_id}"
     ACCEPT_ENDPOINT = "/{friendship_invite_id}/accept"
 
-    def get(self, token, model=ModelList.For(FriendshipInviteModel)):
-        endpoint = self.create_url(params={'access_token': token})
+    def get(self, token, to_user_id, model=ModelList.For(FriendshipInviteModel)):
+        params = dict_of_defined_keys(access_token=token, to_user_id=to_user_id)
+        endpoint = self.create_url(params=params)
         return self._get_request(endpoint, model)
 
     def get_single(self, friendship_invite_id, token, model=FriendshipInviteModel):
@@ -243,10 +247,30 @@ class FriendshipInvites(Resource):
         endpoint = self.create_url(params={'access_token': token})
         return self._post_request(endpoint, model=model, data=data)
 
+    def delete(self, friendship_invite_id, token, model=DeleteResponse):
+        endpoint = self.create_url(
+            suffix=self.SINGLE_ENDPOINT, friendship_invite_id=friendship_invite_id, params={'access_token': token})
+        return self._delete_request(endpoint, model)
+
     def accept(self, friendship_invite_id, token, model=FriendshipInviteModel):
         endpoint = self.create_url(
             suffix=self.ACCEPT_ENDPOINT, friendship_invite_id=friendship_invite_id, params={'access_token': token})
         return self._post_request(endpoint, model, data={})
+
+
+class Friendships(Resource):
+
+    SINGLE_ENDPOINT = "/{friendship_id}"
+
+    def get(self, token, user_id, model=ModelList.For(Friendship)):
+        params = dict_of_defined_keys(access_token=token, user_id=user_id)
+        endpoint = self.create_url(params=params)
+        return self._get_request(endpoint, model)
+
+    def delete(self, token, friendship_id, model=DeleteResponse):
+        endpoint = self.create_url(
+            suffix=self.SINGLE_ENDPOINT, friendship_id=friendship_id, params={'access_token': token})
+        return self._delete_request(endpoint, model)
 
 
 class PvPCenterApi(object):
@@ -256,6 +280,7 @@ class PvPCenterApi(object):
     GAME_OWNERSHIPS_ENDPOINT = '/game_ownerships'
     TEAMS_ENDPOINT = '/teams'
     TEAM_MEMBERSHIPS_ENDPOINT = '/team_memberships'
+    FRIENDSHIPS_ENDPOINT = '/friendships'
     FRIENDSHIP_INVITES_ENDPOINT = '/friendship_invites'
 
     def __init__(self, dispatcher, login, password):
@@ -270,6 +295,7 @@ class PvPCenterApi(object):
         self.game_ownerships = GameOwnerships(dispatcher, self.GAME_OWNERSHIPS_ENDPOINT)
         self.teams = Teams(dispatcher, self.TEAMS_ENDPOINT)
         self.team_memberships = TeamMemberships(dispatcher, self.TEAM_MEMBERSHIPS_ENDPOINT)
+        self.friendships = Friendships(dispatcher, self.FRIENDSHIPS_ENDPOINT)
         self.friendship_invites = FriendshipInvites(dispatcher, self.FRIENDSHIP_INVITES_ENDPOINT)
 
 

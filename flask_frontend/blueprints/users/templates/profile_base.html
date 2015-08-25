@@ -8,7 +8,7 @@
   {% if is_my_profile %}
 
     {% set side_menu = [
-      (url_for('users.profile_view', user_id=user.id), 'profile', gettext('Profile')),
+      (url_for('users.profile_subview', user_id=user.id), 'profile', gettext('Profile')),
       (url_for('users.friends_subview', user_id=user.id), 'friends', gettext('Friends')),
       ('#', 'messages', gettext('Messages')),
       ('#', 'match', gettext('Matches')),
@@ -21,7 +21,7 @@
   {% else %}
 
     {% set side_menu = [
-      (url_for('users.profile_view', user_id=user.id), 'profile', gettext('Profile')),
+      (url_for('users.profile_subview', user_id=user.id), 'profile', gettext('Profile')),
       ('#', 'match', gettext('Matches')),
       ('#', 'challenges', gettext('Challenges')),
       ('#', 'leagues', gettext('Leagues')),
@@ -46,7 +46,7 @@
           <li><a href="#">Fnatic</a></li>
         </ul>
       </div>
-      <div class="content" id="content">
+      <div class="content" id="profile_content">
 
       </div>
     </div>
