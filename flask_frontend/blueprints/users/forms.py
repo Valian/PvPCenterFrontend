@@ -31,7 +31,7 @@ class ChangeEmailForm(ApiForm):
         self.server_errors.extend(errors.get_errors_for_field("message"))
 
     def _make_request(self):
-        return self._api.user.patch(self.user_id, self.token, email=self.email.data)
+        return self._api.users.patch(self.user_id, self.token, email=self.email.data)
 
 
 class ChangeBasicDataForm(ApiForm):
@@ -65,7 +65,7 @@ class ChangeBasicDataForm(ApiForm):
         self.server_errors.extend(errors.get_errors_for_field("message"))
 
     def _make_request(self):
-        return self._api.user.patch(
+        return self._api.users.patch(
             self.user_id, self.token,
             sex=self.sex.data,
             nationality=self.nationality.data,

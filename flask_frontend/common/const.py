@@ -9,7 +9,7 @@ class FLASH_TYPES(object):
     WARNING = 'warning'
 
 
-class SEX:
+class SEX(object):
     UNDEFINED = 0
     MALE = 1
     FEMALE = 2

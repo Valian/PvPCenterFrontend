@@ -8,7 +8,7 @@ from nose_parameterized import parameterized
 
 from api.api import ApiResult
 from api.mock import create_mock_for
-from api.models import User
+from api.models import User, ModelList, FriendshipInvite, RELATION_TO_CURRENT_USER
 from flask_frontend.common.app_test_case import AppTestCase
 
 
@@ -17,13 +17,13 @@ class UsersTests(AppTestCase):
 
     def test_user_profile(self, api_mock):
         return_user = create_mock_for(User)
-        api_mock.user.get.return_value = ApiResult(data=return_user)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
         self.client.get(url_for('users.profile_view', user_id=1))
-        self.assertTrue(api_mock.user.get.called)
+        self.assertTrue(api_mock.users.get_single.called)
 
     def test_my_profile_edit_fails_without_login(self, api_mock):
         return_user = create_mock_for(User)
-        api_mock.user.get.return_value = ApiResult(data=return_user)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
         response = self.client.get(url_for('users.edit_profile_subview', user_id=return_user.id), expect_errors=True)
         self.assertEqual(response.status_code, 403)
 
@@ -35,7 +35,7 @@ class UsersTests(AppTestCase):
 
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_my_friends_calls_api(self, auth_api_mock, api_mock):
-        data = [create_mock_for(User) for _ in xrange(3)]
+        data = create_mock_for(ModelList.For(User), 3)
         api_mock.users.get.return_value = ApiResult(data=data)
         _, user = self.login_user(auth_api_mock)
         response = self.client.get(url_for('users.friends_subview', user_id=user.id))
@@ -45,6 +45,53 @@ class UsersTests(AppTestCase):
         self.assertEqual(call_kwargs['friends_of_user_id'], user.id)
         self.assertIn('friends', response.context)
         self.assertIsInstance(response.context['friends'], list)
+
+    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
+    def test_invite_friend_calls_api(self, auth_api_mock, api_mock):
+        _, user = self.login_user(auth_api_mock)
+        self.client.post(url_for('users.invite_to_friends', user_id=8))
+        self.assertTrue(api_mock.friendship_invites.create.called)
+        self.assertEqual(api_mock.friendship_invites.create.call_args, mock.call(user.token, user.id, 8))
+
+    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
+    def test_accept_friend_invite_calls_api(self, auth_api_mock, api_mock):
+        _, user = self.login_user(auth_api_mock)
+        return_user = create_mock_for(User, relation_to_current_user__type=RELATION_TO_CURRENT_USER.RECEIVED_INVITE)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
+        self.client.post(url_for('users.accept_invite_to_friends', user_id=5))
+        self.assertTrue(api_mock.friendship_invites.accept.called)
+        self.assertEqual(api_mock.friendship_invites.accept.call_args, mock.call(
+            user.token, return_user.relation_to_current_user.id))
+
+    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
+    def test_decline_friend_invite_calls_api(self, auth_api_mock, api_mock):
+        _, user = self.login_user(auth_api_mock)
+        return_user = create_mock_for(User, relation_to_current_user__type=RELATION_TO_CURRENT_USER.RECEIVED_INVITE)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
+        self.client.post(url_for('users.decline_invite_to_friends', user_id=5))
+        self.assertTrue(api_mock.friendship_invites.delete.called)
+        self.assertEqual(api_mock.friendship_invites.delete.call_args, mock.call(
+            user.token, return_user.relation_to_current_user.id))
+
+    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
+    def test_remove_friend_calls_api(self, auth_api_mock, api_mock):
+        _, user = self.login_user(auth_api_mock)
+        return_user = create_mock_for(User, relation_to_current_user__type=RELATION_TO_CURRENT_USER.FRIEND)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
+        self.client.post(url_for('users.remove_from_friends', user_id=5))
+        self.assertTrue(api_mock.friendships.delete.called)
+        self.assertEqual(api_mock.friendships.delete.call_args, mock.call(
+            user.token, return_user.relation_to_current_user.id))
+
+    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
+    def test_remove_sent_friendship_invitation_calls_api(self, auth_api_mock, api_mock):
+        _, user = self.login_user(auth_api_mock)
+        return_user = create_mock_for(User, relation_to_current_user__type=RELATION_TO_CURRENT_USER.SEND_INVITE)
+        api_mock.users.get_single.return_value = ApiResult(data=return_user)
+        self.client.post(url_for('users.decline_invite_to_friends', user_id=5))
+        self.assertTrue(api_mock.friendship_invites.delete.called)
+        self.assertEqual(api_mock.friendship_invites.delete.call_args, mock.call(
+            user.token, return_user.relation_to_current_user.id))
 
 
 class UsersWithAuthTests(AppTestCase):
@@ -58,20 +105,20 @@ class UsersWithAuthTests(AppTestCase):
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_email_edit(self, data, should_call_api, auth_api_mock, api_mock):
         _, user = self.login_user(auth_api_mock)
-        api_mock.user.patch.return_value = ApiResult(data=user)
+        api_mock.users.patch.return_value = ApiResult(data=user)
         response = self.client.post(url_for('users.change_email', user_id=user.id), params=data)
         self.assertEqual(response.status_code, 200)
         if should_call_api:
-            self.assertEqual(api_mock.user.patch.call_count, 1)
-            self.assertEqual(api_mock.user.patch.call_args, mock.call(user.id, user.token, email=data['email']))
+            self.assertEqual(api_mock.users.patch.call_count, 1)
+            self.assertEqual(api_mock.users.patch.call_args, mock.call(user.id, user.token, email=data['email']))
         else:
-            self.assertFalse(api_mock.user.patch.called)
+            self.assertFalse(api_mock.users.patch.called)
 
     @mock.patch('flask_frontend.blueprints.users.views.users_blueprint.api')
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_basic_info_edit(self, auth_api_mock, api_mock):
         _, user = self.login_user(auth_api_mock)
-        api_mock.user.patch.return_value = ApiResult(data=user)
+        api_mock.users.patch.return_value = ApiResult(data=user)
         nationality = 'en'
         birthdate = datetime.date(1992, 12, 23)
         about_me = 'Me like me'
@@ -79,7 +126,7 @@ class UsersWithAuthTests(AppTestCase):
         data = {'nationality': nationality, 'birthdate': birthdate, 'description': about_me, 'sex': sex}
         response = self.client.post(url_for('users.change_basic', user_id=user.id), params=data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(api_mock.user.patch.call_count, 1)
-        self.assertEqual(api_mock.user.patch.call_args, mock.call(
+        self.assertEqual(api_mock.users.patch.call_count, 1)
+        self.assertEqual(api_mock.users.patch.call_args, mock.call(
             user.id, user.token, nationality=nationality, sex=sex, description=about_me, birthdate=birthdate))
 

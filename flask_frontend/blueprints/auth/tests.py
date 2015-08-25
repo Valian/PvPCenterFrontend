@@ -17,7 +17,7 @@ class AuthTests(AppTestCase):
     def test_login(self, api_mock):
         response, user = self.login_user(api_mock)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(api_mock.login.post.called)
+        self.assertTrue(api_mock.users.login.called)
         self.assertIn('Logout', response.body)
         logged_user = response.context['current_user']
         self.assertEqual(user, logged_user)
@@ -28,7 +28,7 @@ class AuthTests(AppTestCase):
     def test_login_remember_me(self, api_mock, flask_login_mock):
         response, user = self.login_user(api_mock, remember=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(api_mock.login.post.called)
+        self.assertTrue(api_mock.users.login.called)
         self.assertTrue(flask_login_mock.login_user.called)
         self.assertEqual(mock.call(user, remember=True), flask_login_mock.login_user.call_args)
 
@@ -43,7 +43,7 @@ class AuthTests(AppTestCase):
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_invalid_email(self, data, error_message, api_mock):
         response, user = self.login_user(api_mock, data=data)
-        self.assertFalse(api_mock.login.post.called)
+        self.assertFalse(api_mock.users.login.called)
         self.assertNotIn('Logout', response.body)
         self.assertIn(error_message, response.body)
 

@@ -7,14 +7,12 @@ from common.utils import abstractclassmethod, to_iter
 
 
 class UnableToParseException(Exception):
-
     def __init__(self, cls, e):
         super(UnableToParseException, self).__init__(
             'Unable to create {0} object, more info: {1}'.format(cls, e))
 
 
 class ModelBase(object):
-
     __metaclass__ = ABCMeta
 
     @classmethod
@@ -38,10 +36,10 @@ class ModelBase(object):
 
 
 class ModelList(list):
-
     def __init__(self, data, total):
         super(ModelList, self).__init__(data)
         self.total = total
+
 
     class For(object):
 
@@ -64,7 +62,6 @@ class ModelList(list):
 
 
 class GameRuleEntry(ModelBase):
-
     __slots__ = ('key', 'value')
 
     def __init__(self, key, value):
@@ -83,7 +80,6 @@ class GameRuleEntry(ModelBase):
 
 
 class GameRule(ModelBase):
-
     __slots__ = ('name', 'entries')
 
     def __init__(self, name, entries):
@@ -104,7 +100,6 @@ class GameRule(ModelBase):
 
 
 class Game(ModelBase):
-
     __slots__ = ('id', 'name')
 
     def __init__(self, id, name, rules):
@@ -126,7 +121,6 @@ class Game(ModelBase):
 
 
 class UserGameOwnership(ModelBase):
-
     def __init__(self, id, nickname, game):
         self.id = id
         self.nickname = nickname
@@ -144,9 +138,65 @@ class UserGameOwnership(ModelBase):
         return '[UserGameOwnership {0}:{1} {2}]'.format(self.id, self.nickname, self.game)
 
 
-class User(ModelBase):
+class DeleteResponse(ModelBase):
 
-    def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships):
+    def __init__(self, success):
+        self.success = success
+
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json.get('success', True))
+
+    def __str__(self):
+        return 'delete succes: {0}'.format(self.success)
+
+    def to_json(self):
+        return {'success': self.success}
+
+
+class RELATION_TO_CURRENT_USER(object):
+    SEND_INVITE = 'SENT_FRIENDSHIP_INVITE'
+    RECEIVED_INVITE = 'RECEIVED_FRIENDSHIP_INVITE'
+    FRIEND = 'FRIEND'
+    STRANGER = 'STRANGER'
+
+
+class RelationToUser(ModelBase):
+
+    def __init__(self, type, id=None):
+        """
+        :type type: str
+        :type id: long
+        """
+        self.type = type
+        self.id = id
+
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json['type'], json.get('id'))
+
+    @property
+    def is_friend(self):
+        return self.type == RELATION_TO_CURRENT_USER.FRIEND
+
+    @property
+    def invite_send(self):
+        return self.type == RELATION_TO_CURRENT_USER.SEND_INVITE
+
+    @property
+    def invite_received(self):
+        return self.type == RELATION_TO_CURRENT_USER.RECEIVED_INVITE
+
+    def __str__(self):
+        return 'Relation {0} with id {1}'.format(self.type, self.id)
+
+    def to_json(self):
+        return {'id': self.id, 'type': self.type}
+
+
+class User(ModelBase):
+    def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships,
+                 relation_to_current_user):
         self.ranking = ranking
         self.id = id
         self.name = name
@@ -157,18 +207,22 @@ class User(ModelBase):
         self.birthdate = birthdate
         self.sex = sex
         self.nationality = nationality
+        self.relation_to_current_user = relation_to_current_user
 
     @classmethod
     def _from_json(cls, json):
         game_ownerships = [UserGameOwnership.from_json(go) for go in json.get('game_ownerships', [])]
+        relation = RelationToUser.from_json(
+            json.get('relation_to_current_user', {'type': RELATION_TO_CURRENT_USER.STRANGER}))
         return cls(
             id=json['id'],
             name=json['nickname'],
             email=json['email'],
             token=json.get('access_token'),
-            ranking=json['ranking'],
+            ranking=json.get('ranking'),
             nationality=json.get('country'),
             sex=json.get('sex'),
+            relation_to_current_user=relation,
             birthdate=json.get('birthdate'),
             description=json.get('description'),
             game_ownerships=game_ownerships)
@@ -185,14 +239,59 @@ class User(ModelBase):
             'sex': self.sex,
             'birthdate': self.birthdate,
             'description': self.description,
-            'ranking': self.ranking}
+            'ranking': self.ranking,
+            'relation_to_current_user': self.relation_to_current_user.to_json()}
 
     def __str__(self):
         return '[User {0}: {1} - {2}, owned games: {3}]'.format(self.id, self.name, self.email, self.game_ownerships)
 
 
-class Division(ModelBase):
+class Friendship(ModelBase):
 
+    def __init__(self, id, friend):
+        self.id = id
+        self.friend = friend
+
+    @classmethod
+    def _from_json(cls, json):
+        friend = User.from_json(json['friend'])
+        return cls(json['id'], friend)
+
+    def to_json(self):
+        friend_json = self.friend.to_json()
+        return {'id': self.id, 'friend': friend_json}
+
+    def __str__(self):
+        return 'Friendship {0} to user {1}'.format(self.id, str(self.friend))
+
+
+class FriendshipInvite(ModelBase):
+    def __init__(self, id, from_user, to_user):
+        """
+        :type id: int
+        :type from_user: User
+        :type to_user: User
+        """
+        self.id = id
+        self.from_user = from_user
+        self.to_user = to_user
+
+    @classmethod
+    def _from_json(cls, json):
+        from_user = User.from_json(json['from_user']) if 'from_user' in json else None
+        to_user = User.from_json(json['to_user']) if 'to_user' in json else None
+        return cls(json['id'], from_user, to_user)
+
+    def to_json(self):
+        to_user_json = self.to_user.to_json() if self.to_user else None
+        from_user_json = self.from_user.to_json() if self.from_user else None
+        return {'id': self.id, 'to_user': to_user_json, 'from_user': from_user_json}
+
+    def __str__(self):
+        return 'Friendship invite from user {0} to user {1}'.format(self.from_user, self.to_user)
+
+
+class Division(ModelBase):
     def __init__(self, id, team, game):
         self.id = id
         self.team = team
@@ -210,7 +309,6 @@ class Division(ModelBase):
 
 
 class Team(ModelBase):
-
     def __init__(self, id, name, description, tag, founder, members_count):
         """
         :type id: long
@@ -273,7 +371,6 @@ class TeamMembership(ModelBase):
 
 
 class Error(ModelBase):
-
     __slots__ = ('message',)
 
     def __init__(self, message):
@@ -294,7 +391,6 @@ class Error(ModelBase):
 
 
 class Errors(ModelBase):
-
     __slots__ = ('errors',)
 
     FIELD_NAME = "errors"
@@ -316,7 +412,7 @@ class Errors(ModelBase):
         errors = {
             field: map(Error.from_json, to_iter(errors))
             for field, errors in json.iteritems()
-        }
+            }
         return cls(errors)
 
     def get_errors_for_field(self, field_name):

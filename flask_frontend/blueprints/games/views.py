@@ -19,7 +19,7 @@ def games_view():
 
 @games_blueprint.route('/<int:game_id>')
 def game_view(game_id):
-    game = get_or_404(games_blueprint.api.game.get, game_id)
+    game = get_or_404(games_blueprint.api.games.get_single, game_id)
     return flask.render_template('game.html', game=game)
 
 

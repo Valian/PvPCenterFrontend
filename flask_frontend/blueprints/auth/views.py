@@ -18,7 +18,7 @@ def init(state):
 
     @login_manager.user_loader
     def load_user(user_id):
-        response = auth_blueprint.api.user.get(user_id, model=User)
+        response = auth_blueprint.api.users.get_single(user_id, model=User)
         if response.ok:
             return response.data
         return None

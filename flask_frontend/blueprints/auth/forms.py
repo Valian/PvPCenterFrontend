@@ -23,7 +23,7 @@ class LoginForm(ApiForm):
         self.server_errors = errors.get_errors_for_field('message')
 
     def _make_request(self):
-        return self._api.login.post(self.email.data, self.password.data, model=User)
+        return self._api.users.login(self.email.data, self.password.data, model=User)
 
 
 class RegisterForm(ApiForm):
