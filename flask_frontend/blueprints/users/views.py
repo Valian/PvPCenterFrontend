@@ -40,6 +40,14 @@ def profile_subview(user_id):
     return flask.render_template("user_profile.html", user=user)
 
 
+@users_blueprint.route("/<int:user_id>/teams")
+def teams_subview(user_id):
+    user = get_or_404(users_blueprint.api.users.get_single, user_id)
+    teams_memberships = get_or_500(users_blueprint.api.team_memberships.get, user_id=user_id)
+    teams = map(lambda tm: tm.team, teams_memberships)
+    return flask.render_template("user_teams.html", user=user, teams=teams)
+
+
 @users_blueprint.route("/<int:user_id>/invite", methods=["POST"])
 @flask_login.login_required
 def invite_to_friends(user_id):

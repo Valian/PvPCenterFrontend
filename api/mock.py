@@ -29,14 +29,15 @@ def create_mock_for(model, list_count=5, **kwargs):
         data = [underlying_model.from_json(fac(**kwargs).to_json()) for _ in xrange(list_count)]
         return ModelList(data, len(data))
     fac = find_factory_in_inheritance_chain(model)
-    return model.from_json(fac(**kwargs).to_json())
+    generated_model = fac(**kwargs)
+    return model.from_json(generated_model.to_json())
 
 
 def find_factory_in_inheritance_chain(model):
-        for cls in model.__mro__:
-            if cls in factories_by_model:
-                return factories_by_model[cls]
-        raise NotImplemented("Create factory for {0} first".format(model))
+    for cls in model.__mro__:
+        if cls in factories_by_model:
+            return factories_by_model[cls]
+    raise NotImplemented("Create factory for {0} first".format(model))
 
 
 class ApiDispatcherMock(ApiDispatcherBase):
@@ -118,7 +119,7 @@ class UserFactory(factory.Factory):
     description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
     ranking = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 100 + 30)
     game_ownerships = factory.List([factory.SubFactory(UserGameOwnershipFactory) for _ in xrange(random.randint(2, 5))])
-    relation_to_current_user = factory.LazyAttribute(lambda o: RelationToUserFactory(id=o.id))
+    relation_to_current_user = factory.SubFactory(RelationToUserFactory)
 
 
 class TeamFactory(factory.Factory):

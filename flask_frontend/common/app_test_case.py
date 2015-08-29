@@ -6,6 +6,7 @@ from unittest import TestCase
 
 from flask import url_for
 from flask_webtest import TestApp
+import mock
 
 from api.api import ApiResult
 from api.mock import create_mock_for
@@ -23,6 +24,18 @@ def should_follow_redirect(f, callback):
             location = filter(lambda h: h[0] == 'Location', response.headerlist)[0][1]
             return callback(location)
         return response
+    return wrapper
+
+
+def logged_in(f):
+    @wraps(f)
+    def wrapper(self, *args, **kwargs):
+        """
+        :type self: AppTestCase
+        """
+        with mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api') as auth_mock:
+            _, user = self.login_user(auth_mock)
+            return f(self, user, *args, **kwargs)
     return wrapper
 
 

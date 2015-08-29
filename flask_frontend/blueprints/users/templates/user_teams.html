@@ -1,0 +1,16 @@
+<h1 class="name">
+  <span>{{ gettext('Teams of %(name)s', name=user.name) }}</span>
+</h1>
+<div>
+  <ul>
+    {% for team in teams %}
+      <li>
+        <a href="{{ url_for('teams.team_view', team_id = team.id) }}">
+            <b>{{ team.name }}</b>
+            {{ team.tag }}
+            {{ team.members_count }}
+        </a>
+      </li>
+    {%  endfor %}
+  </ul>
+</div>

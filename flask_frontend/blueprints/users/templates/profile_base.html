@@ -15,7 +15,7 @@
       ('#', 'challenges', gettext('Challenges')),
       ('#', 'leagues', gettext('Leagues')),
       ('#', 'settings', gettext('Settings')),
-      ('#', 'teams', gettext('Teams'))
+      (url_for('users.teams_subview', user_id=user.id), 'teams', gettext('Teams'))
     ] -%}
 
   {% else %}
@@ -25,7 +25,7 @@
       ('#', 'match', gettext('Matches')),
       ('#', 'challenges', gettext('Challenges')),
       ('#', 'leagues', gettext('Leagues')),
-      ('#', 'teams', gettext('Teams'))
+      (url_for('users.teams_subview', user_id=user.id), 'teams', gettext('Teams'))
     ] -%}
 
   {% endif %}
