@@ -4,7 +4,10 @@ from flask_frontend.config.common import CommonConfig
 
 
 def get_local_config(config=None):
-    from flask_frontend.config.local import LocalConfig
+    try:
+        from flask_frontend.config.local import LocalConfig
+    except ImportError:
+        LocalConfig = {}
     from flask_frontend.config.dev import DevConfig
     return _create_config(CommonConfig, DevConfig, LocalConfig, config)
 
