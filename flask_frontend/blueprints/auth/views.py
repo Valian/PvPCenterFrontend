@@ -31,11 +31,12 @@ def before_app_request():
 
 @auth_blueprint.route("/login", methods=['GET', 'POST'])
 def login():
-    if flask.g.login_form.validate_on_submit():
-        flask_login.login_user(flask.g.login_form.result, remember=flask.g.login_form.remember_me.data)
-        return flask.redirect(flask.url_for('index'))
+    form = flask.g.login_form
+    if form.validate_on_submit():
+        flask_login.login_user(form.result, remember=form.remember_me.data)
+        return form.redirect(flask.url_for('index'))
 
-    return flask.render_template("login.html", form=flask.g.login_form)
+    return flask.render_template("login.html", form=form)
 
 
 @auth_blueprint.route("/logout", methods=['POST'])

@@ -1,5 +1,5 @@
-loadMenu = (url) ->
+loadAsync = (url, target) ->
   if url == '#'
     return
   $.get url, (data) ->
-    $('#profile_content').html(data)
+    $(target).html(data)

@@ -1,1 +1,18 @@
-PLACEHOLDER
+{% extends 'main.html' %}
+
+{% block content %}
+  <div class="col-md-9">
+    <h1>{{ gettext("Notifications") }}</h1>
+    {# we also need searching here, it's not yet implemented but template should contain it, maybe with JS? #}
+    {% for notification in notifications %}
+    <div>
+        <div>
+            <b>{{ notification.title }}</b>
+            {{ notification.time }}
+        </div>
+        {{ notification.content }}
+    </div>
+    {% if not loop.last %} <hr> {% endif %}
+    {%  endfor %}
+  </div>
+{% endblock content %}

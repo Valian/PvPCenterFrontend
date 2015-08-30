@@ -6,11 +6,12 @@ import wtforms
 from flask_babel import gettext
 from wtforms.validators import Length, Email, Regexp, DataRequired, EqualTo
 
-from .user import User
 from flask_frontend.common.api_helper import ApiForm
+from flask_frontend.common.redirect import RedirectFormMixin
+from .user import User
 
 
-class LoginForm(ApiForm):
+class LoginForm(RedirectFormMixin, ApiForm):
 
     email = wtforms.StringField(gettext('Email'), validators=[Email(message=gettext('Invalid email'))])
     password = wtforms.PasswordField(gettext('Password'), validators=[
