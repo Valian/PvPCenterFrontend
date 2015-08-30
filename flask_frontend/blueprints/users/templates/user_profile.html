@@ -13,7 +13,7 @@
 </h1>
 <div class="extra-menu">
   {% if is_my_profile %}
-    <a onclick="loadMenu('{{ url_for('users.edit_profile_subview', user_id=user.id) }}')">
+    <a href="{{ url_for('users.edit_profile_view', user_id=user.id) }}" data-pjax="#profile-content">
       <i class="fa fa-pencil-square-o"></i>
     </a>
   {% else %}

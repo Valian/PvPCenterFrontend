@@ -19,6 +19,7 @@
     "bootstrap": "~3.3.5",
     "owlcar": "~1.3.2",
     "components-font-awesome": "~4.3.0",
-    "flag-icon-css": "~0.7.1"
+    "flag-icon-css": "~0.7.1",
+    "jquery-pjax": "~1.9.6"
   }
 }

@@ -13,7 +13,7 @@ from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
 from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel, \
     UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel, FriendshipInvite as FriendshipInviteModel, \
-    Friendship, DeleteResponse
+    Friendship, DeleteResponse, Notification
 from common.logable import Logable
 
 
@@ -202,6 +202,14 @@ class Teams(Resource):
         return self._patch_request(endpoint, model=model, data=data)
 
 
+class Notifications(Resource):
+
+    def get(self, token, user_id, model=ModelList.For(Notification)):
+        params = {"access_token": token, "user_id": user_id}
+        endpoint = self.create_url(params=params)
+        return self._get_request(endpoint, model=model)
+
+
 class TeamMemberships(Resource):
 
     SINGLE_ENDPOINT = "/{team_membership_id}"
@@ -282,6 +290,7 @@ class PvPCenterApi(object):
     TEAM_MEMBERSHIPS_ENDPOINT = '/team_memberships'
     FRIENDSHIPS_ENDPOINT = '/friendships'
     FRIENDSHIP_INVITES_ENDPOINT = '/friendship_invites'
+    NOTIFICATIONS_ENDPOINT = '/notifications'
 
     def __init__(self, dispatcher, login, password):
         """
@@ -297,6 +306,7 @@ class PvPCenterApi(object):
         self.team_memberships = TeamMemberships(dispatcher, self.TEAM_MEMBERSHIPS_ENDPOINT)
         self.friendships = Friendships(dispatcher, self.FRIENDSHIPS_ENDPOINT)
         self.friendship_invites = FriendshipInvites(dispatcher, self.FRIENDSHIP_INVITES_ENDPOINT)
+        self.notifications = Notifications(dispatcher, self.NOTIFICATIONS_ENDPOINT)
 
 
 

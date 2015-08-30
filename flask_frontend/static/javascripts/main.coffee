@@ -81,3 +81,4 @@ $(window).scroll ->
   stickyNav()
 $(document).on 'click', '.search-toggle a', ->
   $('.search-input input').width searchWidth()
+$(document).pjax('a[data-pjax]')

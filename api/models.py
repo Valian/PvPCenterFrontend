@@ -344,6 +344,7 @@ class Team(ModelBase):
 
 
 class TeamMembership(ModelBase):
+
     def __init__(self, id, user, team):
         """
         :type id: long
@@ -368,6 +369,35 @@ class TeamMembership(ModelBase):
             'id': self.id,
             'user': self.user.to_json(),
             'team': self.team.to_json()}
+
+
+class Notification(ModelBase):
+
+    def __init__(self, title, content, notification_type, time, checked):
+        """
+        :type title: str
+        :type content: str
+        :type notification_type: str
+        :type time: datetime
+        :type checked: bool
+        """
+        self.title = title
+        self.content = content
+        self.type = notification_type
+        self.time = time
+        self.checked = checked
+
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json['title'], json['content'], json['type'], json['time'], json['checked'])
+
+    def to_json(self):
+        return {
+            'title': self.title, 'content': self.content, 'time': self.time, 'type': self.type,
+            'checked': self.checked}
+
+    def __str__(self):
+        return 'Notification {0}: {1} - {2}'.format(self.time, self.title, self.content)
 
 
 class Error(ModelBase):

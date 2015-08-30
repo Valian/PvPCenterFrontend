@@ -2,7 +2,12 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
 from flask import Blueprint
+import flask
 
+
+def render_pjax(base, view, **kwargs):
+    is_pijax = "X-PJAX" in flask.request.headers
+    return flask.render_template('pjax_wrapper.html', is_pjax=is_pijax, extends=base, view=view, **kwargs)
 
 class InvalidConfigurationException(Exception):
     def __init__(self, blueprint_name, e):
@@ -56,3 +61,4 @@ class Pagination(object):
                     yield None
                 yield num
                 last = num
+

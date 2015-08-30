@@ -24,19 +24,19 @@ class UsersTests(AppTestCase):
     def test_my_profile_edit_fails_without_login(self, api_mock):
         return_user = create_mock_for(User)
         api_mock.users.get_single.return_value = ApiResult(data=return_user)
-        response = self.client.get(url_for('users.edit_profile_subview', user_id=return_user.id), expect_errors=True)
+        response = self.client.get(url_for('users.edit_profile_view', user_id=return_user.id), expect_errors=True)
         self.assertEqual(response.status_code, 403)
 
     @logged_in
     def test_profile_edit_pass_when_logged(self, user, api_mock):
-        response = self.client.get(url_for('users.edit_profile_subview', user_id=user.id))
+        response = self.client.get(url_for('users.edit_profile_view', user_id=user.id))
         self.assertEqual(response.status_code, 200)
 
     @logged_in
     def test_my_friends_calls_api(self, user, api_mock):
         data = create_mock_for(ModelList.For(User), 3)
         api_mock.users.get.return_value = ApiResult(data=data)
-        response = self.client.get(url_for('users.friends_subview', user_id=user.id))
+        response = self.client.get(url_for('users.friends_view', user_id=user.id))
         self.assertEqual(api_mock.users.get.call_count, 1)
         call_kwargs = api_mock.users.get.call_args[1]
         self.assertIn('friends_of_user_id', call_kwargs)
@@ -91,7 +91,7 @@ class UsersTests(AppTestCase):
         returned_teams = create_mock_for(ModelList.For(TeamMembership))
         api_mock.users.get_single.return_value = ApiResult(data=return_user)
         api_mock.team_memberships.get.return_value = ApiResult(data=returned_teams)
-        response = self.client.get(url_for('users.teams_subview', user_id=5))
+        response = self.client.get(url_for('users.teams_view', user_id=5))
         self.assertIsInstance(response.context['teams'], list)
 
 class UsersWithAuthTests(AppTestCase):

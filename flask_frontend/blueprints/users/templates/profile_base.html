@@ -8,24 +8,24 @@
   {% if is_my_profile %}
 
     {% set side_menu = [
-      (url_for('users.profile_subview', user_id=user.id), 'profile', gettext('Profile')),
-      (url_for('users.friends_subview', user_id=user.id), 'friends', gettext('Friends')),
+      (url_for('users.profile_view', user_id=user.id), 'profile', gettext('Profile')),
+      (url_for('users.friends_view', user_id=user.id), 'friends', gettext('Friends')),
       ('#', 'messages', gettext('Messages')),
       ('#', 'match', gettext('Matches')),
       ('#', 'challenges', gettext('Challenges')),
       ('#', 'leagues', gettext('Leagues')),
       ('#', 'settings', gettext('Settings')),
-      (url_for('users.teams_subview', user_id=user.id), 'teams', gettext('Teams'))
+      (url_for('users.teams_view', user_id=user.id), 'teams', gettext('Teams'))
     ] -%}
 
   {% else %}
 
     {% set side_menu = [
-      (url_for('users.profile_subview', user_id=user.id), 'profile', gettext('Profile')),
+      (url_for('users.profile_view', user_id=user.id), 'profile', gettext('Profile')),
       ('#', 'match', gettext('Matches')),
       ('#', 'challenges', gettext('Challenges')),
       ('#', 'leagues', gettext('Leagues')),
-      (url_for('users.teams_subview', user_id=user.id), 'teams', gettext('Teams'))
+      (url_for('users.teams_view', user_id=user.id), 'teams', gettext('Teams'))
     ] -%}
 
   {% endif %}
@@ -40,22 +40,18 @@
         </div>
         <ul>
           {% for url, id, text in side_menu %}
-            <li><a href="#{{ id }}" onclick="loadMenu('{{ url }}')">{{ text }}</a></li>
+            <li><a href="{{ url }}" data-pjax="#profile_content">{{ text }}</a></li>
           {% endfor %}
           <li><hr></li>
           <li><a href="#">Fnatic</a></li>
         </ul>
       </div>
       <div class="content" id="profile_content">
+        {% block pjax_content %}
 
+        {% endblock %}
       </div>
     </div>
   </div>
-
-  {% if view %}
-    <script>
-      loadMenu('{{ url_for(view, user_id = user.id) }}');
-    </script>
-  {% endif  %}
 
 {% endblock content %}

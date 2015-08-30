@@ -13,7 +13,7 @@ import re
 from faker import Factory as FakerFactory
 
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
-    FriendshipInvite, Friendship, RELATION_TO_CURRENT_USER, RelationToUser, DeleteResponse
+    FriendshipInvite, Friendship, RELATION_TO_CURRENT_USER, RelationToUser, DeleteResponse, Notification
 from api import ApiDispatcherBase, ApiResult
 
 
@@ -158,6 +158,17 @@ class FriendshipFactory(factory.Factory):
 
     id = factory.Sequence(lambda x: x)
     friend = factory.SubFactory(UserFactory)
+
+
+class NotificationFactory(factory.Factory):
+    class Meta:
+        model = Notification
+
+    title = factory.Iterator(["You got new friend invite", "You must see this", "Upcoming tournament"])
+    content = faker.text()
+    notification_type = factory.Iterator(["Info", "Event", "Unknown"])
+    time = factory.LazyAttribute(lambda o: datetime.datetime.utcnow() - datetime.timedelta(minutes=random.randint(5, 500)))
+    checked = factory.Iterator([True, False])
 
 
 def random_with_seed(array, seed):

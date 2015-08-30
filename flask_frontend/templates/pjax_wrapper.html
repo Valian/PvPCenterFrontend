@@ -1,0 +1,13 @@
+{% if not is_pjax and view %}
+
+  {% extends extends %}
+
+  {% block pjax_content %}
+    {% include view %}
+  {% endblock %}
+
+{% else %}
+
+  {% include view %}
+
+{% endif %}

@@ -7,6 +7,7 @@ from flask_babel import gettext
 
 from . import users_blueprint
 from flask.ext.frontend.blueprints.users.helpers import only_current_user
+from flask.ext.frontend.common.utils import render_pjax
 from flask_frontend.common.const import SEX, FLASH_TYPES
 from flask_frontend.blueprints.users.forms import ChangeEmailForm, ChangeBasicDataForm
 from flask_frontend.common.api_helper import get_or_404, get_or_500
@@ -27,25 +28,19 @@ def init(state):
     gravatar.init_app(app)
     app.jinja_env.filters['sex'] = sex_to_text
 
-
 @users_blueprint.route("/<int:user_id>")
+@users_blueprint.route("/<int:user_id>/profile")
 def profile_view(user_id):
     user = get_or_404(users_blueprint.api.users.get_single, user_id)
-    return flask.render_template("profile_base.html", user=user, view='users.profile_subview')
-
-
-@users_blueprint.route("/<int:user_id>/profile")
-def profile_subview(user_id):
-    user = get_or_404(users_blueprint.api.users.get_single, user_id)
-    return flask.render_template("user_profile.html", user=user)
+    return render_pjax("profile_base.html", "user_profile.html", user=user)
 
 
 @users_blueprint.route("/<int:user_id>/teams")
-def teams_subview(user_id):
+def teams_view(user_id):
     user = get_or_404(users_blueprint.api.users.get_single, user_id)
     teams_memberships = get_or_500(users_blueprint.api.team_memberships.get, user_id=user_id)
     teams = map(lambda tm: tm.team, teams_memberships)
-    return flask.render_template("user_teams.html", user=user, teams=teams)
+    return render_pjax("profile_base.html", "user_teams.html", user=user, teams=teams)
 
 
 @users_blueprint.route("/<int:user_id>/invite", methods=["POST"])
@@ -110,20 +105,21 @@ def remove_from_friends(user_id):
 @users_blueprint.route("/<int:user_id>/friends")
 @only_current_user
 @flask_login.login_required
-def friends_subview(user_id):
+def friends_view(user_id):
     friends = get_or_500(users_blueprint.api.users.get, friends_of_user_id=flask_login.current_user.id)
-    return flask.render_template("user_friends.html", friends=friends, user=flask_login.current_user)
+    return render_pjax("profile_base.html", "user_friends.html", friends=friends, user=flask_login.current_user)
 
 
 @users_blueprint.route("/<int:user_id>/edit")
 @only_current_user
 @flask_login.login_required
-def edit_profile_subview(user_id):
+def edit_profile_view(user_id):
     change_email_form = ChangeEmailForm(users_blueprint.api, flask_login.current_user)
     change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
     change_basic_form.set_data(flask_login.current_user)
-    return flask.render_template(
-        "edit_profile.html", user=flask_login.current_user, email_form=change_email_form, basic_form=change_basic_form)
+    return render_pjax(
+        "profile_base.html", "edit_profile.html", user=flask_login.current_user, email_form=change_email_form,
+        basic_form=change_basic_form)
 
 
 @users_blueprint.route("/<int:user_id>/edit_email", methods=["POST"])

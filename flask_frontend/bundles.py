@@ -13,6 +13,7 @@ bundles = {
         filters=['coffeescript', 'rjsmin'], output='js/main.min.js'),
     'libs_js': Bundle(
         bower + 'jquery/dist/jquery.min.js',
+        bower + 'jquery-pjax/jquery.pjax.js',
         bower + '*/dist/**/*.min.js',
         bower + 'owlcar/owl-carousel/*.min.js',
         output='js/libs.min.js'),
