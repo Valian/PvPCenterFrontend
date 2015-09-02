@@ -30,9 +30,8 @@ class ModelBase(object):
     def to_json(self):
         raise NotImplementedError
 
-    @abstractmethod
     def __str__(self):
-        return super(ModelBase, self).__str__()
+        return str(vars(self))
 
 
 class ModelList(list):
@@ -72,9 +71,6 @@ class GameRuleEntry(ModelBase):
     def _from_json(cls, json):
         return cls(json['key'], json['value'])
 
-    def __str__(self):
-        return '{0} - {1}'.format(self.key, self.value)
-
     def to_json(self):
         return {'key': self.key, 'value': self.value}
 
@@ -90,9 +86,6 @@ class GameRule(ModelBase):
     def _from_json(cls, json):
         entries = map(GameRuleEntry.from_json, json['entries'])
         return cls(json['name'], entries)
-
-    def __str__(self):
-        return 'Rule {0}: {1}'.format(self.name, ', '.join(map(str, self.entries)))
 
     def to_json(self):
         entries_json = map(GameRuleEntry.to_json, self.entries)
@@ -116,9 +109,6 @@ class Game(ModelBase):
         rules = map(GameRule.to_json, self.rules)
         return {'id': self.id, 'name': self.name, 'rules': rules}
 
-    def __str__(self):
-        return '[Game {0}:{1}]'.format(self.id, self.name)
-
 
 class UserGameOwnership(ModelBase):
     def __init__(self, id, nickname, game):
@@ -134,9 +124,6 @@ class UserGameOwnership(ModelBase):
         game = Game.from_json(json['game'])
         return cls(json['id'], json.get('nickname'), game)
 
-    def __str__(self):
-        return '[UserGameOwnership {0}:{1} {2}]'.format(self.id, self.nickname, self.game)
-
 
 class DeleteResponse(ModelBase):
 
@@ -146,9 +133,6 @@ class DeleteResponse(ModelBase):
     @classmethod
     def _from_json(cls, json):
         return cls(json.get('success', True))
-
-    def __str__(self):
-        return 'delete succes: {0}'.format(self.success)
 
     def to_json(self):
         return {'success': self.success}
@@ -186,9 +170,6 @@ class RelationToUser(ModelBase):
     @property
     def invite_received(self):
         return self.type == RELATION_TO_CURRENT_USER.RECEIVED_INVITE
-
-    def __str__(self):
-        return 'Relation {0} with id {1}'.format(self.type, self.id)
 
     def to_json(self):
         return {'id': self.id, 'type': self.type}
@@ -242,9 +223,6 @@ class User(ModelBase):
             'ranking': self.ranking,
             'relation_to_current_user': self.relation_to_current_user.to_json()}
 
-    def __str__(self):
-        return '[User {0}: {1} - {2}, owned games: {3}]'.format(self.id, self.name, self.email, self.game_ownerships)
-
 
 class Friendship(ModelBase):
 
@@ -260,9 +238,6 @@ class Friendship(ModelBase):
     def to_json(self):
         friend_json = self.friend.to_json()
         return {'id': self.id, 'friend': friend_json}
-
-    def __str__(self):
-        return 'Friendship {0} to user {1}'.format(self.id, str(self.friend))
 
 
 class FriendshipInvite(ModelBase):
@@ -287,9 +262,6 @@ class FriendshipInvite(ModelBase):
         from_user_json = self.from_user.to_json() if self.from_user else None
         return {'id': self.id, 'to_user': to_user_json, 'from_user': from_user_json}
 
-    def __str__(self):
-        return 'Friendship invite from user {0} to user {1}'.format(self.from_user, self.to_user)
-
 
 class Division(ModelBase):
     def __init__(self, id, team, game):
@@ -301,37 +273,31 @@ class Division(ModelBase):
     def _from_json(cls, json):
         raise NotImplementedError()
 
-    def __str__(self):
-        raise NotImplementedError()
-
     def to_json(self):
         raise NotImplementedError()
 
 
 class Team(ModelBase):
-    def __init__(self, id, name, description, tag, founder, members_count):
+    def __init__(self, id, name, description, tag, founder, member_count):
         """
         :type id: long
         :type name: str
         :type description: str
         :type tag: str
         :type founder: User
-        :type members_count: int
+        :type member_count: int
         """
         self.id = id
         self.name = name
         self.description = description
         self.tag = tag
         self.founder = founder
-        self.members_count = members_count
+        self.member_count = member_count
 
     @classmethod
     def _from_json(cls, json):
         founder = User.from_json(json['founder']) if json.has_key('founder') else None
-        return cls(json['id'], json['name'], json.get('description'), json.get('tag'), founder, json['members_count'])
-
-    def __str__(self):
-        return 'Team {0}, founder {1}'.format(self.name, self.founder.name)
+        return cls(json['id'], json['name'], json.get('description'), json.get('tag'), founder, json['member_count'])
 
     def to_json(self):
         return {
@@ -340,7 +306,7 @@ class Team(ModelBase):
             'description': self.description,
             'tag': self.tag,
             'founder': self.founder.to_json() if self.founder else '',
-            'members_count': self.members_count}
+            'member_count': self.member_count}
 
 
 class TeamMembership(ModelBase):
@@ -361,14 +327,33 @@ class TeamMembership(ModelBase):
         team = Team.from_json(json['team'])
         return cls(json['id'], user, team)
 
-    def __str__(self):
-        return 'Membership: User {0}, Team {1}'.format(self.user.name, self.team.name)
-
     def to_json(self):
         return {
             'id': self.id,
             'user': self.user.to_json(),
             'team': self.team.to_json()}
+
+
+class TeamInvite(ModelBase):
+
+    def __init__(self, id, team_id, from_user=None, to_user=None):
+        """
+        :type id: long
+        :type team_id: long
+        :type from_user: long | None
+        :type to_user: long | None
+        """
+        self.id = id
+        self.team_id = team_id
+        self.from_user = from_user
+        self.to_user = to_user
+
+    def to_json(self):
+        return {'id': self.id, 'team_id': self.team_id, 'from_user': self.from_user, 'to_user': self.to_user}
+
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json['id'], json['team_id'], json.get('from_user'), json.get('to_user'))
 
 
 class Notification(ModelBase):
@@ -396,8 +381,6 @@ class Notification(ModelBase):
             'title': self.title, 'content': self.content, 'time': self.time, 'type': self.type,
             'checked': self.checked}
 
-    def __str__(self):
-        return 'Notification {0}: {1} - {2}'.format(self.time, self.title, self.content)
 
 class Error(ModelBase):
     __slots__ = ('message',)
@@ -411,9 +394,6 @@ class Error(ModelBase):
 
     def to_json(self):
         return {}
-
-    def __str__(self):
-        return str(self.__unicode__())
 
     def __unicode__(self):
         return u'{0}'.format(self.message)
@@ -450,6 +430,3 @@ class Errors(ModelBase):
         :rtype: list[Error]
         """
         return self.errors.get(field_name, [])
-
-    def __str__(self):
-        return 'Errors: {0}' + '; '.join(["{0}: {1}".format(k, ','.join(v)) for k, v in self.errors])

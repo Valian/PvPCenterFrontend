@@ -13,7 +13,7 @@ from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
 from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel, \
     UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel, FriendshipInvite as FriendshipInviteModel, \
-    Friendship, DeleteResponse, Notification
+    Friendship, DeleteResponse, Notification, TeamInvite
 from common.logable import Logable
 
 
@@ -237,6 +237,36 @@ class TeamMemberships(Resource):
         return self._patch_request(endpoint, model=model, data=data)
 
 
+class TeamInvites(Resource):
+
+    SINGLE_ENDPOINT = "/{team_invite_id}"
+    ACCEPT_ENDPOINT = "/{team_invite_id}/accept"
+
+    def get(self, to_user_id=undefined, team_id=undefined, model=ModelList.For(TeamInvite)):
+        params = dict_of_defined_keys(to_user_id=to_user_id, team_id=team_id)
+        endpoint = self.create_url(params=params)
+        return self._get_request(endpoint, model=model)
+
+    def get_single(self, team_invite_id, model=TeamMembershipModel):
+        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, team_invite_id=team_invite_id)
+        return self._get_request(endpoint, model=model)
+
+    def create(self, token, user_id, team_id, model=TeamMembershipModel):
+        data = {'from_user': user_id, 'team_id': team_id}
+        endpoint = self.create_url(params={'access_token': token})
+        return self._post_request(endpoint, model=model, data=data)
+
+    def delete(self, team_invite_id, token, model=DeleteResponse):
+        endpoint = self.create_url(
+            suffix=self.SINGLE_ENDPOINT, team_invite_id=team_invite_id, params={'access_token': token})
+        return self._delete_request(endpoint, model)
+
+    def accept(self, team_invite_id, token, model=FriendshipInviteModel):
+        endpoint = self.create_url(
+            suffix=self.ACCEPT_ENDPOINT, team_invite_id=team_invite_id, params={'access_token': token})
+        return self._post_request(endpoint, model, data={})
+
+
 class FriendshipInvites(Resource):
     
     SINGLE_ENDPOINT = "/{friendship_invite_id}"
@@ -290,6 +320,7 @@ class PvPCenterApi(object):
     GAME_OWNERSHIPS_ENDPOINT = '/game_ownerships'
     TEAMS_ENDPOINT = '/teams'
     TEAM_MEMBERSHIPS_ENDPOINT = '/team_memberships'
+    TEAM_INVITE_ENDPOINT = '/team_membership_invite'
     FRIENDSHIPS_ENDPOINT = '/friendships'
     FRIENDSHIP_INVITES_ENDPOINT = '/friendship_invites'
     NOTIFICATIONS_ENDPOINT = '/notifications'
@@ -306,6 +337,7 @@ class PvPCenterApi(object):
         self.game_ownerships = GameOwnerships(dispatcher, self.GAME_OWNERSHIPS_ENDPOINT)
         self.teams = Teams(dispatcher, self.TEAMS_ENDPOINT)
         self.team_memberships = TeamMemberships(dispatcher, self.TEAM_MEMBERSHIPS_ENDPOINT)
+        self.team_invites = TeamInvites(dispatcher, self.TEAM_INVITE_ENDPOINT)
         self.friendships = Friendships(dispatcher, self.FRIENDSHIPS_ENDPOINT)
         self.friendship_invites = FriendshipInvites(dispatcher, self.FRIENDSHIP_INVITES_ENDPOINT)
         self.notifications = Notifications(dispatcher, self.NOTIFICATIONS_ENDPOINT)

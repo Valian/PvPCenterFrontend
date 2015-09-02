@@ -143,6 +143,16 @@ class TeamMembershipFactory(factory.Factory):
     team = factory.SubFactory(TeamFactory)
 
 
+class TeamInviteFactory(factory.Factory):
+    class Meta:
+        model = Team
+
+    id = factory.Sequence(lambda x: x)
+    team = factory.Sequence(lambda x: x)
+    to_user = factory.Sequence(lambda x: x)
+    from_user = factory.Sequence(lambda x: x)
+
+
 class FriendshipInviteFactory(factory.Factory):
     class Meta:
         model = FriendshipInvite
