@@ -43,7 +43,9 @@ class RegisterForm(ApiForm):
     spam = wtforms.BooleanField(gettext("Do you want spam"))
 
     def _handle_errors(self, errors):
-        pass
+        self.login.errors.extend(errors.get_errors_for_field('nickname'))
+        self.password.errors.extend(errors.get_errors_for_field('password'))
+        self.server_errors = errors.get_errors_for_field('message')
 
     def _make_request(self):
         return self._api.users.post(self.login.data, self.email.data, self.password.data, model=User)

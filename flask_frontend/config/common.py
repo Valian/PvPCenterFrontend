@@ -12,6 +12,8 @@ CommonConfig = {
     keys.BACKEND_LOGIN: 'login',
     keys.BACKEND_PASS: 'pass',
 
+    keys.LOG_LEVEL: 'INFO',
+
     keys.SECRET_KEY: 'secrettttt',
     keys.MOCK_API: False,
     keys.LANGUAGES: {

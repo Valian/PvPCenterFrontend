@@ -18,9 +18,15 @@ def init(state):
 
     @login_manager.user_loader
     def load_user(user_id):
+        token = flask.session.get('token')
+        if not token:
+            return None
+
         response = auth_blueprint.api.users.get_single(user_id, model=User)
         if response.ok:
-            return response.data
+            user = response.data
+            user.token = token
+            return user
         return None
 
 
@@ -34,6 +40,7 @@ def login():
     form = flask.g.login_form
     if form.validate_on_submit():
         flask_login.login_user(form.result, remember=form.remember_me.data)
+        flask.session['token'] = form.result.token
         return form.redirect(flask.url_for('index'))
 
     return flask.render_template("login.html", form=form)

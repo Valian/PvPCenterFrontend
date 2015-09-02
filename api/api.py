@@ -82,9 +82,9 @@ class ApiDispatcher(ApiDispatcherBase):
         method = getattr(requests, method.lower())
         return method(url, **kwargs)
 
-    @staticmethod
-    def _convert_to_api_result(model, response):
+    def _convert_to_api_result(self, model, response):
         json = response.json()
+        self.log_debug('Response data: {0}'.format(json))
         if not response.ok:
             return ApiResult(errors=Errors.from_json(json))
         else:
@@ -139,21 +139,23 @@ class Users(Resource):
     SINGLE_ENDPOINT = "/{user_id}"
     LOGIN_ENDPOINT = "/login"
 
-    def get(self, friends_of_user_id=undefined, nickname=undefined, strangers_to_user_id=undefined,
+    def get(self, token=undefined, friends_of_user_id=undefined, nickname=undefined, strangers_to_user_id=undefined,
             model=ModelList.For(UserModel)):
+        token = token or undefined
         params = dict_of_defined_keys(
-            friends_of_user_id=friends_of_user_id, strangers_to_user_id=strangers_to_user_id, nickname=nickname)
+            friends_of_user_id=friends_of_user_id, strangers_to_user_id=strangers_to_user_id, nickname=nickname,
+            access_token=token)
         endpoint = self.create_url(params=params)
-
         return self._get_request(endpoint, model=model)
 
     def post(self, login, email, password, model=UserModel):
         endpoint = self.create_url()
-        data = {'login': login, 'email': email, 'password': password}
+        data = {'nickname': login, 'email': email, 'password': password}
         return self._post_request(endpoint, data=data, model=model)
 
-    def get_single(self, user_id, model=UserModel):
-        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, user_id=user_id)
+    def get_single(self, user_id, token=undefined, model=UserModel):
+        params = dict_of_defined_keys(access_token=token or undefined)
+        endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, user_id=user_id, params=params)
         return self._get_request(endpoint, model=model)
 
     def patch(self, user_id, token, email=undefined, nationality=undefined, sex=undefined, birthdate=undefined,

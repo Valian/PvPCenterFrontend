@@ -173,7 +173,7 @@ class RelationToUser(ModelBase):
 
     @classmethod
     def _from_json(cls, json):
-        return cls(json['type'], json.get('id'))
+        return cls(json)  # cls(json['type'], json.get('id'))
 
     @property
     def is_friend(self):
@@ -398,7 +398,6 @@ class Notification(ModelBase):
 
     def __str__(self):
         return 'Notification {0}: {1} - {2}'.format(self.time, self.title, self.content)
-
 
 class Error(ModelBase):
     __slots__ = ('message',)

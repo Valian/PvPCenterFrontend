@@ -9,12 +9,14 @@ from flask.ext.frontend.common.api_helper import get_or_500
 
 NUMBER_OF_NAVBAR_NOTIFICATIONS = 3
 
+
 @notifications_blueprint.route('')
 @flask_login.login_required
 def index_view():
     user = flask_login.current_user
     notificiations = get_or_500(notifications_blueprint.api.notifications.get, user.token, user.id)
     return flask.render_template('notifications_index.html', notifications=notificiations)
+
 
 @notifications_blueprint.route('/navbar')
 @flask_login.login_required

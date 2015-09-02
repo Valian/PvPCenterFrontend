@@ -35,12 +35,11 @@ def create_app(config=None):
 
 def create_logger(app):
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
-
+    level = app.config.get(keys.LOG_LEVEL, 'INFO')
+    logger.setLevel(level)
     if not app.debug:
         stderr_handler = logging.StreamHandler()
-        stderr_handler.setLevel(logging.INFO)
+        stderr_handler.setLevel(level)
         logger.addHandler(stderr_handler)
-
     return logger
 
