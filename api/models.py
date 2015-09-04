@@ -26,10 +26,6 @@ class ModelBase(object):
     def _from_json(cls, json):
         raise NotImplementedError
 
-    @abstractmethod
-    def to_json(self):
-        raise NotImplementedError
-
     def __str__(self):
         return str(vars(self))
 
@@ -38,7 +34,6 @@ class ModelList(list):
     def __init__(self, data, total):
         super(ModelList, self).__init__(data)
         self.total = total
-
 
     class For(object):
 
@@ -71,9 +66,6 @@ class GameRuleEntry(ModelBase):
     def _from_json(cls, json):
         return cls(json['key'], json['value'])
 
-    def to_json(self):
-        return {'key': self.key, 'value': self.value}
-
 
 class GameRule(ModelBase):
     __slots__ = ('name', 'entries')
@@ -86,10 +78,6 @@ class GameRule(ModelBase):
     def _from_json(cls, json):
         entries = map(GameRuleEntry.from_json, json['entries'])
         return cls(json['name'], entries)
-
-    def to_json(self):
-        entries_json = map(GameRuleEntry.to_json, self.entries)
-        return {'name': self.name, 'entries': entries_json}
 
 
 class Game(ModelBase):
@@ -105,19 +93,12 @@ class Game(ModelBase):
         rules = map(GameRule.from_json, json.get('rules', []))
         return cls(json['id'], json['name'], rules)
 
-    def to_json(self):
-        rules = map(GameRule.to_json, self.rules)
-        return {'id': self.id, 'name': self.name, 'rules': rules}
-
 
 class UserGameOwnership(ModelBase):
     def __init__(self, id, nickname, game):
         self.id = id
         self.nickname = nickname
         self.game = game
-
-    def to_json(self):
-        return {'id': self.id, 'nickname': self.nickname, 'game': self.game.to_json()}
 
     @classmethod
     def _from_json(cls, json):
@@ -134,10 +115,7 @@ class DeleteResponse(ModelBase):
     def _from_json(cls, json):
         return cls(json.get('success', True))
 
-    def to_json(self):
-        return {'success': self.success}
-
-
+   
 class RELATION_TO_CURRENT_USER(object):
     SEND_INVITE = 'SENT_FRIENDSHIP_INVITE'
     RECEIVED_INVITE = 'RECEIVED_FRIENDSHIP_INVITE'
@@ -171,10 +149,7 @@ class RelationToUser(ModelBase):
     def invite_received(self):
         return self.type == RELATION_TO_CURRENT_USER.RECEIVED_INVITE
 
-    def to_json(self):
-        return {'id': self.id, 'type': self.type}
-
-
+    
 class User(ModelBase):
     def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships,
                  relation_to_current_user):
@@ -208,21 +183,6 @@ class User(ModelBase):
             description=json.get('description'),
             game_ownerships=game_ownerships)
 
-    def to_json(self):
-        game_ownerships = [go.to_json() for go in self.game_ownerships]
-        return {
-            'id': self.id,
-            'nickname': self.name,
-            'email': self.email,
-            'access_token': self.token,
-            'game_ownerships': game_ownerships,
-            'country': self.nationality,
-            'sex': self.sex,
-            'birthdate': self.birthdate,
-            'description': self.description,
-            'ranking': self.ranking,
-            'relation_to_current_user': self.relation_to_current_user.to_json()}
-
 
 class Friendship(ModelBase):
 
@@ -234,10 +194,6 @@ class Friendship(ModelBase):
     def _from_json(cls, json):
         friend = User.from_json(json['friend'])
         return cls(json['id'], friend)
-
-    def to_json(self):
-        friend_json = self.friend.to_json()
-        return {'id': self.id, 'friend': friend_json}
 
 
 class FriendshipInvite(ModelBase):
@@ -257,11 +213,6 @@ class FriendshipInvite(ModelBase):
         to_user = User.from_json(json['to_user']) if 'to_user' in json else None
         return cls(json['id'], from_user, to_user)
 
-    def to_json(self):
-        to_user_json = self.to_user.to_json() if self.to_user else None
-        from_user_json = self.from_user.to_json() if self.from_user else None
-        return {'id': self.id, 'to_user': to_user_json, 'from_user': from_user_json}
-
 
 class Division(ModelBase):
     def __init__(self, id, team, game):
@@ -271,9 +222,6 @@ class Division(ModelBase):
 
     @classmethod
     def _from_json(cls, json):
-        raise NotImplementedError()
-
-    def to_json(self):
         raise NotImplementedError()
 
 
@@ -299,15 +247,6 @@ class Team(ModelBase):
         founder = User.from_json(json['founder']) if json.has_key('founder') else None
         return cls(json['id'], json['name'], json.get('description'), json.get('tag'), founder, json['member_count'])
 
-    def to_json(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'description': self.description,
-            'tag': self.tag,
-            'founder': self.founder.to_json() if self.founder else '',
-            'member_count': self.member_count}
-
 
 class TeamMembership(ModelBase):
 
@@ -327,12 +266,6 @@ class TeamMembership(ModelBase):
         team = Team.from_json(json['team'])
         return cls(json['id'], user, team)
 
-    def to_json(self):
-        return {
-            'id': self.id,
-            'user': self.user.to_json(),
-            'team': self.team.to_json()}
-
 
 class TeamInvite(ModelBase):
 
@@ -347,9 +280,6 @@ class TeamInvite(ModelBase):
         self.team_id = team_id
         self.from_user = from_user
         self.to_user = to_user
-
-    def to_json(self):
-        return {'id': self.id, 'team_id': self.team_id, 'from_user': self.from_user, 'to_user': self.to_user}
 
     @classmethod
     def _from_json(cls, json):
@@ -376,11 +306,6 @@ class Notification(ModelBase):
     def _from_json(cls, json):
         return cls(json['title'], json['content'], json['type'], json['time'], json['checked'])
 
-    def to_json(self):
-        return {
-            'title': self.title, 'content': self.content, 'time': self.time, 'type': self.type,
-            'checked': self.checked}
-
 
 class Error(ModelBase):
     __slots__ = ('message',)
@@ -391,9 +316,6 @@ class Error(ModelBase):
     @classmethod
     def _from_json(cls, json):
         return cls(message=json)
-
-    def to_json(self):
-        return {}
 
     def __unicode__(self):
         return u'{0}'.format(self.message)
@@ -412,9 +334,6 @@ class Errors(ModelBase):
 
     def __len__(self):
         return len(self.errors)
-
-    def to_json(self):
-        return {'erorrs': ['mock']}
 
     @classmethod
     def _from_json(cls, json):

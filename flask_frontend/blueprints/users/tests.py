@@ -8,7 +8,7 @@ from nose_parameterized import parameterized
 
 from api.api import ApiResult
 from api.mock import create_mock_for
-from api.models import User, ModelList, FriendshipInvite, RELATION_TO_CURRENT_USER, TeamMembership
+from api.models import User, ModelList, FriendshipInvite, RELATION_TO_CURRENT_USER, TeamMembership, Friendship
 from flask_frontend.common.app_test_case import AppTestCase, logged_in
 
 
@@ -34,15 +34,15 @@ class UsersTests(AppTestCase):
 
     @logged_in
     def test_my_friends_calls_api(self, user, api_mock):
-        data = create_mock_for(ModelList.For(User), 3)
-        api_mock.users.get.return_value = ApiResult(data=data)
+        data = create_mock_for(ModelList.For(Friendship), 3)
+        api_mock.friendships.get.return_value = ApiResult(data=data)
         response = self.client.get(url_for('users.friends_view', user_id=user.id))
-        self.assertEqual(api_mock.users.get.call_count, 1)
-        call_kwargs = api_mock.users.get.call_args[1]
-        self.assertIn('friends_of_user_id', call_kwargs)
-        self.assertEqual(call_kwargs['friends_of_user_id'], user.id)
-        self.assertIn('friends', response.context)
-        self.assertIsInstance(response.context['friends'], list)
+        self.assertEqual(api_mock.friendships.get.call_count, 1)
+        call_kwargs = api_mock.friendships.get.call_args[1]
+        self.assertIn('user_id', call_kwargs)
+        self.assertEqual(call_kwargs['user_id'], user.id)
+        self.assertIn('friendships', response.context)
+        self.assertIsInstance(response.context['friendships'], list)
 
     @logged_in
     def test_invite_friend_calls_api(self, user, api_mock):

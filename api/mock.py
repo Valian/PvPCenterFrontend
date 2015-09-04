@@ -13,9 +13,9 @@ import re
 from faker import Factory as FakerFactory
 
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
-    FriendshipInvite, Friendship, RELATION_TO_CURRENT_USER, RelationToUser, DeleteResponse, Notification
+    FriendshipInvite, Friendship, RELATION_TO_CURRENT_USER, RelationToUser, DeleteResponse, Notification, TeamInvite
 from api import ApiDispatcherBase, ApiResult
-
+from flask_frontend.blueprints.auth.user import User as AuthUser
 
 faker = FakerFactory.create()
 logger = logging.getLogger('factory')
@@ -26,11 +26,10 @@ def create_mock_for(model, list_count=5, **kwargs):
     if isinstance(model, ModelList.For):
         underlying_model = model.model
         fac = find_factory_in_inheritance_chain(underlying_model)
-        data = [underlying_model.from_json(fac(**kwargs).to_json()) for _ in xrange(list_count)]
+        data = [fac(**kwargs) for _ in xrange(list_count)]
         return ModelList(data, len(data))
     fac = find_factory_in_inheritance_chain(model)
-    generated_model = fac(**kwargs)
-    return model.from_json(generated_model.to_json())
+    return fac(**kwargs)
 
 
 def find_factory_in_inheritance_chain(model):
@@ -122,6 +121,11 @@ class UserFactory(factory.Factory):
     relation_to_current_user = factory.SubFactory(RelationToUserFactory)
 
 
+class AuthUserFactory(UserFactory):
+    class Meta:
+        model = AuthUser
+
+
 class TeamFactory(factory.Factory):
     class Meta:
         model = Team
@@ -131,7 +135,7 @@ class TeamFactory(factory.Factory):
     description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
     tag = factory.LazyAttribute(lambda o: ['HEY', 'ELO', 'WIN'][o.id % 3])
     founder = factory.LazyAttribute(lambda o: UserFactory(id=o.id))
-    members_count = factory.LazyAttribute(lambda o: o.id * 17 % 10 + 5)
+    member_count = factory.LazyAttribute(lambda o: o.id * 17 % 10 + 5)
 
 
 class TeamMembershipFactory(factory.Factory):
@@ -145,7 +149,7 @@ class TeamMembershipFactory(factory.Factory):
 
 class TeamInviteFactory(factory.Factory):
     class Meta:
-        model = Team
+        model = TeamInvite
 
     id = factory.Sequence(lambda x: x)
     team = factory.Sequence(lambda x: x)

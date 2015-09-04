@@ -4,11 +4,11 @@
   </h1>
   <div>
     <ul>
-      {% for friend in friends %}
+      {% for friendship in friendships %}
         <li>
           <div>
-            <img class="avatar" src="{{ friend.email | gravatar(size=20) }}" alt="" />
-            <a href="{{ url_for('users.profile_view', user_id=friend.id) }}">{{ friend.name }}</a>
+            <img class="avatar" src="{{ friendship.friend.email | gravatar(size=20) }}" alt="" />
+            <a href="{{ url_for('users.profile_view', user_id=friendship.friend.id) }}">{{ friendship.friend.name }}</a>
             <a href="#">(Send message)</a>
           </div>
         </li>

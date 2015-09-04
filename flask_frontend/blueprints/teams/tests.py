@@ -26,7 +26,7 @@ class TeamTests(AppTestCase):
 
     def test_team_view_calls_api(self, api):
         team = TeamFactory()
-        count = team.members_count
+        count = team.member_count
         memberships = [TeamMembershipFactory() for _ in xrange(count)]
         api.teams.get_single.return_value = ApiResult(data=team)
         api.team_memberships.get.return_value = ApiResult(data=memberships)

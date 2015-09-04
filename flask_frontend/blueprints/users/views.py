@@ -109,8 +109,8 @@ def remove_from_friends(user_id):
 @flask_login.login_required
 def friends_view(user_id):
     user = flask_login.current_user
-    friends = get_or_500(users_blueprint.api.friendships.get, token=user.token, user_id=user.id)
-    return render_pjax("profile_base.html", "user_friends.html", friends=friends, user=user)
+    friendships = get_or_500(users_blueprint.api.friendships.get, token=user.token, user_id=user.id)
+    return render_pjax("profile_base.html", "user_friends.html", friendships=friendships, user=user)
 
 
 @users_blueprint.route("/<int:user_id>/edit")
