@@ -47,7 +47,7 @@ class ApiDispatcherMock(ApiDispatcherBase):
 
     @staticmethod
     def find_props(url):
-        obj_id = re.match(r'.*/(\d+)$', url)
+        obj_id = re.match(r'.*/(\d+)', url)
         params = {}
         if obj_id:
             params['id'] = int(obj_id.group(1))

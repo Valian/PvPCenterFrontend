@@ -174,10 +174,24 @@ class Users(Resource):
 
 class GameOwnerships(Resource):
 
+    SINGLE_ENDPOINT = "/{game_ownership_id}"
+
     def get(self, id, token, model=ModelList.For(UserGameOwnership)):
         params = {"user_id": id, "access_token": token}
         endpoint = self.create_url(params=params)
         return self._get_request(endpoint, model=model)
+
+    def create(self, token, user_id, game_id, nickname, model=UserGameOwnership):
+        data = {'user_id': user_id, 'game_id': game_id, 'nickname': nickname}
+        params = {'access_token': token}
+        endpoint = self.create_url(params=params)
+        return self._post_request(endpoint, model=model, data=data)
+
+    def update(self, token, game_ownership_id, nickname, model=UserGameOwnership):
+        data = {'nickname': nickname}
+        params = {'access_token': token}
+        endpoint = self.create_url(self.SINGLE_ENDPOINT, game_ownership_id=game_ownership_id, params=params)
+        return self._patch_request(endpoint, model, data=data)
 
 
 class Teams(Resource):

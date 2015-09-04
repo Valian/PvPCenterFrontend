@@ -8,6 +8,10 @@ def to_iter(obj):
     return [obj]
 
 
+def hash_by(hash_func, iterable):
+    return {hash_func(obj): obj for obj in iterable}
+
+
 class abstractstaticmethod(staticmethod):
 
     __slots__ = ()
