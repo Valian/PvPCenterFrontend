@@ -7,8 +7,9 @@ from flask_babel import gettext
 
 from . import users_blueprint
 from flask.ext.frontend.blueprints.users.helpers import only_current_user
-from flask.ext.frontend.common.utils import render_pjax
-from flask_frontend.common.const import SEX, FLASH_TYPES
+from flask.ext.frontend.common.flash import Flash
+from flask.ext.frontend.common.utils import render_pjax, first_or_none
+from flask_frontend.common.const import SEX
 from flask_frontend.blueprints.users.forms import ChangeEmailForm, ChangeBasicDataForm
 from flask_frontend.common.api_helper import get_or_404, get_or_500
 
@@ -51,56 +52,64 @@ def invite_to_friends(user_id):
     me = flask_login.current_user
     result = users_blueprint.api.friendship_invites.create(me.token, me.id, user_id)
     if result.ok:
-        flask.flash(gettext("Succesfully invited user to friends!"), FLASH_TYPES.SUCCESS)
+        Flash.success(gettext("Succesfully invited user to friends!"))
     else:
-        flask.flash(gettext("Unable to add user to friends"), FLASH_TYPES.ERROR)
+        Flash.error(gettext("Unable to add user to friends"))
     return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
 
 @users_blueprint.route("/<int:user_id>/accept_invitation", methods=["POST"])
 @flask_login.login_required
 def accept_invite_to_friends(user_id):
-    me = flask_login.current_user
-    user = get_or_404(users_blueprint.api.users.get_single, user_id)
-    if user.relation_to_current_user.invite_received:
-        result = users_blueprint.api.friendship_invites.accept(me.token, user.relation_to_current_user.id)
+    relation = get_friendship_invite(user_id)
+    if relation:
+        result = users_blueprint.api.friendship_invites.accept(flask_login.current_user.token, relation.id)
         if result.ok:
-            flask.flash(gettext("Succesfully accepted invite to friends!"), FLASH_TYPES.SUCCESS)
+            Flash.success(gettext("Succesfully accepted invite to friends!"))
             return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
-    flask.flash(gettext("Unable to accept invitation"), FLASH_TYPES.ERROR)
+    Flash.error(gettext("Unable to accept invitation"))
     return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+
+
+def get_friendship_invite(user_id):
+    me = flask_login.current_user
+    relations = get_or_500(users_blueprint.api.friendship_invites.get, me.token, me.id, user_id)
+    relation = first_or_none(relations)
+    return relation
+
+def get_frienship(user_id):
+    me = flask_login.current_user
+    friendships = get_or_500(users_blueprint.api.friendships.get, me.token, me.id, user_id)
+    friendship = first_or_none(friendships)
+    return friendship
 
 
 @users_blueprint.route("/<int:user_id>/decline_invitation", methods=["POST"])
 @flask_login.login_required
 def decline_invite_to_friends(user_id):
-    me = flask_login.current_user
-    user = get_or_404(users_blueprint.api.users.get_single, user_id)
-    relation = user.relation_to_current_user
-    if relation.invite_received or relation.invite_send:
-        result = users_blueprint.api.friendship_invites.delete(me.token, relation.id)
+    relation = get_friendship_invite(user_id)
+    if relation:
+        result = users_blueprint.api.friendship_invites.delete(flask_login.current_user.token, relation.id)
         if result.ok:
-            flask.flash(gettext("Invitation declined"), FLASH_TYPES.SUCCESS)
+            Flash.success(gettext("Invitation declined"))
             return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
-    flask.flash(gettext("Unable to decline invitation"), FLASH_TYPES.ERROR)
+    Flash.success(gettext("Unable to decline invitation"))
     return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
 
 @users_blueprint.route("/<int:user_id>/remove_friend", methods=["POST"])
 @flask_login.login_required
 def remove_from_friends(user_id):
-    me = flask_login.current_user
-    user = get_or_404(users_blueprint.api.users.get_single, user_id)
-    relation = user.relation_to_current_user
-    if relation.is_friend:
-        result = users_blueprint.api.friendships.delete(me.token, relation.id)
+    friendship = get_frienship(user_id)
+    if friendship:
+        result = users_blueprint.api.friendships.delete(flask_login.current_user.token, friendship.id)
         if result.ok:
-            flask.flash(gettext("Friend removed"), FLASH_TYPES.SUCCESS)
+            Flash.success(gettext("Friend removed"))
             return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
-    flask.flash(gettext("Unable to remove user from friends"), FLASH_TYPES.ERROR)
+    Flash.error(gettext("Unable to remove user from friends"))
     return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
 
@@ -134,7 +143,7 @@ def change_email(user_id):
     change_basic_form.set_data(flask_login.current_user)
 
     if change_email_form.validate_on_submit():
-        flask.flash(gettext('Successfully changed email!'))
+        Flash.success(gettext('Successfully changed email!'))
 
     return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
@@ -147,6 +156,6 @@ def change_basic(user_id):
     change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
 
     if change_basic_form.validate_on_submit():
-        flask.flash(gettext('Successfully changed basic data!'))
+        Flash.success(gettext('Successfully changed basic data!'))
 
     return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))

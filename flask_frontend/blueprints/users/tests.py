@@ -53,38 +53,46 @@ class UsersTests(AppTestCase):
     @logged_in
     def test_accept_friend_invite_calls_api(self, user, api_mock):
         return_user = create_mock_for(User, relation_to_current_user__type=RELATION_TO_CURRENT_USER.RECEIVED_INVITE)
+        return_invites = create_mock_for(ModelList.For(FriendshipInvite), 1)
         api_mock.users.get_single.return_value = ApiResult(data=return_user)
+        api_mock.friendship_invites.get.return_value = ApiResult(data=return_invites)
         self.client.post(url_for('users.accept_invite_to_friends', user_id=5))
         self.assertTrue(api_mock.friendship_invites.accept.called)
         self.assertEqual(api_mock.friendship_invites.accept.call_args, mock.call(
-            user.token, return_user.relation_to_current_user.id))
+            user.token, return_invites[0].id))
 
     @logged_in
     def test_decline_friend_invite_calls_api(self, user, api_mock):
         return_user = create_mock_for(User, relation_to_current_user__type=RELATION_TO_CURRENT_USER.RECEIVED_INVITE)
+        return_invites = create_mock_for(ModelList.For(FriendshipInvite), 1)
         api_mock.users.get_single.return_value = ApiResult(data=return_user)
+        api_mock.friendship_invites.get.return_value = ApiResult(data=return_invites)
         self.client.post(url_for('users.decline_invite_to_friends', user_id=5))
         self.assertTrue(api_mock.friendship_invites.delete.called)
         self.assertEqual(api_mock.friendship_invites.delete.call_args, mock.call(
-            user.token, return_user.relation_to_current_user.id))
+            user.token, return_invites[0].id))
 
     @logged_in
     def test_remove_friend_calls_api(self, user, api_mock):
         return_user = create_mock_for(User, relation_to_current_user__type=RELATION_TO_CURRENT_USER.FRIEND)
+        return_friendships = create_mock_for(ModelList.For(Friendship), 1)
+        api_mock.friendships.get.return_value = ApiResult(data=return_friendships)
         api_mock.users.get_single.return_value = ApiResult(data=return_user)
         self.client.post(url_for('users.remove_from_friends', user_id=5))
         self.assertTrue(api_mock.friendships.delete.called)
         self.assertEqual(api_mock.friendships.delete.call_args, mock.call(
-            user.token, return_user.relation_to_current_user.id))
+            user.token, return_friendships[0].id))
 
     @logged_in
     def test_remove_sent_friendship_invitation_calls_api(self, user, api_mock):
         return_user = create_mock_for(User, relation_to_current_user__type=RELATION_TO_CURRENT_USER.SEND_INVITE)
+        return_invites = create_mock_for(ModelList.For(FriendshipInvite), 1)
         api_mock.users.get_single.return_value = ApiResult(data=return_user)
+        api_mock.friendship_invites.get.return_value = ApiResult(data=return_invites)
         self.client.post(url_for('users.decline_invite_to_friends', user_id=5))
         self.assertTrue(api_mock.friendship_invites.delete.called)
         self.assertEqual(api_mock.friendship_invites.delete.call_args, mock.call(
-            user.token, return_user.relation_to_current_user.id))
+            user.token, return_invites[0].id))
 
     def test_show_user_teams(self, api_mock):
         return_user = create_mock_for(User)

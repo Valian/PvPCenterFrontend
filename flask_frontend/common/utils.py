@@ -9,6 +9,11 @@ def render_pjax(base, view, **kwargs):
     is_pijax = "X-PJAX" in flask.request.headers
     return flask.render_template('pjax_wrapper.html', is_pjax=is_pijax, extends=base, view=view, **kwargs)
 
+
+def first_or_none(iterable):
+    return iterable[0] if len(iterable) > 0 else None
+
+
 class InvalidConfigurationException(Exception):
     def __init__(self, blueprint_name, e):
         super(InvalidConfigurationException, self).__init__(

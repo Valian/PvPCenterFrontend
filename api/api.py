@@ -286,8 +286,8 @@ class FriendshipInvites(Resource):
     SINGLE_ENDPOINT = "/{friendship_invite_id}"
     ACCEPT_ENDPOINT = "/{friendship_invite_id}/accept"
 
-    def get(self, token, to_user_id, model=ModelList.For(FriendshipInviteModel)):
-        params = dict_of_defined_keys(access_token=token, to_user_id=to_user_id)
+    def get(self, token, to_user_id, from_user_id=undefined, model=ModelList.For(FriendshipInviteModel)):
+        params = dict_of_defined_keys(access_token=token, to_user_id=to_user_id, from_user_id=from_user_id)
         endpoint = self.create_url(params=params)
         return self._get_request(endpoint, model)
 
@@ -316,8 +316,8 @@ class Friendships(Resource):
 
     SINGLE_ENDPOINT = "/{friendship_id}"
 
-    def get(self, token, user_id, model=ModelList.For(Friendship)):
-        params = dict_of_defined_keys(access_token=token, user_id=user_id)
+    def get(self, token, user_id, to_user_id=undefined, model=ModelList.For(Friendship)):
+        params = dict_of_defined_keys(access_token=token, user_id=user_id, to_user_id=to_user_id)
         endpoint = self.create_url(params=params)
         return self._get_request(endpoint, model)
 

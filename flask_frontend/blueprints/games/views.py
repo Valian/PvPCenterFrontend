@@ -8,6 +8,7 @@ import flask_login
 from . import games_blueprint
 from common.utils import hash_by
 from flask.ext.frontend.blueprints.games.forms import GameUpdateForm, GameJoinForm
+from flask.ext.frontend.common.flash import Flash
 from flask.ext.frontend.common.utils import render_pjax
 from flask_frontend.common.api_helper import get_or_404, get_or_none
 
@@ -38,7 +39,7 @@ def join_game(game_id):
     form, type = get_game_ownership_form(game_id, user)
 
     if form.validate_on_submit():
-        flask.flash(gettext('Successfully updated!'))
+        Flash.success(gettext('Successfully updated!'))
         return flask.redirect(flask.url_for('games.game_view', game_id=game_id))
 
     return render_pjax('game.html', 'game.html', game=game, form=form, type=type)

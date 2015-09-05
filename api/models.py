@@ -125,17 +125,15 @@ class RELATION_TO_CURRENT_USER(object):
 
 class RelationToUser(ModelBase):
 
-    def __init__(self, type, id=None):
+    def __init__(self, type):
         """
         :type type: str
-        :type id: long
         """
         self.type = type
-        self.id = id
 
     @classmethod
     def _from_json(cls, json):
-        return cls(json)  # cls(json['type'], json.get('id'))
+        return cls(json)
 
     @property
     def is_friend(self):

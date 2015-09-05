@@ -42,15 +42,19 @@ def find_factory_in_inheritance_chain(model):
 class ApiDispatcherMock(ApiDispatcherBase):
 
     def make_request(self, method, endpoint, model, **kwargs):
-        params = self.find_props(endpoint)
+        params = self.find_props(endpoint, model)
         return ApiResult(data=create_mock_for(model, **params))
 
     @staticmethod
-    def find_props(url):
-        obj_id = re.match(r'.*/(\d+)', url)
+    def find_props(url, model):
+        method_args_names = inspect.getargspec(model.__init__)
         params = {}
-        if obj_id:
-            params['id'] = int(obj_id.group(1))
+        for name in method_args_names[0]:
+            if not 'id' in name:
+                continue
+            obj_id = re.match(r'.*/(\d+)', url)
+            if obj_id:
+                params['id'] = int(obj_id.group(1))
         return params
 
 
@@ -100,8 +104,7 @@ class RelationToUserFactory(factory.Factory):
     class Meta:
         model = RelationToUser
 
-    type = factory.LazyAttribute(lambda o: vars(RELATION_TO_CURRENT_USER).values()[o.id % 4])
-    id = factory.Sequence(lambda x: x)
+    type = factory.Iterator(vars(RELATION_TO_CURRENT_USER).values())
 
 
 class UserFactory(factory.Factory):

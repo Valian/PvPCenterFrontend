@@ -7,7 +7,6 @@
     </a>
   </small>
 </h1>
-{% from 'macros.html' import render_form, flash_messages %}
-{{ flash_messages() }}
+{% from 'macros.html' import render_form %}
 {{ render_form(basic_form, url_for('users.change_basic', user_id=user.id), action_text=gettext('Save profile')) }}
 {{ render_form(email_form, url_for('users.change_email', user_id=user.id), action_text=gettext('Change email')) }}
