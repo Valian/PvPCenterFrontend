@@ -26,9 +26,6 @@ class ChangeEmailForm(ApiForm):
         self.user_id = user.id
         self.token = user.token
 
-    def _handle_errors(self, errors):
-        self.email.errors.extend(errors.get_errors_for_field("email"))
-        self.server_errors.extend(errors.get_errors_for_field("message"))
 
     def _make_request(self):
         return self._api.users.patch(self.user_id, self.token, email=self.email.data)
@@ -56,13 +53,6 @@ class ChangeBasicDataForm(ApiForm):
         self.birthdate.data = user.birthdate
         self.nationality.data = user.nationality
         self.description.data = user.description
-
-    def _handle_errors(self, errors):
-        self.sex.errors.extend(errors.get_errors_for_field("sex"))
-        self.nationality.errors.extend(errors.get_errors_for_field("nationality"))
-        self.birthdate.errors.extend(errors.get_errors_for_field("birthdate"))
-        self.description.errors.extend(errors.get_errors_for_field("description"))
-        self.server_errors.extend(errors.get_errors_for_field("message"))
 
     def _make_request(self):
         return self._api.users.patch(

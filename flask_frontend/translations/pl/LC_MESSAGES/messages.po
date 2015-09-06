@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2015-07-12 13:54+0200\n"
-"PO-Revision-Date: 2015-07-20 09:53+0100\n"
+"PO-Revision-Date: 2015-09-06 20:28+0100\n"
 "Last-Translator: hehe <hasd@kasd>\n"
 "Language-Team: pl <LL@li.org>\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
@@ -34,7 +34,7 @@ msgstr "Gry"
 
 #: flask_frontend/templates/navbar.html:51
 msgid "Transfer market"
-msgstr "Dupa"
+msgstr "Rynek transferowy"
 
 #: flask_frontend/templates/navbar.html:56
 msgid "Media"

@@ -2,7 +2,7 @@
 
 {% block content %}
   <div class="col-md-9">
-    <h1>{{ gettext("Teams") }}</h1>
+    <h1>{{ gettext("Teams") }} <a href="{{ url_for('teams.create_team_view') }}">(Create new)</a></h1>
     {# we also need searching here, it's not yet implemented but template should contain it, maybe with JS? #}
     <div class="row">
       <ul>
@@ -12,6 +12,10 @@
                 <b>{{ team.name }}</b>
                 {{ team.tag }}
                 {{ team.members_count }}
+                {# add check if current player is already in team (??) #}
+                {% if current_user.is_authenticated() %}
+                  <a href="#">{{ gettext('Join team') }}</a>
+                {% endif %}
             </a>
           </li>
         {%  endfor %}

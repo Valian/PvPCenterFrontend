@@ -25,9 +25,6 @@ class GameJoinForm(ApiForm):
     def _make_request(self):
         return self._api.game_ownerships.create(self.token, self.user_id, self.game_id, self.nickname)
 
-    def _handle_errors(self, errors):
-        self.server_errors.extend(errors.get_errors_for_field("nickname"))
-        self.server_errors.extend(errors.get_errors_for_field("message"))
 
 class GameUpdateForm(ApiForm):
 
@@ -40,7 +37,3 @@ class GameUpdateForm(ApiForm):
 
     def _make_request(self):
         return self._api.game_ownerships.update(self.token, self.game_ownership_id, self.nickname)
-
-    def _handle_errors(self, errors):
-        self.server_errors.extend(errors.get_errors_for_field("nickname"))
-        self.server_errors.extend(errors.get_errors_for_field("message"))

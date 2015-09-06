@@ -1,0 +1,9 @@
+{% extends 'main.html' %}
+
+{% block content %}
+  <div class="col-md-9">
+    <h1>{{ gettext("Create new team") }}</h1>
+    {% from 'macros.html' import render_form %}
+    {{ render_form(form) }}
+  </div>
+{% endblock content %}

@@ -5,8 +5,9 @@ from flask import url_for
 import mock
 
 from api.api import ApiResult, ApiException
-from api.mock import TeamFactory, UserFactory, TeamMembershipFactory
-from flask_frontend.common.app_test_case import AppTestCase
+from api.mock import TeamFactory, UserFactory, TeamMembershipFactory, create_mock_for
+from api.models import ModelList, TeamMembership, Team
+from flask_frontend.common.app_test_case import AppTestCase, logged_in
 
 
 @mock.patch('flask_frontend.blueprints.teams.views.teams_blueprint.api')
@@ -14,7 +15,7 @@ class TeamTests(AppTestCase):
 
     def test_teams_view_calls_api(self, api):
         count = 10
-        teams = [TeamFactory() for _ in xrange(count)]
+        teams = create_mock_for(ModelList.For(Team), count)
         api.teams.get.return_value = ApiResult(data=teams)
         response = self.client.get(url_for('teams.teams_view'))
         self.assertEqual(api.teams.get.call_count, 1)
@@ -25,9 +26,9 @@ class TeamTests(AppTestCase):
         self.client.get(url_for('teams.teams_view'), expect_errors=True)
 
     def test_team_view_calls_api(self, api):
-        team = TeamFactory()
+        team = create_mock_for(Team)
         count = team.member_count
-        memberships = [TeamMembershipFactory() for _ in xrange(count)]
+        memberships = create_mock_for(ModelList.For(TeamMembership), count)
         api.teams.get_single.return_value = ApiResult(data=team)
         api.team_memberships.get.return_value = ApiResult(data=memberships)
         response = self.client.get(url_for('teams.team_view', team_id=team.id))
@@ -40,3 +41,13 @@ class TeamTests(AppTestCase):
         api.teams.get_single.side_effect = ApiException("url", "method", Exception())
         api.team_memberships.get.side_effect = ApiException("url", "method", Exception())
         self.client.get(url_for('teams.team_view', team_id=1), expect_errors=True)
+
+    @logged_in
+    def test_create_new_team(self, user, api):
+        team = create_mock_for(Team)
+        api.teams.post.return_value = ApiResult(data=team)
+        body = {'name': 'Heheheh', 'tag': 'TAG', 'description': 'description'}
+        response = self.client.post(url_for('teams.create_team_view'), params=body)
+        self.assertLess(response.status_code, 400)
+        expected_call = mock.call(user.token, body['name'], body['description'], body['tag'])
+        self.assertEqual(api.teams.post.call_args, expected_call)

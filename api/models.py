@@ -337,8 +337,7 @@ class Errors(ModelBase):
     def _from_json(cls, json):
         errors = {
             field: map(Error.from_json, to_iter(errors))
-            for field, errors in json.iteritems()
-            }
+            for field, errors in json.iteritems()}
         return cls(errors)
 
     def get_errors_for_field(self, field_name):

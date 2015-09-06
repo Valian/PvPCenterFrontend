@@ -202,9 +202,9 @@ class Teams(Resource):
         endpoint = self.create_url()
         return self._get_request(endpoint, model=model)
 
-    def post(self, token, name, description, tag, founder_id, model=TeamModel):
+    def post(self, token, name, description, tag, model=TeamModel):
         endpoint = self.create_url(params={"access_token": token})
-        data = {'name': name, 'description': description, 'tag': tag, 'founder_id': founder_id}
+        data = {'name': name, 'description': description, 'tag': tag}
         return self._post_request(endpoint, model=model, data=data)
 
     def get_single(self, team_id, model=TeamModel):

@@ -94,9 +94,13 @@ class ApiForm(flask_wtf.Form):
     def _additional_validation(self):
         return True
 
-    @abstractmethod
     def _handle_errors(self, errors):
-        raise NotImplementedError()
+        for name, errors in errors.errors.items():
+            if hasattr(self, name):
+                attr = getattr(self, name)
+                attr.errors.extend(errors)
+            else:
+                self.server_errors.extend(errors)
 
     @abstractmethod
     def _make_request(self):
