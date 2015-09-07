@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+{% block content %}
+  <div class="col-md-9">
+    <h1>{{ gettext("Users") }}</h1>
+    {% from 'macros.html' import render_pjax_form %}
+    {{ render_pjax_form({'nickname': { } }, '#search-results', url_for('users.users_view')) }}
+    <div class="content" id="search-results">
+      {% block pjax_content %}
+
+      {% endblock %}
+    </div>
+  </div>
+{% endblock content %}

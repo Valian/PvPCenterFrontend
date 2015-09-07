@@ -77,8 +77,14 @@ stickyNav = ->
 
 $(document).ready ready
 $(document).on 'page:load', ready
+
 $(window).scroll ->
   stickyNav()
+
 $(document).on 'click', '.search-toggle a', ->
   $('.search-input input').width searchWidth()
-$(document).pjax('a[data-pjax]')
+
+$(document).pjax 'a[data-pjax]'
+
+$(document).on 'submit', 'form[data-pjax]', (event) ->
+  $.pjax.submit(event, $(this).attr('data-pjax'))

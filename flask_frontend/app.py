@@ -1,6 +1,7 @@
 import logging
 
 from flask import Flask
+from flask.ext.frontend.filters import create_filters
 
 from flask_frontend.views import create_main_views
 from flask_frontend.bundles import create_bundles
@@ -27,6 +28,7 @@ def create_app(config=None):
     app.register_blueprint(notifications_blueprint, url_prefix='/notifications')
 
     create_logger(app)
+    create_filters(app)
     create_bundles(app)
     create_main_views(app)
 

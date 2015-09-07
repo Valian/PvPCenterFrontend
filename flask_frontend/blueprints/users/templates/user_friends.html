@@ -13,5 +13,7 @@
           </div>
         </li>
       {% endfor %}
+      {% from 'macros.html' import render_pagination %}
+      {{ render_pagination(pagination, '#profile_content') }}
     </ul>
   </div>

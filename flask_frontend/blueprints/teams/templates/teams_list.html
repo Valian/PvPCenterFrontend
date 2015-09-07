@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+{% block content %}
+  <div class="col-md-9">
+    <h1>{{ gettext("Teams") }} <a href="{{ url_for('teams.create_team_view') }}">(Create new)</a></h1>
+    {% from 'macros.html' import render_pjax_form %}
+    {{ render_pjax_form({'name': { } }, '#search-results', url_for('teams.teams_view')) }}
+    <div class="content" id="search-results">
+      {% block pjax_content %}
+
+      {% endblock %}
+    </div>
+  </div>
+{% endblock content %}

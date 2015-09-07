@@ -55,6 +55,25 @@
   </form>
 {%- endmacro %}
 
+{% macro render_pjax_form(fields, container_selector, action_url='', action_text='Submit', class_='', with_labels=True) -%}
+  <form method="get" action="{{ action_url }}" class="{{ class_ }}" data-pjax="{{ container_selector }}">
+    {% if caller %}
+      {{ caller() }}
+    {% else %}
+      {% for name, options in fields.items() %}
+        <div>
+          {% if with_labels %}
+            {% set label = (name | id_to_label) if not options['label'] else options['label'] %}
+            <label for="{{ name }}">{{ label }}</label>
+          {% endif %}
+          <input id="{{ name }}" name="{{ name }}">
+        </div>
+      {% endfor %}
+      <button type="submit">{{ action_text }} </button>
+    {% endif %}
+  </form>
+{%- endmacro %}
+
 
 {% macro flash_messages() %}
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -66,4 +85,38 @@
       </ul>
     {% endif %}
   {% endwith %}
+{% endmacro %}
+
+{% macro pjax_attribute(container) %}
+  {{ ('data-pjax=' + container) if container else ''}}
+{%- endmacro %}
+
+{% macro render_pagination(pagination, pjax_container_id) %}
+  <ul class="pagination">
+    {% if pagination.has_prev %}
+      <li>
+        <a href="{{ url_for_other_page(pagination.page - 1) }}" {{ pjax_attribute(pjax_container_id) }} aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+    {% endif %}
+    {% for page in pagination.iter_pages() %}
+      {% if page %}
+        {% if page != pagination.page %}
+          <li><a href="{{ url_for_other_page(page) }}" {{ pjax_attribute(pjax_container_id) }}>{{ page }}</a></li>
+        {% else %}
+          <li class="active"><a href="#">{{ page }} <span class="sr-only">(current)</span></a></li>
+        {% endif %}
+      {% else %}
+        <li class="disabled"><a href="#">…</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if pagination.has_next %}
+      <li>
+        <a href="{{ url_for_other_page(pagination.page + 1) }}" {{ pjax_attribute(pjax_container_id) }} aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    {% endif %}
+  </ul>
 {% endmacro %}

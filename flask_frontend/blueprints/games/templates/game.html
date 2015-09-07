@@ -29,8 +29,7 @@
 			{% if current_user.is_authenticated() %}
 				<h3>{{ gettext('Join game' if type == 'create' else 'Update nickname') }}</h3>
 
-				{% from 'macros.html' import render_form, flash_messages %}
-				{{ flash_messages() }}
+				{% from 'macros.html' import render_form %}
 				{{ render_form(form, url_for('games.join_game', game_id=game.id), action_text=gettext('Save')) }}
 			{% endif %}
 			<h3>{{ gettext('Rules') }}</h3>

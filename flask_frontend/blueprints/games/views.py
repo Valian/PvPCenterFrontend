@@ -15,7 +15,8 @@ from flask_frontend.common.api_helper import get_or_404, get_or_none
 
 @games_blueprint.before_app_request
 def before_request():
-    flask.g.games = get_or_none(games_blueprint.api.games.get) or []
+    if 'static' not in flask.request.url:
+        flask.g.games = get_or_none(games_blueprint.api.games.get) or []
 
 
 @games_blueprint.route('')
@@ -30,6 +31,7 @@ def game_view(game_id):
     if flask_login.current_user.is_authenticated():
         form, type = get_game_ownership_form(game_id, flask_login.current_user)
     return flask.render_template('game.html', game=game, form=form, type=type)
+
 
 @games_blueprint.route('/<int:game_id>/join', methods=["POST"])
 @flask_login.login_required

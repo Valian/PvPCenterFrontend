@@ -3,14 +3,12 @@
 {% block content %}
   <div class="col-md-9">
     <h1>{{ gettext("Overview of %(team_name)s", team_name=team.name) }}</h1>
-    <div class="row">
-        <a href="{{ url_for('teams.team_view', team_id = team.id) }}">
-          <b>{{ team.name }}</b>
-          {{ team.tag }}
-          {{ team.members_count }}
-          {{ team.founder.name }}
-          <div>{{ team.description }}</div>
-        </a>
+    <div class="row">        
+      <b>{{ team.name }}</b>
+      {{ team.tag }}
+      {{ team.members_count }}
+      {{ team.founder.name }}
+      <div>{{ team.description }}</div>
     </div>
     <h2>{{ gettext("Members of %(team_name)s", team_name=team.name) }}</h2>
     <div class="row">

@@ -11,6 +11,7 @@ import urlparse
 
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
+from flask.ext.frontend.common.pagination import get_pagination_params
 from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel, \
     UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel, FriendshipInvite as FriendshipInviteModel, \
     Friendship, DeleteResponse, Notification, TeamInvite
@@ -105,6 +106,11 @@ class Resource(object):
             url = url + '?{0}'.format(urllib.urlencode(params))
         return url
 
+    def create_url_with_pagination(self, suffix="", params=None, **kwargs):
+        page, per_page = get_pagination_params()
+        params = (params or {}).update(offset=(page - 1) * per_page, limit=per_page)
+        return self.create_url(suffix, params, **kwargs)
+
     def _get_request(self, endpoint, model=None, **kwargs):
         return self.dispatcher.make_request('GET', endpoint, model, **kwargs)
 
@@ -126,7 +132,7 @@ class Games(Resource):
     SINGLE_ENDPOINT = "/{game_id}"
 
     def get(self, model=ModelList.For(GameModel)):
-        endpoint = self.create_url()
+        endpoint = self.create_url_with_pagination()
         return self._get_request(endpoint, model=model)
 
     def get_single(self, game_id, model=GameModel):
@@ -145,7 +151,7 @@ class Users(Resource):
         params = dict_of_defined_keys(
             friends_of_user_id=friends_of_user_id, strangers_to_user_id=strangers_to_user_id, nickname=nickname,
             access_token=token)
-        endpoint = self.create_url(params=params)
+        endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
     def post(self, login, email, password, model=UserModel):
@@ -178,7 +184,7 @@ class GameOwnerships(Resource):
 
     def get(self, id, token, model=ModelList.For(UserGameOwnership)):
         params = {"user_id": id, "access_token": token}
-        endpoint = self.create_url(params=params)
+        endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
     def create(self, token, user_id, game_id, nickname, model=UserGameOwnership):
@@ -198,8 +204,9 @@ class Teams(Resource):
 
     SINGLE_ENDPOINT = "/{team_id}"
 
-    def get(self, model=ModelList.For(TeamModel)):
-        endpoint = self.create_url()
+    def get(self, name=undefined, model=ModelList.For(TeamModel)):
+        params = dict_of_defined_keys(name=name)
+        endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
     def post(self, token, name, description, tag, model=TeamModel):
@@ -222,7 +229,7 @@ class Notifications(Resource):
 
     def get(self, token, user_id, model=ModelList.For(Notification)):
         params = {"access_token": token, "user_id": user_id}
-        endpoint = self.create_url(params=params)
+        endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
 
@@ -232,7 +239,7 @@ class TeamMemberships(Resource):
 
     def get(self, team_id=undefined, user_id=undefined, model=ModelList.For(TeamMembershipModel)):
         params = dict_of_defined_keys(team_id=team_id, user_id=user_id)
-        endpoint = self.create_url(params=params)
+        endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
     def get_single(self, team_membership_id, model=TeamMembershipModel):
@@ -258,7 +265,7 @@ class TeamInvites(Resource):
 
     def get(self, to_user_id=undefined, team_id=undefined, model=ModelList.For(TeamInvite)):
         params = dict_of_defined_keys(to_user_id=to_user_id, team_id=team_id)
-        endpoint = self.create_url(params=params)
+        endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
     def get_single(self, team_invite_id, model=TeamMembershipModel):
@@ -288,7 +295,7 @@ class FriendshipInvites(Resource):
 
     def get(self, token, to_user_id, from_user_id=undefined, model=ModelList.For(FriendshipInviteModel)):
         params = dict_of_defined_keys(access_token=token, to_user_id=to_user_id, from_user_id=from_user_id)
-        endpoint = self.create_url(params=params)
+        endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model)
 
     def get_single(self, friendship_invite_id, token, model=FriendshipInviteModel):
@@ -318,7 +325,7 @@ class Friendships(Resource):
 
     def get(self, token, user_id, to_user_id=undefined, model=ModelList.For(Friendship)):
         params = dict_of_defined_keys(access_token=token, user_id=user_id, to_user_id=to_user_id)
-        endpoint = self.create_url(params=params)
+        endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model)
 
     def delete(self, token, friendship_id, model=DeleteResponse):

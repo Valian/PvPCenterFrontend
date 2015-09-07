@@ -1,0 +1,17 @@
+<ul>
+{% for team in teams %}
+  <li>
+    <a href="{{ url_for('teams.team_view', team_id = team.id) }}">
+      <b>{{ team.name }}</b>
+      {{ team.tag }}
+      {{ team.members_count }}
+      {# add check if current player is already in team (??) #}
+      {% if current_user.is_authenticated() %}
+        <a href="#">{{ gettext('Join team') }}</a>
+      {% endif %}
+    </a>
+  </li>
+{%  endfor %}
+</ul>
+{% from 'macros.html' import render_pagination %}
+{{ render_pagination(pagination, '#search-results') }}

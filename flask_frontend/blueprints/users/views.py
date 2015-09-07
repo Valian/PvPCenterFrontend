@@ -8,6 +8,7 @@ from flask_babel import gettext
 from . import users_blueprint
 from flask.ext.frontend.blueprints.users.helpers import only_current_user
 from flask.ext.frontend.common.flash import Flash
+from flask.ext.frontend.common.pagination import get_pagination_params, Pagination
 from flask.ext.frontend.common.utils import render_pjax, first_or_none
 from flask_frontend.common.const import SEX
 from flask_frontend.blueprints.users.forms import ChangeEmailForm, ChangeBasicDataForm
@@ -28,6 +29,14 @@ def init(state):
     gravatar = flask_gravatar.Gravatar()
     gravatar.init_app(app)
     app.jinja_env.filters['sex'] = sex_to_text
+
+
+@users_blueprint.route("/")
+def users_view():
+    nickname = flask.request.args.get('nickname', '')
+    users = get_or_500(users_blueprint.api.users.get, nickname=nickname)
+    pagination = Pagination.create_from_model_list(users)
+    return render_pjax("users_list.html", "users_list_result.html", pagination=pagination, users=users)
 
 
 @users_blueprint.route("/<int:user_id>")
@@ -78,6 +87,7 @@ def get_friendship_invite(user_id):
     relation = first_or_none(relations)
     return relation
 
+
 def get_frienship(user_id):
     me = flask_login.current_user
     friendships = get_or_500(users_blueprint.api.friendships.get, me.token, me.id, user_id)
@@ -118,8 +128,10 @@ def remove_from_friends(user_id):
 @flask_login.login_required
 def friends_view(user_id):
     user = flask_login.current_user
-    friendships = get_or_500(users_blueprint.api.friendships.get, token=user.token, user_id=user.id)
-    return render_pjax("profile_base.html", "user_friends.html", friendships=friendships, user=user)
+    friendships = get_or_500(users_blueprint.api.friendships.get, token=user.token, user_id=user_id)
+    pagination = Pagination.create_from_model_list(friendships)
+    return render_pjax(
+        "profile_base.html", "user_friends.html", friendships=friendships, user=user, pagination=pagination)
 
 
 @users_blueprint.route("/<int:user_id>/edit")

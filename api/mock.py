@@ -22,7 +22,7 @@ logger = logging.getLogger('factory')
 logger.setLevel(logging.INFO)
 
 
-def create_mock_for(model, list_count=5, **kwargs):
+def create_mock_for(model, list_count=21, **kwargs):
     if isinstance(model, ModelList.For):
         underlying_model = model.model
         fac = find_factory_in_inheritance_chain(underlying_model)
@@ -43,6 +43,7 @@ class ApiDispatcherMock(ApiDispatcherBase):
 
     def make_request(self, method, endpoint, model, **kwargs):
         params = self.find_props(endpoint, model)
+        logging.info('Mock {0} request to {1} endpoint'.format(method, endpoint))
         return ApiResult(data=create_mock_for(model, **params))
 
     @staticmethod
@@ -50,7 +51,7 @@ class ApiDispatcherMock(ApiDispatcherBase):
         method_args_names = inspect.getargspec(model.__init__)
         params = {}
         for name in method_args_names[0]:
-            if not 'id' in name:
+            if 'id' not in name:
                 continue
             obj_id = re.match(r'.*/(\d+)', url)
             if obj_id:

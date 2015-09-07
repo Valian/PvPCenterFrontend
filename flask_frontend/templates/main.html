@@ -10,6 +10,8 @@
 <div class="content">
   <div class="container">
     <div class="row">
+      {% from 'macros.html' import flash_messages %}
+      {{ flash_messages() }}
       {% block content %}
       {% endblock content %}
     </div>

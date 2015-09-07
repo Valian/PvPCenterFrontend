@@ -1,0 +1,13 @@
+<ul>
+  {% for user in users %}
+    <li>
+      <a href="{{ url_for('users.profile_view', user_id = user.id) }}">
+        <img src="{{ user.email | gravatar(size=20) }}">
+        <b>{{ user.name }}</b>
+        {{ user.email }}
+      </a>
+    </li>
+  {%  endfor %}
+  {% from 'macros.html' import render_pagination %}
+  {{ render_pagination(pagination, '#search-results') }}
+</ul>

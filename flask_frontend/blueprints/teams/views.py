@@ -6,6 +6,8 @@ from flask.ext.babel import gettext
 import flask_login
 from flask.ext.frontend.blueprints.teams.forms import CreateTeamForm
 from flask.ext.frontend.common.flash import Flash
+from flask.ext.frontend.common.pagination import Pagination
+from flask.ext.frontend.common.utils import render_pjax
 
 from flask_frontend.common.api_helper import get_or_500
 from flask_frontend.blueprints.teams import teams_blueprint
@@ -13,8 +15,11 @@ from flask_frontend.blueprints.teams import teams_blueprint
 
 @teams_blueprint.route('')
 def teams_view():
-    teams = get_or_500(teams_blueprint.api.teams.get)
-    return flask.render_template('teams.html', teams=teams)
+    name = flask.request.args.get('name', '')
+    teams = get_or_500(teams_blueprint.api.teams.get, name=name)
+    pagination = Pagination.create_from_model_list(teams)
+    return render_pjax('teams_list.html', 'teams_list_result.html', teams=teams, pagination=pagination)
+
 
 @teams_blueprint.route('/create', methods=['POST', 'GET'])
 @flask_login.login_required
@@ -25,6 +30,7 @@ def create_team_view():
         return flask.redirect(flask.url_for('teams.team_view', team_id=form.result.id))
 
     return flask.render_template('team_create.html', form=form)
+
 
 @teams_blueprint.route('/<int:team_id>')
 def team_view(team_id):
