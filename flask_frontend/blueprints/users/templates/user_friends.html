@@ -2,6 +2,7 @@
   <h1 class="name">
     <span>{{ gettext('Friends of %(name)s', name=user.name) }}</span>
   </h1>
+  <h3><a href="{{ url_for('users.users_view') }}">Add new friends</a></h3>
   <div>
     <ul>
       {% for friendship in friendships %}
