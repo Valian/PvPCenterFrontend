@@ -68,7 +68,7 @@ class ApiDispatcher(ApiDispatcherBase):
             url = self.create_url(endpoint)
             params = dict(self.additional_params)
             params.update(kwargs)
-            self.log_debug("Performing {0} request to {1}".format(method, url))
+            self.log_debug("Performing {0} request to {1}. Additional: {2}".format(method, url, str(kwargs)))
             response = self._send_request(method, url, **params)
             self.log_debug("Performed {0} {1}, response code: {2}".format(url, method, response.status_code))
             return self._convert_to_api_result(model, response)

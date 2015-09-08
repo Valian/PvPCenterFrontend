@@ -6,10 +6,10 @@
   <p>{{ user.email }}</p>
 
   <h3>{{ gettext('Ranking') }}</h3>
-  <p>#{{ user.ranking }}</p>
+  <p>{{ ('#' + user.ranking) if user_ranking else gettext('Not ranked')}}</p>
 
   <h3>{{ gettext('Nationality') }}</h3>
-  <p>{{ user.nationality }}</p>
+  <p>{{ user.nationality | country_name }}</p>
 
   <h3>{{ gettext('Sex') }}</h3>
   <p>{{ user.sex | sex }}</p>
@@ -20,40 +20,26 @@
   <h3>{{ gettext('About me') }}</h3>
   <p>{{ user.description if user.description else gettext('No description') }}</p>
 
-  <h3>Gry</h3>
-  {{ user_game_ownerships(user) }}
-
-  <h3>Dodatkowe informacje</h3>
-  <div class="moreinfo">
-    <h4>Facebook</h4>
-    <a href="#">facebook.com/fnatic</a>
-    <h4>Twitch.tv</h4>
-    <a href="#">twitch.tv/fnatic</a>
-    <h4>Steam</h4>
-    <a href="#">steam.com/fnatic</a>
-    <h4>Januszowo</h4>
-    <a href="#">januszowo.cebula/fnatic</a>
-  </div>
+  {{ user_game_ownerships(user.game_ownerships) }}
 {% endmacro %}
 
-{% macro user_game_ownerships(user) %}
-  <!-- <div class="row icons">
-    <div class="col-md-2"><a href="#"><img src="assets/lol-icon.png"></a></div>
-    <div class="col-md-2"><a href="#"><img src="assets/cod-icon.png"></a></div>
-    <div class="col-md-2"><a href="#"><img src="assets/hearthstone-icon.png"></a></div>
-    <div class="col-md-2"><a href="#"><img src="assets/csgo-icon.png"></a></div>
-  </div> -->
-  <table class="table table-striped">
-    <tr>
-      <th class="col">Game</th>
-      <th class="col">Nickname</th>
-    </tr>
-    {% for game_ownership in user.game_ownerships %}
+{% macro user_game_ownerships(game_ownerships) %}
+  <h3>{{ gettext('Games') }}</h3>
+  {% if not game_ownerships or game_ownerships | length == 0 %}
+    <p>{{ gettext("No games found") }}</p>
+  {% else %}
+    <table class="table table-striped">
       <tr>
-        <td>{{ game_ownership.game.name }}</td>
-        <td>{{ game_ownership.nickname }}</td>
+        <th class="col">Game</th>
+        <th class="col">Nickname</th>
       </tr>
-    {% endfor %}
-  </table>
+      {% for game_ownership in game_ownerships %}
+        <tr>
+          <td>{{ game_ownership.game.name }}</td>
+          <td>{{ game_ownership.nickname }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
 
 {% endmacro %}

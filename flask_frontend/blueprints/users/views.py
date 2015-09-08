@@ -169,5 +169,8 @@ def change_basic(user_id):
 
     if change_basic_form.validate_on_submit():
         Flash.success(gettext('Successfully changed basic data!'))
+        return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
-    return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+    return render_pjax(
+        "profile_base.html", "edit_profile.html", user=flask_login.current_user, email_form=change_email_form,
+        basic_form=change_basic_form)

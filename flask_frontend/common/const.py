@@ -4,5 +4,5 @@
 
 class SEX(object):
     UNDEFINED = 0
-    MALE = 1
-    FEMALE = 2
+    MALE = "M"
+    FEMALE = "F"

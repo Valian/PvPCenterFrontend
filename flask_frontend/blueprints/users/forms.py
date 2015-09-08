@@ -4,6 +4,7 @@
 import wtforms
 
 from flask_babel import gettext
+from api.constants import NATIONALITIES
 from flask_frontend.common.const import SEX
 from wtforms.validators import Email, EqualTo
 from api.models import User
@@ -26,16 +27,14 @@ class ChangeEmailForm(ApiForm):
         self.user_id = user.id
         self.token = user.token
 
-
     def _make_request(self):
         return self._api.users.patch(self.user_id, self.token, email=self.email.data)
 
 
 class ChangeBasicDataForm(ApiForm):
 
-    sex = wtforms.SelectField(gettext('Sex'), coerce=int, choices=[
-        (SEX.UNDEFINED, gettext('Undefined')), (SEX.MALE, gettext('Male')), (SEX.FEMALE, gettext('Female'))])
-    nationality = wtforms.SelectField(gettext('Nationality'), choices=[('pl', 'Poland'), ('en', "Great Britain")])
+    sex = wtforms.SelectField(gettext('Sex'), choices=[(SEX.MALE, gettext('Male')), (SEX.FEMALE, gettext('Female'))])
+    nationality = wtforms.SelectField(gettext('Nationality'), choices=NATIONALITIES.CODES)
     birthdate = wtforms.DateField(gettext('Birthday'))
     description = wtforms.TextAreaField(gettext('About me'), default='None')
 

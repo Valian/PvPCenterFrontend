@@ -19,12 +19,12 @@ class ModelBase(object):
     def from_json(cls, json):
         try:
             return cls._from_json(json)
-        except (TypeError, AttributeError, KeyError) as e:
+        except Exception as e:
             raise UnableToParseException(cls, e)
 
     @abstractclassmethod
     def _from_json(cls, json):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def __str__(self):
         return str(vars(self))
@@ -174,10 +174,10 @@ class User(ModelBase):
             email=json['email'],
             token=json.get('access_token'),
             ranking=json.get('ranking'),
-            nationality=json.get('country'),
+            nationality=json.get('nationality'),
             sex=json.get('sex'),
             relation_to_current_user=relation,
-            birthdate=json.get('birthdate'),
+            birthdate=json['birthdate'],
             description=json.get('description'),
             game_ownerships=game_ownerships)
 
