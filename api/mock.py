@@ -123,6 +123,7 @@ class UserFactory(factory.Factory):
     ranking = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 100 + 30)
     game_ownerships = factory.List([factory.SubFactory(UserGameOwnershipFactory) for _ in xrange(random.randint(2, 5))])
     relation_to_current_user = factory.SubFactory(RelationToUserFactory)
+    image_url = factory.LazyAttribute(lambda o: [None, 'http://res.cloudinary.com/dihrxuryz/image/upload/v1442074482/xmhoxjbioanmd5htrl0p.png'][o.id % 2])
 
 
 class AuthUserFactory(UserFactory):

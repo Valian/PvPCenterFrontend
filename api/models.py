@@ -150,7 +150,7 @@ class RelationToUser(ModelBase):
     
 class User(ModelBase):
     def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships,
-                 relation_to_current_user):
+                 relation_to_current_user, image_url):
         self.ranking = ranking
         self.id = id
         self.name = name
@@ -162,6 +162,7 @@ class User(ModelBase):
         self.sex = sex
         self.nationality = nationality
         self.relation_to_current_user = relation_to_current_user
+        self.image_url = image_url
 
     @classmethod
     def _from_json(cls, json):
@@ -177,8 +178,9 @@ class User(ModelBase):
             nationality=json.get('nationality'),
             sex=json.get('sex'),
             relation_to_current_user=relation,
-            birthdate=json['birthdate'],
+            birthdate=json.get('birthdate'),
             description=json.get('description'),
+            image_url=json.get('image_url'),
             game_ownerships=game_ownerships)
 
 

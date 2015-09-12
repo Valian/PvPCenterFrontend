@@ -24,7 +24,7 @@ class LoginForm(RedirectFormMixin, ApiForm):
 
 class RegisterForm(ApiForm):
 
-    login = wtforms.StringField(gettext('Login'), validators=[
+    nickname = wtforms.StringField(gettext('Login'), validators=[
         Length(8, message=gettext('Min %(num)d characters', num=8)),
         Regexp(r'^[\w_]+$', message=gettext("Only alphanumeric characters!"))])
     email = wtforms.StringField(gettext('Email'), validators=[
@@ -38,5 +38,5 @@ class RegisterForm(ApiForm):
     spam = wtforms.BooleanField(gettext("Do you want spam"))
 
     def _make_request(self):
-        return self._api.users.post(self.login.data, self.email.data, self.password.data, model=User)
+        return self._api.users.post(self.nickname.data, self.email.data, self.password.data, model=User)
 

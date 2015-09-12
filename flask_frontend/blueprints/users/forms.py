@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
+import cloudinary.uploader
+
 import wtforms
-
 from flask_babel import gettext
-from api.constants import NATIONALITIES
-from flask_frontend.common.const import SEX
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import Email, EqualTo
-from api.models import User
+from api.api import ApiException
 
+from api.constants import NATIONALITIES
+from api.models import User
+from flask_frontend.common.const import SEX
 from flask_frontend.common.api_helper import ApiForm
 
 
@@ -61,3 +64,18 @@ class ChangeBasicDataForm(ApiForm):
             birthdate=self.birthdate.data,
             description=self.description.data)
 
+
+class ChangeAvatarForm(ApiForm):
+
+    avatar = FileField(gettext("Avatar"), validators=[
+        FileRequired(message=gettext("You must specify file")),
+        FileAllowed(['jpg', 'png'], gettext('Allowed extensions: .jpg, .png'))])
+
+    def __init__(self, user_id, token, api, *args, **kwargs):
+        super(ChangeAvatarForm, self).__init__(api, *args, **kwargs)
+        self.user_id = user_id
+        self.token = token
+
+    def _make_request(self):
+        result = cloudinary.uploader.upload_image(self.avatar.data)
+        self._api.users.patch(self.user_id, self.token, image_url=result.url)

@@ -39,11 +39,18 @@ def before_app_request():
 def login():
     form = flask.g.login_form
     if form.validate_on_submit():
-        flask_login.login_user(form.result, remember=form.remember_me.data)
-        flask.session['token'] = form.result.token
+        login_user(form.result, form.remember_me.data, form.email.data, form.password.data)
         return form.redirect(flask.url_for('index'))
 
     return flask.render_template("login.html", form=form)
+
+
+def login_user(user, remember_me, email, password):
+    flask_login.login_user(user, remember=remember_me)
+    flask.session['token'] = user.token
+    if remember_me:
+        flask.session['email'] = email
+        flask.session['password'] = password
 
 
 @auth_blueprint.route("/logout", methods=['POST'])
@@ -57,7 +64,7 @@ def logout():
 def register():
     register_form = RegisterForm(auth_blueprint.api)
     if register_form.validate_on_submit():
-        flask_login.login_user(register_form.result)
+        login_user(register_form.result, False, register_form.result.email, register_form.password.data)
         return flask.redirect(flask.url_for('index'))
 
     return flask.render_template("register.html", form=register_form)

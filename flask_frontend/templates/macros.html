@@ -36,8 +36,8 @@
   </div>
 {%- endmacro %}
 
-{% macro render_form(form, action_url='', action_text='Submit', class_='', btn_class='btn btn-default submit', with_labels=True) -%}
-  <form method="POST" action="{{ action_url }}" role="form" class="{{ class_ }}">
+{% macro render_form(form, action_url='', action_text='Submit', class_='', btn_class='btn btn-default submit', with_labels=True, upload_file=False) -%}
+  <form method="POST" action="{{ action_url }}" role="form" class="{{ class_ }}" {{ 'enctype=multipart/form-data' if upload_file else '' }}>
     {{ form.hidden_tag() if form.hidden_tag }}
     {% for error in form.server_errors %}
       <div class="alert alert-danger">

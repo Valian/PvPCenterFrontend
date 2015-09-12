@@ -6,5 +6,6 @@ from flask_frontend.config import keys
 DevConfig = {
     keys.DEBUG: "TRUE",
     keys.MOCK_API: True,
-    keys.LOG_LEVEL: 'DEBUG'
+    keys.LOG_LEVEL: 'DEBUG',
+    "ASSETS_DEBUG": False
 }

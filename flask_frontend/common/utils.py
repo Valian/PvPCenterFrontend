@@ -1,8 +1,21 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
+import time
+import cloudinary
+
 from flask import Blueprint
 import flask
+from flask.ext.frontend.config import keys
+
+
+def generate_cloudinary_options(config, **kwargs):
+    timestamp = int(time.time())
+    callback = flask.url_for('cloudinary_cors')
+    api_key = config[keys.CLOUDINARY_PUBLIC_KEY]
+    secret = config[keys.CLOUDINARY_SECRET]
+    kwargs.update({'timestamp': timestamp, 'callback': callback})
+    return cloudinary.utils.sign_request(kwargs, {'api_key': api_key, 'api_secret': secret})
 
 
 def render_pjax(base, view, **kwargs):

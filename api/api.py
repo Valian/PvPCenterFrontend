@@ -39,7 +39,8 @@ class ApiException(Exception):
 
 class ApiResult(object):
 
-    def __init__(self, data=None, errors=None):
+    def __init__(self, data=None, errors=None, status=200):
+        self.status = status
         self.errors = errors
         self.data = data
         self.ok = not self.errors or len(errors) == 0
@@ -73,6 +74,7 @@ class ApiDispatcher(ApiDispatcherBase):
             self.log_debug("Performed {0} {1}, response code: {2}".format(url, method, response.status_code))
             return self._convert_to_api_result(model, response)
         except (UnableToParseException, RequestException, ValueError) as e:
+            self.log_error("Error while performing request, more info: {0}".format(e))
             raise ApiException(endpoint, method, e)
 
     def create_url(self, endpoint):
@@ -87,9 +89,9 @@ class ApiDispatcher(ApiDispatcherBase):
         json = response.json()
         self.log_debug('Response data: {0}'.format(json))
         if not response.ok:
-            return ApiResult(errors=Errors.from_json(json))
+            return ApiResult(errors=Errors.from_json(json), status=response.status_code)
         else:
-            return ApiResult(data=model.from_json(json) if model else json)
+            return ApiResult(data=model.from_json(json) if model else json, status=response.status_code)
 
 
 class Resource(object):
@@ -108,7 +110,8 @@ class Resource(object):
 
     def create_url_with_pagination(self, suffix="", params=None, **kwargs):
         page, per_page = get_pagination_params()
-        params = (params or {}).update(offset=(page - 1) * per_page, limit=per_page)
+        params = params or {}
+        params.update(offset=(page - 1) * per_page, limit=per_page)
         return self.create_url(suffix, params, **kwargs)
 
     def _get_request(self, endpoint, model=None, **kwargs):
@@ -165,10 +168,11 @@ class Users(Resource):
         return self._get_request(endpoint, model=model)
 
     def patch(self, user_id, token, email=undefined, nationality=undefined, sex=undefined, birthdate=undefined,
-              description=undefined, model=UserModel):
+              description=undefined, image_url=undefined, model=UserModel):
         params = {"access_token": token}
         data = dict_of_defined_keys(
-            email=email, nationality=nationality, sex=sex, birthdate=birthdate, description=description)
+            email=email, nationality=nationality, sex=sex, birthdate=birthdate, description=description,
+            image_url=image_url)
         endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, params=params, user_id=user_id)
         return self._patch_request(endpoint, model=model, data=data)
 

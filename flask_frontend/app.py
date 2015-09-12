@@ -1,4 +1,5 @@
 import logging
+import cloudinary
 
 from flask import Flask
 from flask.ext.frontend.filters import create_filters
@@ -31,6 +32,7 @@ def create_app(config=None):
     create_filters(app)
     create_bundles(app)
     create_main_views(app)
+    initialize_cloudinary(app)
 
     return app
 
@@ -45,3 +47,9 @@ def create_logger(app):
         logger.addHandler(stderr_handler)
     return logger
 
+
+def initialize_cloudinary(app):
+    cloudinary.config(
+        cloud_name=app.config[keys.CLOUDINARY_CLOUD_NAME],
+        api_key=app.config[keys.CLOUDINARY_PUBLIC_KEY],
+        api_secret=app.config[keys.CLOUDINARY_SECRET])

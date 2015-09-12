@@ -3,3 +3,4 @@ loadAsync = (url, target) ->
     return
   $.get url, (data) ->
     $(target).html(data)
+

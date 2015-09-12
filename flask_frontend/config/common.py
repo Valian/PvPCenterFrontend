@@ -19,5 +19,9 @@ CommonConfig = {
     keys.LANGUAGES: {
         'pl': 'Polski',
         'en': 'English'
-    }
+    },
+
+    keys.CLOUDINARY_CLOUD_NAME: 'unset',
+    keys.CLOUDINARY_PUBLIC_KEY: 'public_key',
+    keys.CLOUDINARY_SECRET: 'secret'
 }

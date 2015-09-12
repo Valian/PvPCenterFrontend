@@ -102,38 +102,21 @@ class UsersTests(AppTestCase):
         response = self.client.get(url_for('users.teams_view', user_id=5))
         self.assertIsInstance(response.context['teams'], list)
 
-class UsersWithAuthTests(AppTestCase):
 
-    @parameterized.expand([
-        ({'email': "dupa@dupa.com", 'repeat': "other"}, False),
-        ({'email': "dupa", 'repeat': "dupa"}, False),
-        ({'email': "dupa@dupa.com", 'repeat': "dupa@dupa.com"}, True)
-    ])
-    @mock.patch('flask_frontend.blueprints.users.views.users_blueprint.api')
-    @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
-    def test_email_edit(self, data, should_call_api, auth_api_mock, api_mock):
-        _, user = self.login_user(auth_api_mock)
-        api_mock.users.patch.return_value = ApiResult(data=user)
-        response = self.client.post(url_for('users.change_email', user_id=user.id), params=data)
-        self.assertEqual(response.status_code, 302)
-        if should_call_api:
-            self.assertEqual(api_mock.users.patch.call_count, 1)
-            self.assertEqual(api_mock.users.patch.call_args, mock.call(user.id, user.token, email=data['email']))
-        else:
-            self.assertFalse(api_mock.users.patch.called)
+class UsersWithAuthTests(AppTestCase):
 
     @mock.patch('flask_frontend.blueprints.users.views.users_blueprint.api')
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_basic_info_edit(self, auth_api_mock, api_mock):
         _, user = self.login_user(auth_api_mock)
         api_mock.users.patch.return_value = ApiResult(data=user)
-        nationality = 'en'
+        nationality = 'US'
         birthdate = datetime.date(1992, 12, 23)
         about_me = 'Me like me'
         sex = 1
         data = {'nationality': nationality, 'birthdate': birthdate, 'description': about_me, 'sex': sex}
         response = self.client.post(url_for('users.change_basic', user_id=user.id), params=data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(api_mock.users.patch.call_count, 1)
         self.assertEqual(api_mock.users.patch.call_args, mock.call(
             user.id, user.token, nationality=nationality, sex=sex, description=about_me, birthdate=birthdate))

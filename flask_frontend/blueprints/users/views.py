@@ -3,15 +3,18 @@
 import flask
 import flask_login
 import flask_gravatar
+import cloudinary
+import cloudinary.uploader
+
 from flask_babel import gettext
 
 from . import users_blueprint
 from flask.ext.frontend.blueprints.users.helpers import only_current_user
 from flask.ext.frontend.common.flash import Flash
-from flask.ext.frontend.common.pagination import get_pagination_params, Pagination
-from flask.ext.frontend.common.utils import render_pjax, first_or_none
+from flask.ext.frontend.common.pagination import Pagination
+from flask.ext.frontend.common.utils import render_pjax, first_or_none, generate_cloudinary_options
 from flask_frontend.common.const import SEX
-from flask_frontend.blueprints.users.forms import ChangeEmailForm, ChangeBasicDataForm
+from flask_frontend.blueprints.users.forms import ChangeBasicDataForm, ChangeAvatarForm
 from flask_frontend.common.api_helper import get_or_404, get_or_500
 
 
@@ -138,33 +141,35 @@ def friends_view(user_id):
 @only_current_user
 @flask_login.login_required
 def edit_profile_view(user_id):
-    change_email_form = ChangeEmailForm(users_blueprint.api, flask_login.current_user)
-    change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
+    logged_user = flask_login.current_user
+    change_basic_form = ChangeBasicDataForm(users_blueprint.api, logged_user)
     change_basic_form.set_data(flask_login.current_user)
+    avatar_form = ChangeAvatarForm(logged_user.id, logged_user.token, users_blueprint.api)
     return render_pjax(
-        "profile_base.html", "edit_profile.html", user=flask_login.current_user, email_form=change_email_form,
-        basic_form=change_basic_form)
+        "profile_base.html", "edit_profile.html", user=flask_login.current_user, basic_form=change_basic_form,
+        avatar_form=avatar_form)
 
 
-@users_blueprint.route("/<int:user_id>/edit_email", methods=["POST"])
+@users_blueprint.route("/<int:user_id>/upload_avatar", methods=["POST"])
 @only_current_user
 @flask_login.login_required
-def change_email(user_id):
-    change_email_form = ChangeEmailForm(users_blueprint.api, flask_login.current_user)
-    change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
-    change_basic_form.set_data(flask_login.current_user)
+def upload_avatar(user_id):
+    logged_user = flask_login.current_user
+    change_basic_form = ChangeBasicDataForm(users_blueprint.api, logged_user)
+    change_basic_form.set_data(logged_user)
+    avatar_form = ChangeAvatarForm(logged_user.id, logged_user.token, users_blueprint.api)
+    if avatar_form.validate_on_submit():
+        Flash.success("Succesfully updated image!")
 
-    if change_email_form.validate_on_submit():
-        Flash.success(gettext('Successfully changed email!'))
-
-    return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+    return render_pjax(
+        "profile_base.html", "edit_profile.html", user=logged_user, basic_form=change_basic_form,
+        avatar_form=avatar_form)
 
 
 @users_blueprint.route("/<int:user_id>/edit_basic", methods=["POST"])
 @only_current_user
 @flask_login.login_required
 def change_basic(user_id):
-    change_email_form = ChangeEmailForm(users_blueprint.api, flask_login.current_user)
     change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
 
     if change_basic_form.validate_on_submit():
@@ -172,5 +177,4 @@ def change_basic(user_id):
         return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
     return render_pjax(
-        "profile_base.html", "edit_profile.html", user=flask_login.current_user, email_form=change_email_form,
-        basic_form=change_basic_form)
+        "profile_base.html", "edit_profile.html", user=flask_login.current_user, basic_form=change_basic_form)

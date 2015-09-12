@@ -25,4 +25,3 @@ def create_main_views(app):
     @app.route('/index.html')
     def index():
         return flask.render_template('index.html')
-

@@ -87,7 +87,7 @@ class ApiForm(flask_wtf.Form):
                 return True
             self._handle_errors(api_result.errors)
             return False
-        except ApiException as e:
+        except Exception as e:
             self.server_errors = [gettext("Server error, try again later")]
             return False
 

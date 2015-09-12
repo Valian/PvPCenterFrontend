@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 from functools import wraps
+import logging
 
 from unittest import TestCase
 
@@ -52,6 +53,7 @@ class AppTestCase(TestCase):
         return get_test_config(config)
 
     def setUp(self):
+        logging.getLogger().setLevel(logging.ERROR)
         config = self.get_config()
         self.app = create_app(config)
         self.client = TestAppRedirectWrapper(self.app)

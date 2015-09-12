@@ -63,6 +63,6 @@ class AuthTests(AppTestCase):
     def test_register(self, api_mock):
         return_user = create_mock_for(User)
         api_mock.users.post.return_value = ApiResult(data=return_user)
-        data = {'email': "dupa@dupa.com", 'password': "password", 'password_again': 'password', 'login': 'loggggin'}
+        data = {'email': "dupa@dupa.com", 'password': "password", 'password_again': 'password', 'nickname': 'loggggin'}
         self.client.post(url_for('auth.register'), params=data)
         self.assertTrue(api_mock.users.post.called)

@@ -7,5 +7,6 @@ TestConfig = {
     keys.TESTING: True,
     "WTF_CSRF_ENABLED": False,
     "LOGIN_DISABLED": False,
-    keys.MOCK_API: True
+    keys.MOCK_API: True,
+    keys.LOG_LEVEL: 'ERROR'
 }
