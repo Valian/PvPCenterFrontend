@@ -1,3 +1,6 @@
+{% extends 'profile_base.html' %}
+
+{% block pjax_content %}
 
   <h1 class="name">
     <span>{{ gettext('Friends of %(name)s', name=user.name) }}</span>
@@ -8,10 +11,12 @@
       {% for friendship in friendships %}
         <li>
           {% from 'user_macros.html' import user_listing %}
-          {{ user_listing(user) }}
+          {{ user_listing(friendship.friend) }}
         </li>
       {% endfor %}
       {% from 'macros.html' import render_pagination %}
       {{ render_pagination(pagination, '#profile_content') }}
     </ul>
   </div>
+
+{% endblock %}

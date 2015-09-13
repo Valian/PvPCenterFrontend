@@ -1,12 +1,18 @@
-<h1 class="name">
-  <span>{{ gettext('Profil of %(name)s', name=current_user.name) }}</span>
-  <small class="watch">
-    <a href="#">
-      <i class="fa fa-eye"></i>
-      13
-    </a>
-  </small>
-</h1>
-{% from 'macros.html' import render_form %}
-{{ render_form(basic_form, url_for('users.change_basic', user_id=user.id), action_text=gettext('Save profile')) }}
-{{ render_form(avatar_form, url_for('users.upload_avatar', user_id=user.id), action_text=gettext('Upload'), upload_file=True) }}
+{% extends 'profile_base.html' %}
+
+{% block pjax_content %}
+
+  <h1 class="name">
+    <span>{{ gettext('Profil of %(name)s', name=current_user.name) }}</span>
+    <small class="watch">
+      <a href="#">
+        <i class="fa fa-eye"></i>
+        13
+      </a>
+    </small>
+  </h1>
+  {% from 'macros.html' import render_form %}
+  {{ render_form(basic_form, url_for('users.change_basic', user_id=user.id), action_text=gettext('Save profile')) }}
+  {{ render_form(avatar_form, url_for('users.upload_avatar', user_id=user.id), action_text=gettext('Upload'), upload_file=True) }}
+
+{% endblock %}

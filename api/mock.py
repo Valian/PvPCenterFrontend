@@ -11,6 +11,8 @@ import factory
 import factory.fuzzy as fuzzy
 import re
 from faker import Factory as FakerFactory
+from constants import NATIONALITIES
+from flask.ext.frontend.common.const import SEX
 
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
     FriendshipInvite, Friendship, RELATION_TO_CURRENT_USER, RelationToUser, DeleteResponse, Notification, TeamInvite
@@ -116,8 +118,8 @@ class UserFactory(factory.Factory):
     name = factory.LazyAttribute(lambda x: random_with_seed(faker.provider('faker.providers.person').first_names, x.id))
     email = factory.LazyAttribute(lambda o: '{0}@mock.com'.format(o.name.replace(' ', '_')))
     token = fuzzy.FuzzyText(length=15)
-    nationality = factory.LazyAttribute(lambda o: ['pl', 'en'][o.id % 2])
-    sex = factory.LazyAttribute(lambda o: [None, 1, 2][o.id % 3])
+    nationality = factory.LazyAttribute(lambda o: NATIONALITIES.CODE_TO_NATIONALITY.keys()[o.id % len(NATIONALITIES.CODES)])
+    sex = factory.LazyAttribute(lambda o: [SEX.UNDEFINED, SEX.MALE, SEX.FEMALE][o.id % 3])
     birthdate = factory.LazyAttribute(lambda o: datetime.date(1992, 12, 03))
     description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
     ranking = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 100 + 30)

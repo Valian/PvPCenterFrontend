@@ -8,7 +8,7 @@ from flask.ext.frontend.blueprints.teams.helpers import TeamRoute, TeamEditRoute
 from flask_frontend.blueprints.teams.forms import CreateTeamForm
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.pagination import Pagination
-from flask_frontend.common.utils import render_pjax
+from flask_frontend.common.utils import render_pjax, pjax
 
 from flask_frontend.common.api_helper import get_or_500
 from flask_frontend.blueprints.teams import teams_blueprint
@@ -23,7 +23,7 @@ def teams_view():
     name = flask.request.args.get('name', '')
     teams = get_or_500(teams_blueprint.api.teams.get, name=name)
     pagination = Pagination.create_from_model_list(teams)
-    return render_pjax('teams_list.html', 'teams_list_result.html', teams=teams, pagination=pagination)
+    return pjax('teams_list.html', teams=teams, pagination=pagination)
 
 
 @teams_blueprint.route('/create', methods=['POST', 'GET'])

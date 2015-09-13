@@ -10,7 +10,7 @@ from flask_frontend.blueprints.users.helpers import only_current_user
 from flask.ext.frontend.blueprints.users.helpers import UserRoute, UserFriendEditRoute, UserEditRoute
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.pagination import Pagination
-from flask_frontend.common.utils import render_pjax
+from flask_frontend.common.utils import render_pjax, pjax
 from flask_frontend.common.const import SEX
 from flask_frontend.common.api_helper import get_or_500
 
@@ -41,19 +41,19 @@ def users_view():
     nickname = flask.request.args.get('nickname', '')
     users = get_or_500(users_blueprint.api.users.get, nickname=nickname)
     pagination = Pagination.create_from_model_list(users)
-    return render_pjax("users_list.html", "users_list_result.html", pagination=pagination, users=users)
+    return pjax("users_list.html", pagination=pagination, users=users)
 
 
 @user_route('')
 def profile_view(user):
-    return render_pjax("profile_base.html", "user_profile.html", user=user)
+    return pjax("user_profile.html", user=user)
 
 
 @user_route("/teams")
 def teams_view(user):
     teams_memberships = get_or_500(users_blueprint.api.team_memberships.get, user_id=user.id)
     teams = map(lambda tm: tm.team, teams_memberships)
-    return render_pjax("profile_base.html", "user_teams.html", user=user, teams=teams)
+    return pjax("user_teams.html", user=user, teams=teams)
 
 
 @user_route("/invite", methods=["POST"])
@@ -79,7 +79,7 @@ def accept_invite_to_friends(user, friendship, friendship_invite):
             return render_pjax("profile_base.html", "user_profile.html", user=user)
 
     Flash.error(gettext("Unable to accept invitation"))
-    return render_pjax("profile_base.html", "user_profile.html", user=user)
+    return pjax("user_profile.html", user=user)
 
 
 @edit_friendship_route("/decline_invitation", methods=["POST"])
@@ -92,7 +92,7 @@ def decline_invite_to_friends(user, friendship, friendship_invite):
             return render_pjax("profile_base.html", "user_profile.html", user=user)
 
     Flash.success(gettext("Unable to decline invitation"))
-    return render_pjax("profile_base.html", "user_profile.html", user=user)
+    return pjax("user_profile.html", user=user)
 
 
 @edit_friendship_route("/remove_friend", methods=["POST"])
@@ -105,7 +105,7 @@ def remove_from_friends(user, friendship, friendship_invite):
             return render_pjax("profile_base.html", "user_profile.html", user=user)
 
     Flash.error(gettext("Unable to remove user from friends"))
-    return render_pjax("profile_base.html", "user_profile.html", user=user)
+    return pjax("user_profile.html", user=user)
 
 
 @user_route("/friends")
@@ -114,30 +114,24 @@ def friends_view(user):
     current_user = flask_login.current_user
     friendships = get_or_500(users_blueprint.api.friendships.get, token=current_user.token, user_id=user.id)
     pagination = Pagination.create_from_model_list(friendships)
-    return render_pjax(
-        "profile_base.html", "user_friends.html", friendships=friendships, user=user, pagination=pagination)
+    return pjax("user_friends.html", friendships=friendships, user=user, pagination=pagination)
 
 
 @edit_user_route("/edit")
 def edit_profile_view(user, avatar_form, basic_form):
     basic_form.set_data(flask_login.current_user)
-    return render_pjax(
-        "profile_base.html", "edit_profile.html", user=user, basic_form=basic_form,
-        avatar_form=avatar_form)
+    return pjax("edit_profile.html", user=user, basic_form=basic_form, avatar_form=avatar_form)
 
 
 @edit_user_route("/upload_avatar", methods=["POST"])
 def upload_avatar(user, avatar_form, basic_form):
     if avatar_form.validate_on_submit():
         Flash.success("Succesfully updated image!")
-    return render_pjax(
-        "profile_base.html", "edit_profile.html", user=user, basic_form=basic_form, avatar_form=avatar_form)
+    return pjax("edit_profile.html", user=user, basic_form=basic_form, avatar_form=avatar_form)
 
 
 @edit_user_route("/edit_basic", methods=["POST"])
 def change_basic(user, avatar_form, basic_form):
     if basic_form.validate_on_submit():
         Flash.success(gettext('Successfully changed basic data!'))
-
-    return render_pjax(
-        "profile_base.html", "edit_profile.html", user=user, avatar_form=avatar_form, basic_form=basic_form)
+    return pjax("edit_profile.html", user=user, avatar_form=avatar_form, basic_form=basic_form)

@@ -1,42 +1,45 @@
-{% from 'user_macros.html' import user_basic_info, user_game_ownerships %}
+{% extends 'profile_base.html' %}
 
-{% set is_my_profile = current_user.is_authenticated() and current_user.id == user.id %}
+{% block pjax_content %}
 
-<h1 class="name">
-  <span>{{ gettext('Profil of %(name)s', name=user.name) }}</span>
-</h1>
-<div class="extra-menu">
-  {% if is_my_profile %}
-    <a href="{{ url_for('users.edit_profile_view', user_id=user.id) }}" data-pjax="#profile_content">
-      <i class="fa fa-pencil-square-o"></i>
-    </a>
-  {% elif current_user.is_authenticated() %}
+  {% from 'user_macros.html' import user_basic_info, user_game_ownerships %}
+  {% set is_my_profile = current_user.is_authenticated() and current_user.id == user.id %}
+  <h1 class="name">
+    <span>{{ gettext('Profil of %(name)s', name=user.name) }}</span>
+  </h1>
+  <div class="extra-menu">
+    {% if is_my_profile %}
+      <a href="{{ url_for('users.edit_profile_view', user_id=user.id) }}" data-pjax="#profile_content">
+        <i class="fa fa-pencil-square-o"></i>
+      </a>
+    {% elif current_user.is_authenticated() %}
 
-    {% if user.relation_to_current_user.invite_send or user.relation_to_current_user.invite_received %}
-      <form action="{{ url_for('users.decline_invite_to_friends', user_id=user.id) }}" method="post">
-        <button type="submit">{{ gettext('Decline invite') }}</button>
-      </form>
+      {% if user.relation_to_current_user.invite_send or user.relation_to_current_user.invite_received %}
+        <form action="{{ url_for('users.decline_invite_to_friends', user_id=user.id) }}" method="post">
+          <button type="submit">{{ gettext('Decline invite') }}</button>
+        </form>
+      {% endif %}
+
+      {% if user.relation_to_current_user.is_friend %}
+        <form action="{{ url_for('users.remove_from_friends', user_id=user.id) }}" method="post">
+          <button type="submit">{{ gettext('Remove from friends') }}</button>
+        </form>
+      {% elif user.relation_to_current_user.invite_received %}
+        <form action="{{ url_for('users.accept_invite_to_friends', user_id=user.id) }}" method="post">
+          <button type="submit">{{ gettext('Accept invite') }}</button>
+        </form>
+      {% elif not user.relation_to_current_user.invite_send %}
+        <form action="{{ url_for('users.invite_to_friends', user_id=user.id) }}" method="post">
+          <button type="submit">{{ gettext('Invite to friends') }}</button>
+        </form>
+      {% endif %}
+
     {% endif %}
 
-    {% if user.relation_to_current_user.is_friend %}
-      <form action="{{ url_for('users.remove_from_friends', user_id=user.id) }}" method="post">
-        <button type="submit">{{ gettext('Remove from friends') }}</button>
-      </form>
-    {% elif user.relation_to_current_user.invite_received %}
-      <form action="{{ url_for('users.accept_invite_to_friends', user_id=user.id) }}" method="post">
-        <button type="submit">{{ gettext('Accept invite') }}</button>
-      </form>
-    {% elif not user.relation_to_current_user.invite_send %}
-      <form action="{{ url_for('users.invite_to_friends', user_id=user.id) }}" method="post">
-        <button type="submit">{{ gettext('Invite to friends') }}</button>
-      </form>
+    {% if not is_my_profile %}
+      <a href="#" class="fight"><img src="{{ url_for('static', filename='images/challenge.png') }}"></a>
     {% endif %}
+  </div>
+  {{ user_basic_info(user) }}
 
-  {% endif %}
-
-  {% if not is_my_profile %}
-    <a href="#" class="fight"><img src="{{ url_for('static', filename='images/challenge.png') }}"></a>
-  {% endif %}
-</div>
-
-{{ user_basic_info(user) }}
+{% endblock %}

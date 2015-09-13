@@ -7,7 +7,16 @@
     {{ render_pjax_form({'nickname': { } }, '#search-results', url_for('users.users_view')) }}
     <div class="content" id="search-results">
       {% block pjax_content %}
-
+        <ul>
+          {% for user in users %}
+            <li>
+              {% from 'user_macros.html' import user_listing %}
+              {{ user_listing(user) }}
+            </li>
+          {%  endfor %}
+          {% from 'macros.html' import render_pagination %}
+          {{ render_pagination(pagination, '#search-results') }}
+        </ul>
       {% endblock %}
     </div>
   </div>

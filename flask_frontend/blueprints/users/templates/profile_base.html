@@ -14,7 +14,7 @@
       ('#', 'match', gettext('Matches')),
       ('#', 'challenges', gettext('Challenges')),
       ('#', 'leagues', gettext('Leagues')),
-      ('#', 'settings', gettext('Settings')),
+      (url_for('users.edit_profile_view', user_id=user.id), 'settings', gettext('Settings')),
       (url_for('users.teams_view', user_id=user.id), 'teams', gettext('Teams'))
     ] -%}
 

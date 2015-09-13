@@ -7,7 +7,20 @@
     {{ render_pjax_form({'name': { } }, '#search-results', url_for('teams.teams_view')) }}
     <div class="content" id="search-results">
       {% block pjax_content %}
-
+        <ul>
+          {% for team in teams %}
+            <li>
+              {% from 'team_macros.html' import team_listing %}
+              {% call team_listing(team) %}
+                {% if current_user.is_authenticated() %}
+                  <a href="#">{{ gettext('Join team') }}</a>
+                {% endif %}
+              {% endcall %}
+            </li>
+          {%  endfor %}
+        </ul>
+        {% from 'macros.html' import render_pagination %}
+        {{ render_pagination(pagination, '#search-results') }}
       {% endblock %}
     </div>
   </div>

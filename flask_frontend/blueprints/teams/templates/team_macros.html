@@ -2,3 +2,16 @@
   {% set size = kwargs.get('width') %}
   {{ team.image_url | cloudinary(**kwargs) if team.image_url else team.founder.email | gravatar(size) }}
 {% endmacro %}
+
+{% macro team_listing(team) %}
+  <img src="{{ team_logo_src(team, width=20) }}">
+  <a href="{{ url_for('teams.team_view', team_id = team.id) }}">
+    <b>{{ team.name }}</b>
+    {{ team.tag }}
+    {{ team.members_count }}
+    {# add check if current player is already in team (??) #}
+    {% if caller %}
+      {{ caller() }}
+    {% endif %}
+  </a>
+{% endmacro %}

@@ -6,13 +6,15 @@
   <p>{{ user.email }}</p>
 
   <h3>{{ gettext('Ranking') }}</h3>
-  <p>{{ ('#' + user.ranking) if user_ranking else gettext('Not ranked')}}</p>
+  <p>{{ '#{0}'.format(user.ranking) if user.ranking else gettext('Not ranked')}}</p>
 
   <h3>{{ gettext('Nationality') }}</h3>
   <p>{{ user.nationality | country_name }}</p>
 
-  <h3>{{ gettext('Sex') }}</h3>
-  <p>{{ user.sex | sex }}</p>
+  {% if user.sex %}
+    <h3>{{ gettext('Sex') }}</h3>
+    <p>{{ user.sex | sex }}</p>
+  {% endif %}
 
   <h3>{{ gettext('Age') }}</h3>
   <p>{{ user.birthdate }}</p>

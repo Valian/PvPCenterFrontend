@@ -55,6 +55,18 @@ def render_pjax(base, view, **kwargs):
     return flask.render_template('pjax_wrapper.html', is_pjax=is_pijax, extends=base, view=view, **kwargs)
 
 
+def pjax(template, pjax_block='pjax_content', **kwargs):
+    if "X-PJAX" in flask.request.headers:
+        app = flask.current_app
+        app.update_template_context(kwargs)
+        template = app.jinja_env.get_template(template)
+        block = template.blocks[pjax_block]
+        context = template.new_context(kwargs)
+        return u''.join(block(context))
+    else:
+        return flask.render_template(template, **kwargs)
+
+
 def first_or_none(iterable):
     return iterable[0] if len(iterable) > 0 else None
 
