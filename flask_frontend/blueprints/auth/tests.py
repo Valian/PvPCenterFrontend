@@ -37,8 +37,6 @@ class AuthTests(AppTestCase):
         ({'email': "dupa@dupa", 'password': "password"}, 'Invalid'),
         ({'email': "dupadupa", 'password': "password"}, 'Invalid'),
         ({'email': "", 'password': "password"}, 'Invalid'),
-        ({'email': "dupa@dupa.com", 'password': ""}, 'Min'),
-        ({'email': "dupa@dupa.com", 'password': "sd"}, 'Min'),
     ])
     @mock.patch('flask_frontend.blueprints.auth.views.auth_blueprint.api')
     def test_invalid_email(self, data, error_message, api_mock):

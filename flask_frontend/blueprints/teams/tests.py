@@ -49,5 +49,16 @@ class TeamTests(AppTestCase):
         body = {'name': 'Heheheh', 'tag': 'TAG', 'description': 'description'}
         response = self.client.post(url_for('teams.create_team_view'), params=body)
         self.assertLess(response.status_code, 400)
-        expected_call = mock.call(user.token, body['name'], body['description'], body['tag'])
+        expected_call = mock.call(user.token, user.id, body['name'], body['description'], body['tag'])
         self.assertEqual(api.teams.post.call_args, expected_call)
+
+    @logged_in
+    def test_edit_team_data(self, user, api):
+        team = create_mock_for(Team, founder__id=user.id)
+        api.teams.get_single.return_value = ApiResult(data=team)
+        body = {'name': 'Heheheh', 'tag': 'TAG', 'description': 'description'}
+        response = self.client.post(url_for('teams.change_basic', team_id=team.id), params=body)
+        self.assertLess(response.status_code, 400)
+        expected_call = mock.call(
+            team.id, user.token, name=body['name'], description=body['description'], tag=body['tag'])
+        self.assertEqual(api.teams.patch.call_args, expected_call)

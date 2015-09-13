@@ -7,7 +7,7 @@ from flask_babel import gettext
 
 from . import users_blueprint
 from flask_frontend.blueprints.users.helpers import only_current_user
-from flask_frontend.blueprints.users.routes import UserRoute, UserEditRoute, UserFriendEditRoute
+from flask.ext.frontend.blueprints.users.helpers import UserRoute, UserFriendEditRoute, UserEditRoute
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.pagination import Pagination
 from flask_frontend.common.utils import render_pjax
@@ -119,15 +119,14 @@ def friends_view(user):
 
 
 @edit_user_route("/edit")
-@only_current_user
 def edit_profile_view(user, avatar_form, basic_form):
+    basic_form.set_data(flask_login.current_user)
     return render_pjax(
         "profile_base.html", "edit_profile.html", user=user, basic_form=basic_form,
         avatar_form=avatar_form)
 
 
 @edit_user_route("/upload_avatar", methods=["POST"])
-@only_current_user
 def upload_avatar(user, avatar_form, basic_form):
     if avatar_form.validate_on_submit():
         Flash.success("Succesfully updated image!")
@@ -136,7 +135,6 @@ def upload_avatar(user, avatar_form, basic_form):
 
 
 @edit_user_route("/edit_basic", methods=["POST"])
-@only_current_user
 def change_basic(user, avatar_form, basic_form):
     if basic_form.validate_on_submit():
         Flash.success(gettext('Successfully changed basic data!'))

@@ -226,9 +226,10 @@ class Teams(Resource):
         return self._get_request(endpoint, model=model)
 
     def patch(self, team_id, token, name=undefined, description=undefined, tag=undefined, founder_id=undefined,
-              model=TeamModel):
+              image_url=undefined, model=TeamModel):
         endpoint = self.create_url(suffix=self.SINGLE_ENDPOINT, team_id=team_id, params={"access_token": token})
-        data = dict_of_defined_keys(name=name, description=description, tag=tag, founder_id=founder_id)
+        data = dict_of_defined_keys(
+            name=name, description=description, tag=tag, founder_id=founder_id, image_url=image_url)
         return self._patch_request(endpoint, model=model, data=data)
 
 

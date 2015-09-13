@@ -14,8 +14,7 @@ from .user import User
 class LoginForm(RedirectFormMixin, ApiForm):
 
     email = wtforms.StringField(gettext('Email'), validators=[Email(message=gettext('Invalid email'))])
-    password = wtforms.PasswordField(gettext('Password'), validators=[
-        Length(8, message=gettext('Min %(num)d characters', num=8))])
+    password = wtforms.PasswordField(gettext('Password'))
     remember_me = wtforms.BooleanField(gettext('Remember me'), default=False)
 
     def _make_request(self):
@@ -24,13 +23,9 @@ class LoginForm(RedirectFormMixin, ApiForm):
 
 class RegisterForm(ApiForm):
 
-    nickname = wtforms.StringField(gettext('Login'), validators=[
-        Length(8, message=gettext('Min %(num)d characters', num=8)),
-        Regexp(r'^[\w_]+$', message=gettext("Only alphanumeric characters!"))])
-    email = wtforms.StringField(gettext('Email'), validators=[
-        Email(message=gettext('Invalid email'))])
-    password = wtforms.PasswordField(gettext('Password'), validators=[
-        Length(8, message=gettext('Min %(num)d characters', num=8))])
+    nickname = wtforms.StringField(gettext('Login'))
+    email = wtforms.StringField(gettext('Email'), validators=[Email(message=gettext('Invalid email'))])
+    password = wtforms.PasswordField(gettext('Password'))
     password_again = wtforms.PasswordField(gettext('Repeat password'), validators=[
         EqualTo('password', message=gettext('Passwords must match'))])
     rules = wtforms.BooleanField(gettext("Do you accept our rules"), validators=[

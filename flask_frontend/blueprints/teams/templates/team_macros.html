@@ -1,0 +1,4 @@
+{% macro team_logo_src(team) %}
+  {% set size = kwargs.get('width') %}
+  {{ team.image_url | cloudinary(**kwargs) if team.image_url else team.founder.email | gravatar(size) }}
+{% endmacro %}

@@ -139,8 +139,9 @@ class TeamFactory(factory.Factory):
     name = factory.LazyAttribute(lambda x: random_with_seed(faker.provider('faker.providers.lorem').word_list, x.id))
     description = factory.LazyAttribute(lambda o: [None, 'Taki oto ja', 'Pro elo elo'][o.id % 3])
     tag = factory.LazyAttribute(lambda o: ['HEY', 'ELO', 'WIN'][o.id % 3])
-    founder = factory.LazyAttribute(lambda o: UserFactory(id=o.id))
+    founder = factory.SubFactory(UserFactory)
     member_count = factory.LazyAttribute(lambda o: o.id * 17 % 10 + 5)
+    image_url = factory.LazyAttribute(lambda o: [None, 'http://res.cloudinary.com/dihrxuryz/image/upload/v1442074482/xmhoxjbioanmd5htrl0p.png'][o.id % 2])
 
 
 class TeamMembershipFactory(factory.Factory):

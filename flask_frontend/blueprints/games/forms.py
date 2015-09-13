@@ -6,7 +6,7 @@ from wtforms.validators import Length
 
 from flask_frontend.common.api_helper import ApiForm
 
-nickname_field = wtforms.StringField(gettext('Nickname'), validators=[Length(3, message=gettext('At least 3 characters'))])
+nickname_field = wtforms.StringField(gettext('Nickname'))
 
 
 class GameJoinForm(ApiForm):

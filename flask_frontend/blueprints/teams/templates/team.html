@@ -2,7 +2,14 @@
 
 {% block content %}
   <div class="col-md-9">
-    <h1>{{ gettext("Overview of %(team_name)s", team_name=team.name) }}</h1>
+    {% from 'team_macros.html' import team_logo_src %}
+    <img src="{{ team_logo_src(team, width=130) }}">
+    <h1>
+      {{ gettext("Overview of %(team_name)s", team_name=team.name) }}
+      {% if current_user.is_authenticated() and team.founder.id == current_user.id %}
+        <a href="{{ url_for('teams.edit_team_view', team_id=team.id) }}">(Edit)</a>
+      {% endif %}
+    </h1>
     <div class="row">        
       <b>{{ team.name }}</b>
       {{ team.tag }}

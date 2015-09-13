@@ -36,6 +36,7 @@ class UsersTests(AppTestCase):
     def test_my_friends_calls_api(self, user, api_mock):
         data = create_mock_for(ModelList.For(Friendship), 3)
         api_mock.friendships.get.return_value = ApiResult(data=data)
+        api_mock.users.get_single.return_value = ApiResult(data=user)
         response = self.client.get(url_for('users.friends_view', user_id=user.id))
         self.assertEqual(api_mock.friendships.get.call_count, 1)
         call_kwargs = api_mock.friendships.get.call_args[1]
@@ -46,9 +47,11 @@ class UsersTests(AppTestCase):
 
     @logged_in
     def test_invite_friend_calls_api(self, user, api_mock):
-        self.client.post(url_for('users.invite_to_friends', user_id=8))
+        user_id = 8
+        api_mock.users.get_single.return_value = ApiResult(data=create_mock_for(User, id=user_id))
+        self.client.post(url_for('users.invite_to_friends', user_id=user_id))
         self.assertTrue(api_mock.friendship_invites.create.called)
-        self.assertEqual(api_mock.friendship_invites.create.call_args, mock.call(user.token, user.id, 8))
+        self.assertEqual(api_mock.friendship_invites.create.call_args, mock.call(user.token, user.id, user_id))
 
     @logged_in
     def test_accept_friend_invite_calls_api(self, user, api_mock):

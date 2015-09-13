@@ -227,13 +227,14 @@ class Division(ModelBase):
 
 
 class Team(ModelBase):
-    def __init__(self, id, name, description, tag, founder, member_count):
+    def __init__(self, id, name, description, tag, founder, image_url, member_count):
         """
         :type id: long
         :type name: str
         :type description: str
         :type tag: str
         :type founder: User
+        :type image_url: str
         :type member_count: int
         """
         self.id = id
@@ -241,12 +242,20 @@ class Team(ModelBase):
         self.description = description
         self.tag = tag
         self.founder = founder
+        self.image_url = image_url
         self.member_count = member_count
 
     @classmethod
     def _from_json(cls, json):
-        founder = User.from_json(json['founder']) if json.has_key('founder') else None
-        return cls(json['id'], json['name'], json.get('description'), json.get('tag'), founder, json['member_count'])
+        founder = User.from_json(json['founder']) if 'founder' in json else None
+        return cls(
+            id=json['id'],
+            name=json['name'],
+            description=json.get('description'),
+            tag=json.get('tag'),
+            founder=founder,
+            image_url=json.get('image_url'),
+            member_count=json['member_count'])
 
 
 class TeamMembership(ModelBase):
