@@ -2,7 +2,7 @@ import logging
 import cloudinary
 
 from flask import Flask
-from flask.ext.frontend.filters import create_filters
+from flask_frontend.filters import create_filters
 
 from flask_frontend.views import create_main_views
 from flask_frontend.bundles import create_bundles

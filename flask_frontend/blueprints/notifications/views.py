@@ -4,8 +4,8 @@
 
 import flask
 import flask_login
-from flask.ext.frontend.blueprints.notifications import notifications_blueprint
-from flask.ext.frontend.common.api_helper import get_or_500
+from flask_frontend.blueprints.notifications import notifications_blueprint
+from flask_frontend.common.api_helper import get_or_500
 
 NUMBER_OF_NAVBAR_NOTIFICATIONS = 3
 

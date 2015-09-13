@@ -1,12 +1,44 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
+from functools import wraps
+from abc import abstractmethod, ABCMeta
 
 import time
 import cloudinary
 
 from flask import Blueprint
 import flask
-from flask.ext.frontend.config import keys
+from common.logable import Logable
+from flask_frontend.config import keys
+
+
+class CustomRoute(Logable):
+
+    __metaclass__ = ABCMeta
+
+    def __init__(self, blueprint, prefix):
+        self.prefix = prefix
+        self.blueprint = blueprint
+
+    def __call__(self, route, **kwargs):
+
+        def decorator(f):
+            modified_route = '{0}{1}'.format(self.prefix, route)
+
+            @wraps(f)
+            def wrapper(**wrapper_kwargs):
+                new_kwargs = self.prepare_view(**wrapper_kwargs)
+                return f(**new_kwargs)
+
+            self.blueprint.add_url_rule(modified_route, endpoint=f.__name__, view_func=wrapper, **kwargs)
+            return wrapper
+        return decorator
+
+    @abstractmethod
+    def prepare_view(self, **kwargs):
+        """
+        :rtype: dict
+        """
 
 
 def generate_cloudinary_options(config, **kwargs):

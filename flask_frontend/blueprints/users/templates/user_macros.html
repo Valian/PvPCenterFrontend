@@ -23,6 +23,19 @@
   {{ user_game_ownerships(user.game_ownerships) }}
 {% endmacro %}
 
+{% macro user_logo_src(user) %}
+  {% set size = kwargs.get('width') %}
+  {{ user.image_url | cloudinary(**kwargs) if user.image_url else user.email | gravatar(size) }}
+{% endmacro %}
+
+{% macro user_listing(user) %}
+  <div>
+    <img class="avatar" src="{{ user_logo_src(user, width=20) }}" alt="" />
+    <a href="{{ url_for('users.profile_view', user_id=user.id) }}">{{ user.name }}</a>
+    <a href="#">(Send message)</a>
+  </div>
+{% endmacro %}
+
 {% macro user_game_ownerships(game_ownerships) %}
   <h3>{{ gettext('Games') }}</h3>
   {% if not game_ownerships or game_ownerships | length == 0 %}

@@ -7,11 +7,8 @@
     <ul>
       {% for friendship in friendships %}
         <li>
-          <div>
-            <img class="avatar" src="{{ friendship.friend.email | gravatar(size=20) }}" alt="" />
-            <a href="{{ url_for('users.profile_view', user_id=friendship.friend.id) }}">{{ friendship.friend.name }}</a>
-            <a href="#">(Send message)</a>
-          </div>
+          {% from 'user_macros.html' import user_listing %}
+          {{ user_listing(user) }}
         </li>
       {% endfor %}
       {% from 'macros.html' import render_pagination %}

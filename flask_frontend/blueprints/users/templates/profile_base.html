@@ -34,8 +34,8 @@
     <div class="row">
       <div class="menu">
         <div class="logo">
-          {% set image_url = user.image_url | cloudinary(width=130) if user.image_url else user.email | gravatar %}
-          <img class="avatar" src="{{ image_url }}" alt="" />
+          {% from 'user_macros.html' import user_logo_src %}
+          <img class="avatar" src="{{ user_logo_src(user, width=130) }}" alt="" />
           <img class="flag" src="{{ url_for('static', filename='images/flag.png') }}" alt="" />
           <h3>{{ user.name }}</h3>
         </div>

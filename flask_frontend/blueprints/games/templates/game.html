@@ -21,10 +21,16 @@
 			<h3>{{ gettext('Game description') }}</h3>
 			<p>Butcher locavore vegan chillwave fingerstache. Post-ironic meditation artisan Wes Anderson polaroid. Fap tofu High Life seitan raw denim. Readymade 90's keytar, viral kale chips gastropub pork belly Portland hoodie paleo. Slow-carb bicycle rights tilde, bespoke leggings kitsch health goth meditation brunch trust fund Vice cardigan polaroid whatever Neutra. Meh PBR&B before they sold out art party polaroid quinoa, Wes Anderson sartorial ennui skateboard Schlitz. Direct trade before they sold out biodiesel flannel, asymmetrical Echo Park swag salvia.</p>
 			{% if current_user.is_authenticated() %}
-				<h3>{{ gettext('Join game' if type == 'create' else 'Update nickname') }}</h3>
+                {% if game_ownership %}
+                  <form method="post" action="{{ url_for('games.leave_game', game_id=game.id) }}">
+                    <button>(Leave)</button>
+                  </form>
+                {% endif %}
+				<h3>{{ gettext('Join game' if not game_ownership else 'Update nickname') }}</h3>
 
 				{% from 'macros.html' import render_form %}
 				{{ render_form(form, url_for('games.join_game', game_id=game.id), action_text=gettext('Save')) }}
+
 			{% endif %}
 			<h3>{{ gettext('Rules') }}</h3>
 			<div role="tabpanel" class="row rules">

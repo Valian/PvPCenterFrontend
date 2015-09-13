@@ -8,6 +8,7 @@ from flask_frontend.common.api_helper import ApiForm
 
 nickname_field = wtforms.StringField(gettext('Nickname'), validators=[Length(3, message=gettext('At least 3 characters'))])
 
+
 class GameJoinForm(ApiForm):
 
     nickname = nickname_field
@@ -23,7 +24,7 @@ class GameJoinForm(ApiForm):
         self.user_id = user_id
 
     def _make_request(self):
-        return self._api.game_ownerships.create(self.token, self.user_id, self.game_id, self.nickname)
+        return self._api.game_ownerships.create(self.token, self.user_id, self.game_id, self.nickname.data)
 
 
 class GameUpdateForm(ApiForm):
@@ -36,4 +37,4 @@ class GameUpdateForm(ApiForm):
         self.token = token
 
     def _make_request(self):
-        return self._api.game_ownerships.update(self.token, self.game_ownership_id, self.nickname)
+        return self._api.game_ownerships.update(self.token, self.game_ownership_id, self.nickname.data)

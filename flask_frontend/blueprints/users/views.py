@@ -3,19 +3,16 @@
 import flask
 import flask_login
 import flask_gravatar
-import cloudinary
-import cloudinary.uploader
-
 from flask_babel import gettext
 
 from . import users_blueprint
-from flask.ext.frontend.blueprints.users.helpers import only_current_user
-from flask.ext.frontend.common.flash import Flash
-from flask.ext.frontend.common.pagination import Pagination
-from flask.ext.frontend.common.utils import render_pjax, first_or_none, generate_cloudinary_options
+from flask_frontend.blueprints.users.helpers import only_current_user
+from flask_frontend.blueprints.users.routes import UserRoute, UserEditRoute, UserFriendEditRoute
+from flask_frontend.common.flash import Flash
+from flask_frontend.common.pagination import Pagination
+from flask_frontend.common.utils import render_pjax
 from flask_frontend.common.const import SEX
-from flask_frontend.blueprints.users.forms import ChangeBasicDataForm, ChangeAvatarForm
-from flask_frontend.common.api_helper import get_or_404, get_or_500
+from flask_frontend.common.api_helper import get_or_500
 
 
 def sex_to_text(value):
@@ -34,6 +31,11 @@ def init(state):
     app.jinja_env.filters['sex'] = sex_to_text
 
 
+user_route = UserRoute(users_blueprint, "/<int:user_id>")
+edit_user_route = UserEditRoute(users_blueprint, "/<int:user_id>")
+edit_friendship_route = UserFriendEditRoute(users_blueprint, "/<int:user_id>")
+
+
 @users_blueprint.route("/")
 def users_view():
     nickname = flask.request.args.get('nickname', '')
@@ -42,139 +44,102 @@ def users_view():
     return render_pjax("users_list.html", "users_list_result.html", pagination=pagination, users=users)
 
 
-@users_blueprint.route("/<int:user_id>")
-@users_blueprint.route("/<int:user_id>/profile")
-def profile_view(user_id):
-    token = flask_login.current_user.token if flask_login.current_user.is_authenticated() else None
-    user = get_or_404(users_blueprint.api.users.get_single, user_id, token=token)
+@user_route('')
+def profile_view(user):
     return render_pjax("profile_base.html", "user_profile.html", user=user)
 
 
-@users_blueprint.route("/<int:user_id>/teams")
-def teams_view(user_id):
-    user = get_or_404(users_blueprint.api.users.get_single, user_id)
-    teams_memberships = get_or_500(users_blueprint.api.team_memberships.get, user_id=user_id)
+@user_route("/teams")
+def teams_view(user):
+    teams_memberships = get_or_500(users_blueprint.api.team_memberships.get, user_id=user.id)
     teams = map(lambda tm: tm.team, teams_memberships)
     return render_pjax("profile_base.html", "user_teams.html", user=user, teams=teams)
 
 
-@users_blueprint.route("/<int:user_id>/invite", methods=["POST"])
+@user_route("/invite", methods=["POST"])
 @flask_login.login_required
-def invite_to_friends(user_id):
+def invite_to_friends(user):
     me = flask_login.current_user
-    result = users_blueprint.api.friendship_invites.create(me.token, me.id, user_id)
-    if result.ok:
+    result = get_or_500(users_blueprint.api.friendship_invites.create, me.token, me.id, user.id)
+    if result:
         Flash.success(gettext("Succesfully invited user to friends!"))
     else:
         Flash.error(gettext("Unable to add user to friends"))
-    return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+    # TODO - return to referrer
+    return flask.redirect(flask.url_for('users.profile_view', user_id=user.id))
 
 
-@users_blueprint.route("/<int:user_id>/accept_invitation", methods=["POST"])
+@edit_friendship_route("/accept_invitation", methods=["POST"])
 @flask_login.login_required
-def accept_invite_to_friends(user_id):
-    relation = get_friendship_invite(user_id)
-    if relation:
-        result = users_blueprint.api.friendship_invites.accept(flask_login.current_user.token, relation.id)
+def accept_invite_to_friends(user, friendship, friendship_invite):
+    if friendship_invite:
+        result = users_blueprint.api.friendship_invites.accept(flask_login.current_user.token, friendship_invite.id)
         if result.ok:
             Flash.success(gettext("Succesfully accepted invite to friends!"))
-            return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+            return render_pjax("profile_base.html", "user_profile.html", user=user)
 
     Flash.error(gettext("Unable to accept invitation"))
-    return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+    return render_pjax("profile_base.html", "user_profile.html", user=user)
 
 
-def get_friendship_invite(user_id):
-    me = flask_login.current_user
-    relations = get_or_500(users_blueprint.api.friendship_invites.get, me.token, me.id, user_id)
-    relation = first_or_none(relations)
-    return relation
-
-
-def get_frienship(user_id):
-    me = flask_login.current_user
-    friendships = get_or_500(users_blueprint.api.friendships.get, me.token, me.id, user_id)
-    friendship = first_or_none(friendships)
-    return friendship
-
-
-@users_blueprint.route("/<int:user_id>/decline_invitation", methods=["POST"])
+@edit_friendship_route("/decline_invitation", methods=["POST"])
 @flask_login.login_required
-def decline_invite_to_friends(user_id):
-    relation = get_friendship_invite(user_id)
-    if relation:
-        result = users_blueprint.api.friendship_invites.delete(flask_login.current_user.token, relation.id)
+def decline_invite_to_friends(user, friendship, friendship_invite):
+    if friendship_invite:
+        result = users_blueprint.api.friendship_invites.delete(flask_login.current_user.token, friendship_invite.id)
         if result.ok:
             Flash.success(gettext("Invitation declined"))
-            return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+            return render_pjax("profile_base.html", "user_profile.html", user=user)
 
     Flash.success(gettext("Unable to decline invitation"))
-    return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+    return render_pjax("profile_base.html", "user_profile.html", user=user)
 
 
-@users_blueprint.route("/<int:user_id>/remove_friend", methods=["POST"])
+@edit_friendship_route("/remove_friend", methods=["POST"])
 @flask_login.login_required
-def remove_from_friends(user_id):
-    friendship = get_frienship(user_id)
+def remove_from_friends(user, friendship, friendship_invite):
     if friendship:
         result = users_blueprint.api.friendships.delete(flask_login.current_user.token, friendship.id)
         if result.ok:
             Flash.success(gettext("Friend removed"))
-            return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+            return render_pjax("profile_base.html", "user_profile.html", user=user)
 
     Flash.error(gettext("Unable to remove user from friends"))
-    return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
+    return render_pjax("profile_base.html", "user_profile.html", user=user)
 
 
-@users_blueprint.route("/<int:user_id>/friends")
+@user_route("/friends")
 @only_current_user
-@flask_login.login_required
-def friends_view(user_id):
-    user = flask_login.current_user
-    friendships = get_or_500(users_blueprint.api.friendships.get, token=user.token, user_id=user_id)
+def friends_view(user):
+    current_user = flask_login.current_user
+    friendships = get_or_500(users_blueprint.api.friendships.get, token=current_user.token, user_id=user.id)
     pagination = Pagination.create_from_model_list(friendships)
     return render_pjax(
         "profile_base.html", "user_friends.html", friendships=friendships, user=user, pagination=pagination)
 
 
-@users_blueprint.route("/<int:user_id>/edit")
+@edit_user_route("/edit")
 @only_current_user
-@flask_login.login_required
-def edit_profile_view(user_id):
-    logged_user = flask_login.current_user
-    change_basic_form = ChangeBasicDataForm(users_blueprint.api, logged_user)
-    change_basic_form.set_data(flask_login.current_user)
-    avatar_form = ChangeAvatarForm(logged_user.id, logged_user.token, users_blueprint.api)
+def edit_profile_view(user, avatar_form, basic_form):
     return render_pjax(
-        "profile_base.html", "edit_profile.html", user=flask_login.current_user, basic_form=change_basic_form,
+        "profile_base.html", "edit_profile.html", user=user, basic_form=basic_form,
         avatar_form=avatar_form)
 
 
-@users_blueprint.route("/<int:user_id>/upload_avatar", methods=["POST"])
+@edit_user_route("/upload_avatar", methods=["POST"])
 @only_current_user
-@flask_login.login_required
-def upload_avatar(user_id):
-    logged_user = flask_login.current_user
-    change_basic_form = ChangeBasicDataForm(users_blueprint.api, logged_user)
-    change_basic_form.set_data(logged_user)
-    avatar_form = ChangeAvatarForm(logged_user.id, logged_user.token, users_blueprint.api)
+def upload_avatar(user, avatar_form, basic_form):
     if avatar_form.validate_on_submit():
         Flash.success("Succesfully updated image!")
-
     return render_pjax(
-        "profile_base.html", "edit_profile.html", user=logged_user, basic_form=change_basic_form,
-        avatar_form=avatar_form)
+        "profile_base.html", "edit_profile.html", user=user, basic_form=basic_form, avatar_form=avatar_form)
 
 
-@users_blueprint.route("/<int:user_id>/edit_basic", methods=["POST"])
+@edit_user_route("/edit_basic", methods=["POST"])
 @only_current_user
-@flask_login.login_required
-def change_basic(user_id):
-    change_basic_form = ChangeBasicDataForm(users_blueprint.api, flask_login.current_user)
-
-    if change_basic_form.validate_on_submit():
+def change_basic(user, avatar_form, basic_form):
+    if basic_form.validate_on_submit():
         Flash.success(gettext('Successfully changed basic data!'))
-        return flask.redirect(flask.url_for('users.profile_view', user_id=user_id))
 
     return render_pjax(
-        "profile_base.html", "edit_profile.html", user=flask_login.current_user, basic_form=change_basic_form)
+        "profile_base.html", "edit_profile.html", user=user, avatar_form=avatar_form, basic_form=basic_form)

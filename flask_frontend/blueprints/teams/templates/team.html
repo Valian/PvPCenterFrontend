@@ -15,11 +15,8 @@
       <ul>
         {% for member in members %}
         <li>
-          <div>
-            <img class="avatar" src="{{ member.email | gravatar(size=20) }}" alt="" />
-            <a href="{{ url_for('users.profile_view', user_id=member.id) }}">{{ member.name }}</a>
-            <a href="#">(Send message)</a>
-          </div>
+          {% from 'user_macros.html' import user_listing %}
+          {{ user_listing(member) }}
         </li>
         {% endfor %}
       </ul>

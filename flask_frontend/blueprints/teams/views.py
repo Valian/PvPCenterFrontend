@@ -4,10 +4,10 @@
 import flask
 from flask.ext.babel import gettext
 import flask_login
-from flask.ext.frontend.blueprints.teams.forms import CreateTeamForm
-from flask.ext.frontend.common.flash import Flash
-from flask.ext.frontend.common.pagination import Pagination
-from flask.ext.frontend.common.utils import render_pjax
+from flask_frontend.blueprints.teams.forms import CreateTeamForm
+from flask_frontend.common.flash import Flash
+from flask_frontend.common.pagination import Pagination
+from flask_frontend.common.utils import render_pjax
 
 from flask_frontend.common.api_helper import get_or_500
 from flask_frontend.blueprints.teams import teams_blueprint
@@ -24,7 +24,7 @@ def teams_view():
 @teams_blueprint.route('/create', methods=['POST', 'GET'])
 @flask_login.login_required
 def create_team_view():
-    form = CreateTeamForm(flask_login.current_user.token, teams_blueprint.api)
+    form = CreateTeamForm(flask_login.current_user, teams_blueprint.api)
     if form.validate_on_submit():
         Flash.success(gettext("Succesfully created team!"))
         return flask.redirect(flask.url_for('teams.team_view', team_id=form.result.id))

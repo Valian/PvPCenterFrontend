@@ -2,7 +2,7 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import flask
 
-from flask.ext.frontend.blueprints.lang.languages import init_babel, set_locale, get_locale
+from flask_frontend.blueprints.lang.languages import init_babel, set_locale, get_locale
 from flask_frontend.config import keys
 from . import lang_blueprint
 

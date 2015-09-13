@@ -3,7 +3,7 @@
 from flask.ext.babel import gettext
 import wtforms
 from wtforms.validators import Length, Regexp, DataRequired
-from flask.ext.frontend.common.api_helper import ApiForm
+from flask_frontend.common.api_helper import ApiForm
 
 
 class CreateTeamForm(ApiForm):
@@ -19,9 +19,9 @@ class CreateTeamForm(ApiForm):
     description = wtforms.TextAreaField(gettext('Description'), validators=[
         Regexp(r'[\w\s]*', message="Only letters and digits!")])
 
-    def __init__(self, token, api, *args, **kwargs):
+    def __init__(self, user, api, *args, **kwargs):
         super(CreateTeamForm, self).__init__(api, *args, **kwargs)
-        self.token = token
+        self.user = user
 
     def _make_request(self):
-        return self._api.teams.post(self.token, self.name.data, self.description.data, self.tag.data)
+        return self._api.teams.post(self.user.token, self.user.id, self.name.data, self.description.data, self.tag.data)

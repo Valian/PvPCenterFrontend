@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
-from _ast import Delete
 
 import urllib
-
-from requests import RequestException
-
-import requests
 import urlparse
 
+from requests import RequestException
+import requests
 from abc import ABCMeta, abstractmethod
 from requests.auth import HTTPBasicAuth
-from flask.ext.frontend.common.pagination import get_pagination_params
-from models import Game as GameModel, Error, UnableToParseException, Errors, ModelList, User as UserModel, \
+
+from flask_frontend.common.pagination import get_pagination_params
+from models import Game as GameModel, UnableToParseException, Errors, ModelList, User as UserModel, \
     UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel, FriendshipInvite as FriendshipInviteModel, \
     Friendship, DeleteResponse, Notification, TeamInvite
 from common.logable import Logable
@@ -203,6 +201,11 @@ class GameOwnerships(Resource):
         endpoint = self.create_url(self.SINGLE_ENDPOINT, game_ownership_id=game_ownership_id, params=params)
         return self._patch_request(endpoint, model, data=data)
 
+    def delete(self, token, game_ownership_id, model=DeleteResponse):
+        params = {'access_token': token}
+        endpoint = self.create_url(self.SINGLE_ENDPOINT, game_ownership_id=game_ownership_id, params=params)
+        return self._delete_request(endpoint, model)
+
 
 class Teams(Resource):
 
@@ -213,9 +216,9 @@ class Teams(Resource):
         endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
-    def post(self, token, name, description, tag, model=TeamModel):
+    def post(self, token, founder_id, name, description, tag, model=TeamModel):
         endpoint = self.create_url(params={"access_token": token})
-        data = {'name': name, 'description': description, 'tag': tag}
+        data = {'name': name, 'description': description, 'tag': tag, 'founder_id': founder_id}
         return self._post_request(endpoint, model=model, data=data)
 
     def get_single(self, team_id, model=TeamModel):
