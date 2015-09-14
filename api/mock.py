@@ -10,14 +10,19 @@ import logging
 import factory
 import factory.fuzzy as fuzzy
 import re
-from faker import Factory as FakerFactory
-from constants import NATIONALITIES
-from flask.ext.frontend.common.const import SEX
 
-from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
-    FriendshipInvite, Friendship, RELATION_TO_CURRENT_USER, RelationToUser, DeleteResponse, Notification, TeamInvite
+from faker import Factory as FakerFactory
+
 from api import ApiDispatcherBase, ApiResult
+from constants import RELATION_TO_CURRENT_USER
+from constants import NATIONALITIES, TEAM_RELATION_TO_CURRENT_USER
+from flask_frontend.common.const import SEX
 from flask_frontend.blueprints.auth.user import User as AuthUser
+from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
+    FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamInvite, TeamRelationToUser
+
+
+CLOUDINARY_URL = 'http://res.cloudinary.com/dihrxuryz/image/upload/v1442074482/xmhoxjbioanmd5htrl0p.png'
 
 faker = FakerFactory.create()
 logger = logging.getLogger('factory')
@@ -125,7 +130,14 @@ class UserFactory(factory.Factory):
     ranking = factory.LazyAttribute(lambda o: (o.id * 13 + 7) % 100 + 30)
     game_ownerships = factory.List([factory.SubFactory(UserGameOwnershipFactory) for _ in xrange(random.randint(2, 5))])
     relation_to_current_user = factory.SubFactory(RelationToUserFactory)
-    image_url = factory.LazyAttribute(lambda o: [None, 'http://res.cloudinary.com/dihrxuryz/image/upload/v1442074482/xmhoxjbioanmd5htrl0p.png'][o.id % 2])
+    image_url = factory.LazyAttribute(lambda o: [None, CLOUDINARY_URL][o.id % 2])
+
+
+class TeamRelationToUserFactory(factory.Factory):
+    class Meta:
+        model = TeamRelationToUser
+
+    type = factory.Iterator(vars(TEAM_RELATION_TO_CURRENT_USER).values())
 
 
 class AuthUserFactory(UserFactory):
@@ -143,7 +155,8 @@ class TeamFactory(factory.Factory):
     tag = factory.LazyAttribute(lambda o: ['HEY', 'ELO', 'WIN'][o.id % 3])
     founder = factory.SubFactory(UserFactory)
     member_count = factory.LazyAttribute(lambda o: o.id * 17 % 10 + 5)
-    image_url = factory.LazyAttribute(lambda o: [None, 'http://res.cloudinary.com/dihrxuryz/image/upload/v1442074482/xmhoxjbioanmd5htrl0p.png'][o.id % 2])
+    relation_to_current_user = factory.SubFactory(TeamRelationToUserFactory)
+    image_url = factory.LazyAttribute(lambda o: [None, CLOUDINARY_URL][o.id % 2])
 
 
 class TeamMembershipFactory(factory.Factory):

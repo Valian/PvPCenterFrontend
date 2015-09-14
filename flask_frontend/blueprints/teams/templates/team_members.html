@@ -1,0 +1,25 @@
+{% extends 'base_team.html' %}
+
+{% block pjax_content %}
+  <h1 class="name">
+    <span>{{ gettext("members of %(team_name)s", team_name=team.name) }}</span>
+  </h1>
+  <ul>
+    {% for member in memberships %}
+      <li>
+        {% from 'user_macros.html' import user_listing %}
+        {% if team.relation_to_current_user.is_captain %}
+          {% call user_listing(member.user) %}
+            <form action="{{ url_for('teams.remove_from_team', team_id=team.id, user_id=member.id) }}" method="post">
+              <button>Remove from team</button>
+            </form>
+          {% endcall %}
+        {% else %}
+          {{ user_listing(member.user) }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  {% from 'macros.html' import render_pagination %}
+  {{ render_pagination(pagination, '#team_content') }}
+{% endblock %}

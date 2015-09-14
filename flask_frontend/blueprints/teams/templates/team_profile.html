@@ -1,0 +1,22 @@
+{% extends 'base_team.html' %}
+
+{% block pjax_content %}
+  <h1 class="name">
+    <span>{{ gettext("Overview of %(team_name)s", team_name=team.name) }}</span>
+  </h1>
+  <div class="extra-menu">
+    {% if current_user.is_authenticated() and team.relation_to_current_user.is_founder %}
+      <a href="{{ url_for('teams.edit_team_view', team_id=team.id) }}" class="admin-item">
+        <i class="fa fa-pencil-square-o"></i>
+      </a>
+    {% endif %}
+  </div>
+  <h3>{{ gettext('Team description') }}</h3>
+  <p>{{ team.description if team.description else gettext('No description provided') }}</p>
+
+  <h3>{{ gettext('Tag') }}</h3>
+  <p>{{ team.tag }}</p>
+
+  <h3>{{ gettext('Team creation date') }}</h3>
+  <p>15 marca 1997</p>
+{% endblock %}

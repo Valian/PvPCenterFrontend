@@ -3,6 +3,7 @@
 
 from abc import ABCMeta
 
+from constants import RELATION_TO_CURRENT_USER, TEAM_RELATION_TO_CURRENT_USER as TEAM_RELATION
 from common.utils import abstractclassmethod, to_iter
 
 
@@ -115,13 +116,6 @@ class DeleteResponse(ModelBase):
     def _from_json(cls, json):
         return cls(json.get('success', True))
 
-   
-class RELATION_TO_CURRENT_USER(object):
-    SEND_INVITE = 'SENT_FRIENDSHIP_INVITE'
-    RECEIVED_INVITE = 'RECEIVED_FRIENDSHIP_INVITE'
-    FRIEND = 'FRIEND'
-    STRANGER = 'STRANGER'
-
 
 class RelationToUser(ModelBase):
 
@@ -226,8 +220,41 @@ class Division(ModelBase):
         raise NotImplementedError()
 
 
+class TeamRelationToUser(ModelBase):
+
+    def __init__(self, type):
+        """
+        :type type: TEAM_RELATION
+        """
+        self.type = type
+
+    @property
+    def is_founder(self):
+        return self.type == TEAM_RELATION.FOUNDER
+
+    @property
+    def is_captain(self):
+        return self.type in (TEAM_RELATION.FOUNDER, TEAM_RELATION.CAPTAIN)
+
+    @property
+    def is_member(self):
+        return self.type in (TEAM_RELATION.MEMBER, TEAM_RELATION.FOUNDER, TEAM_RELATION.CAPTAIN)
+
+    @property
+    def is_invited(self):
+        return self.type == TEAM_RELATION.INVITED
+
+    @property
+    def is_proposed(self):
+        return self.type == TEAM_RELATION.PROPOSED
+
+    @classmethod
+    def _from_json(cls, json):
+        return cls(json)
+
+
 class Team(ModelBase):
-    def __init__(self, id, name, description, tag, founder, image_url, member_count):
+    def __init__(self, id, name, description, tag, founder, image_url, relation_to_current_user, member_count):
         """
         :type id: long
         :type name: str
@@ -235,6 +262,7 @@ class Team(ModelBase):
         :type tag: str
         :type founder: User
         :type image_url: str
+        :type relation_to_current_user: TeamRelationToUser
         :type member_count: int
         """
         self.id = id
@@ -244,10 +272,13 @@ class Team(ModelBase):
         self.founder = founder
         self.image_url = image_url
         self.member_count = member_count
+        self.relation_to_current_user = relation_to_current_user
 
     @classmethod
     def _from_json(cls, json):
         founder = User.from_json(json['founder']) if 'founder' in json else None
+        relation = TeamRelationToUser.from_json(
+            json.get('current_user_relation', TEAM_RELATION.STRANGER))
         return cls(
             id=json['id'],
             name=json['name'],
@@ -255,6 +286,7 @@ class Team(ModelBase):
             tag=json.get('tag'),
             founder=founder,
             image_url=json.get('image_url'),
+            relation_to_current_user=relation,
             member_count=json['member_count'])
 
 

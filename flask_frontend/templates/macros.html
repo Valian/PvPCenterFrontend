@@ -120,3 +120,12 @@
     {% endif %}
   </ul>
 {% endmacro %}
+
+{% macro render_side_menu(side_menu, pjax_container) %}
+  <ul>
+    {% for url, id, text in side_menu %}
+      <li><a href="{{ url }}" data-pjax="{{ pjax_container }}">{{ text }}</a></li>
+    {% endfor %}
+    {{ caller() if caller else '' }}
+  </ul>
+{% endmacro %}

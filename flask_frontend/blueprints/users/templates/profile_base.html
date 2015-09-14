@@ -39,13 +39,11 @@
           <img class="flag" src="{{ url_for('static', filename='images/flag.png') }}" alt="" />
           <h3>{{ user.name }}</h3>
         </div>
-        <ul>
-          {% for url, id, text in side_menu %}
-            <li><a href="{{ url }}" data-pjax="#profile_content">{{ text }}</a></li>
-          {% endfor %}
+        {% from 'macros.html' import render_side_menu %}
+        {% call render_side_menu(side_menu, '#profile_content') %}
           <li><hr></li>
           <li><a href="#">Fnatic</a></li>
-        </ul>
+        {% endcall %}
       </div>
       <div class="content" id="profile_content">
         {% block pjax_content %}

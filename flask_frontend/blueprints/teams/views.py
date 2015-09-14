@@ -39,9 +39,22 @@ def create_team_view():
 
 @team_route('')
 def team_view(team):
+    return pjax('team_profile.html', team=team)
+
+
+@team_route('/members')
+def members_view(team):
     team_memberships = get_or_500(teams_blueprint.api.team_memberships.get, team_id=team.id)
-    members = map(lambda x: x.user, team_memberships)
-    return flask.render_template('team.html', team=team, members=members)
+    pagination = Pagination.create_from_model_list(team_memberships)
+    return pjax('team_members.html', team=team, memberships=team_memberships, pagination=pagination)
+
+
+@team_route('/remove', methods=['POST'])
+def remove_from_team(team):
+    # TODO
+    team_memberships = get_or_500(teams_blueprint.api.team_memberships.get, team_id=team.id)
+    pagination = Pagination.create_from_model_list(team_memberships)
+    return pjax('team_members.html', team=team, memberships=team_memberships, pagination=pagination)
 
 
 @edit_route('/edit')

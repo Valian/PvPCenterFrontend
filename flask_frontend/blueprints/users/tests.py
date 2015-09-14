@@ -8,7 +8,8 @@ from nose_parameterized import parameterized
 
 from api.api import ApiResult
 from api.mock import create_mock_for
-from api.models import User, ModelList, FriendshipInvite, RELATION_TO_CURRENT_USER, TeamMembership, Friendship
+from api.models import User, ModelList, FriendshipInvite, TeamMembership, Friendship
+from api.constants import RELATION_TO_CURRENT_USER
 from flask_frontend.common.app_test_case import AppTestCase, logged_in
 
 
