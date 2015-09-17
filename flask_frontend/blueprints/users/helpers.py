@@ -1,31 +1,23 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
-from functools import wraps
-
 import flask
-from flask.ext import login
 import flask_login
+
 from flask.ext.frontend.blueprints.users.forms import ChangeBasicDataForm, ChangeAvatarForm
 from flask.ext.frontend.common.api_helper import get_or_404, get_or_500
-from flask.ext.frontend.common.utils import CustomRoute, first_or_none
+from flask.ext.frontend.common.utils import CustomRoute, first_or_none, RestrictionDecorator
 
 
-def only_current_user(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
+class only_current_user(RestrictionDecorator):
+
+    def check_restrictions(self, *args, **kwargs):
         logged_user = flask_login.current_user
-        try:
-            user_id = kwargs.get('user_id')
-            if user_id is None:
-                user_id = kwargs['user'].id
-            if not logged_user.is_authenticated() or logged_user.id != user_id:
-                flask.abort(403)
-        except (AttributeError, KeyError):
-            flask.abort(500)
-
-        return f(*args, **kwargs)
-    return wrapper
+        user_id = kwargs.get('user_id')
+        if user_id is None:
+            user_id = kwargs['user'].id
+        if not logged_user.is_authenticated() or logged_user.id != user_id:
+            flask.abort(403)
 
 
 class UserRoute(CustomRoute):

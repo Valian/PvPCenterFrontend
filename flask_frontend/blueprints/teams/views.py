@@ -4,18 +4,46 @@
 import flask
 from flask.ext.babel import gettext
 import flask_login
-from flask.ext.frontend.blueprints.teams.helpers import TeamRoute, TeamEditRoute, only_team_owner
-from flask_frontend.blueprints.teams.forms import CreateTeamForm
+
+from flask.ext.frontend.blueprints.teams.helpers import TeamRoute, only_team_owner
+from flask.ext.frontend.common.views import route, TemplateView, register
+from flask_frontend.blueprints.teams.forms import CreateTeamForm, ChangeTeamLogoForm, EditTeamInfoForm
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.pagination import Pagination
-from flask_frontend.common.utils import render_pjax, pjax
-
-from flask_frontend.common.api_helper import get_or_500
+from flask_frontend.common.utils import pjax
+from flask_frontend.common.api_helper import get_or_500, get_or_404
 from flask_frontend.blueprints.teams import teams_blueprint
 
 
 team_route = TeamRoute(teams_blueprint, '/<int:team_id>')
-edit_route = TeamEditRoute(teams_blueprint, '/<int:team_id>')
+
+
+@register(teams_blueprint)
+class EditTeamViews(TemplateView):
+
+    decorators = [only_team_owner]
+    template = 'team_edit.html'
+
+    @route('/<int:team_id>')
+    def create_context(self, team_id):
+        user = flask_login.current_user
+        team = get_or_404(teams_blueprint.api.teams.get_single, team_id=team_id)
+        change_logo_form = ChangeTeamLogoForm(team.id, user.token, teams_blueprint.api)
+        change_basic_form = EditTeamInfoForm(user, team, teams_blueprint.api)
+        return dict(team=team, logo_form=change_logo_form, basic_form=change_basic_form)
+
+    def edit(self, team, basic_form):
+        basic_form.set_data(team)
+
+    @route(methods=['POST'])
+    def change_basic(self, basic_form):
+        if basic_form.validate_on_submit():
+            Flash.success(gettext("Team updated"))
+
+    @route(methods=['POST'])
+    def upload_logo(self, logo_form):
+        if logo_form.validate_on_submit():
+            Flash.success(gettext("Logo updated"))
 
 
 @teams_blueprint.route('')
@@ -55,26 +83,3 @@ def remove_from_team(team):
     team_memberships = get_or_500(teams_blueprint.api.team_memberships.get, team_id=team.id)
     pagination = Pagination.create_from_model_list(team_memberships)
     return pjax('team_members.html', team=team, memberships=team_memberships, pagination=pagination)
-
-
-@edit_route('/edit')
-@only_team_owner
-def edit_team_view(team, logo_form, basic_form):
-    basic_form.set_data(team)
-    return flask.render_template('team_edit.html', team=team, logo_form=logo_form, basic_form=basic_form)
-
-
-@edit_route('/change_basic', methods=['POST'])
-@only_team_owner
-def change_basic(team, logo_form, basic_form):
-    if basic_form.validate_on_submit():
-        Flash.success(gettext("Team updated"))
-    return flask.render_template('team_edit.html', team=team, logo_form=logo_form, basic_form=basic_form)
-
-
-@edit_route('/upload_logo', methods=['POST'])
-@only_team_owner
-def upload_logo(team, logo_form, basic_form):
-    if logo_form.validate_on_submit():
-        Flash.success(gettext("Logo updated"))
-    return flask.render_template('team_edit.html', team=team, logo_form=logo_form, basic_form=basic_form)

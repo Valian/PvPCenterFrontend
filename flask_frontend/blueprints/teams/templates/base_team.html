@@ -14,7 +14,7 @@
     ] -%}
 
     {% if team.relation_to_current_user.is_founder %}
-      {{ side_menu.append((url_for('teams.edit_team_view', team_id=team.id), 'settings', gettext('Settings'))) }}
+      {{ side_menu.append((url_for('teams.EditTeamViews:edit', team_id=team.id), 'settings', gettext('Settings'))) }}
     {%  endif %}
 
 

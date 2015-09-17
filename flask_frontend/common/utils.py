@@ -12,6 +12,24 @@ from common.logable import Logable
 from flask_frontend.config import keys
 
 
+class RestrictionDecorator(object):
+
+    def __init__(self, f):
+        self.f = f
+        self.__name__ = f.__name__
+
+    def __call__(self, *args, **kwargs):
+        try:
+            self.check_restrictions(*args, **kwargs)
+        except Exception:
+            flask.abort(500)
+
+        return self.f(*args, **kwargs)
+
+    def check_restrictions(self, *args, **kwargs):
+        pass
+
+
 class CustomRoute(Logable):
 
     __metaclass__ = ABCMeta
@@ -39,6 +57,17 @@ class CustomRoute(Logable):
         """
         :rtype: dict
         """
+
+
+class GenericRoute(CustomRoute):
+
+    def prepare_view(self, **kwargs):
+        result = {}
+        for name, value in kwargs.iteritems():
+            pass
+
+    def _get_single(self, id_name, id_value):
+        pass
 
 
 def generate_cloudinary_options(config, **kwargs):

@@ -1,26 +1,21 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
-from functools import wraps
+
 import flask
 
 import flask_login
 from flask.ext.frontend.blueprints.teams.forms import ChangeTeamLogoForm, EditTeamInfoForm
 from flask.ext.frontend.common.api_helper import get_or_404
-from flask.ext.frontend.common.utils import CustomRoute
+from flask.ext.frontend.common.utils import CustomRoute, RestrictionDecorator
 
 
-def only_team_owner(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
+class only_team_owner(RestrictionDecorator):
+
+    def check_restrictions(self, *args, **kwargs):
         logged_user = flask_login.current_user
-        try:
-            user_id = kwargs['team'].founder.id
-            if not logged_user.is_authenticated() or logged_user.id != user_id:
-                flask.abort(403)
-        except (KeyError, AttributeError):
-            flask.abort(500)
-        return f(*args, **kwargs)
-    return wrapper
+        user_id = kwargs['team'].founder.id
+        if not logged_user.is_authenticated() or logged_user.id != user_id:
+            flask.abort(403)
 
 
 class TeamRoute(CustomRoute):
