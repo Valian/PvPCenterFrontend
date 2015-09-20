@@ -18,7 +18,7 @@ class GamesTests(AppTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_get_game(self, m_games__get_single):
-        response = self.client.get(flask.url_for('games.show', game_id=1))
+        response = self.client.get(flask.url_for('games.game_view', game_id=1))
         self.assertTrue(m_games__get_single.called)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['game'], m_games__get_single.return_value.data)

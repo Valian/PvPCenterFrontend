@@ -28,6 +28,7 @@ def restrict(checker):
         return wrapper
     return decorator
 
+
 class RestrictionDecorator(object):
 
     def __init__(self, f):

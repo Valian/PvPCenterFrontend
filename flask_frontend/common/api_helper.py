@@ -23,6 +23,7 @@ def get_api_instance(config):
         disp = ApiDispatcher(config[conf_const.BACKEND_URL])
     return PvPCenterApi(disp, config[conf_const.BACKEND_LOGIN], config[conf_const.BACKEND_PASS])
 
+
 def get_or_none(func, *args, **kwargs):
     try:
         result = func(*args, **kwargs)

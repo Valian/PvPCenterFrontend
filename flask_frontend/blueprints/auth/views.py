@@ -8,7 +8,7 @@ from flask.ext.frontend.common.view import UrlRoutes, template_view, UrlRoute, v
 from .forms import LoginForm, RegisterForm
 
 
-def create_routes(env):
+def create_routes():
     return UrlRoutes([
         UrlRoute('/login', login, methods=['GET', 'POST']),
         UrlRoute('/logout', logout, methods=['POST']),

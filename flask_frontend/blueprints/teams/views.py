@@ -3,26 +3,25 @@
 
 import flask
 import flask_login
-
 from flask.ext.babel import gettext
+
+from api.models import Team
 from flask.ext.frontend.blueprints.teams.helpers import only_team_owner
 from flask.ext.frontend.common.utils import restrict
-from flask.ext.frontend.common.view import pjax_view, template_view, UrlRoute, UrlRoutes, PjaxView, ApiIndexMethod, \
-    ApiGetMethod
-
+from flask.ext.frontend.common.view import pjax_view, template_view, UrlRoute, UrlRoutes, ModelView, PjaxRenderer, IndexView
 from flask_frontend.blueprints.teams.forms import CreateTeamForm, ChangeTeamLogoForm, EditTeamInfoForm
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.pagination import Pagination
 from flask_frontend.common.api_helper import get_or_500, get_or_404
 
 
-def create_routes(env):
-    team_view = PjaxView('team_profile.html', ApiGetMethod('team', env.api.teams.get_single, allow_all_params=True))
-    teams_view = PjaxView('teams_list.html', ApiIndexMethod('teams', env.api.teams.get, allow_all_params=True))
+def create_routes():
+    team_view = ModelView(Team, PjaxRenderer('team_profile.html'), allow_all_params=True)
+    teams_view = IndexView(Team, PjaxRenderer('teams_list.html'), allow_all_params=True)
     return UrlRoutes([
-        UrlRoute('/', teams_view, endpoint='teams_view'),
+        UrlRoute('/', teams_view),
         UrlRoute('/create', create_team_view),
-        UrlRoute('/<int:team_id>', team_view, endpoint='team_view'),
+        UrlRoute('/<int:team_id>', team_view),
         UrlRoute('/<int:team_id>/edit', edit),
         UrlRoute('/<int:team_id>/change_basic', change_basic, methods=['POST']),
         UrlRoute('/<int:team_id>/upload_logo', upload_logo, methods=['POST']),

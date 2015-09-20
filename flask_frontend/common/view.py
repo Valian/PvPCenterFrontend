@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import inspect
-
-from abc import ABCMeta, abstractmethod
 import functools
 
+from abc import ABCMeta, abstractmethod
 import flask
 
 from common.logable import Logable
@@ -64,7 +63,7 @@ class ApiGetMethod(ContextCreator):
     def __init__(self, param_name, api_method, allowed_params=None, allow_all_params=False):
         self.name = param_name
         self.api_method = api_method
-        self.allowed_names = self._get_allowed_params(api_method, allowed_params, allow_all_params)
+        self.allowed_names = self._get_allowed_params(api_method, allowed_params or [], allow_all_params)
 
     def create_context(self, env, **params):
         for name in self.allowed_names:
@@ -91,6 +90,7 @@ class ApiIndexMethod(ApiGetMethod):
         result = super(ApiIndexMethod, self).create_context(env, **kwargs)
         result['pagination'] = Pagination.create_from_model_list(result[self.name])
         return result
+
 
 class ResponseProcessor(Logable):
 
@@ -129,15 +129,15 @@ def empty_func():
 
 class BaseView(Logable):
 
-    def __init__(self, context_creator=None, response_processor=None):
+    def __init__(self, context_creator=None, response_processor=None, view_func=None):
         self.response_processor = response_processor
         self.context_creator = context_creator
-        self.f = empty_func
-        self.f_args = []
+        self.view_func = view_func or empty_func
+        self.view_func_args = get_true_argspec(self.view_func)[0]
 
     def __call__(self, f):
-        self.f = self._get_function(f)
-        self.f_args = get_true_argspec(self.f)[0]
+        self.view_func = self._get_function(f)
+        self.view_func_args = get_true_argspec(self.view_func)[0]
         return self
 
     @staticmethod
@@ -148,7 +148,7 @@ class BaseView(Logable):
         return func
 
     def as_view(self, env):
-        @functools.wraps(self.f)
+        @functools.wraps(self.view_func)
         def proxy(**view_args):
             view_args = self.create_context(env, view_args)
             if not isinstance(view_args, dict):
@@ -162,10 +162,10 @@ class BaseView(Logable):
         return proxy
 
     def call_view_method(self, env, view_args):
-        expected_kwargs = {key: value for key, value in view_args.iteritems() if key in self.f_args}
-        if 'env' in self.f_args:
+        expected_kwargs = {key: value for key, value in view_args.iteritems() if key in self.view_func_args}
+        if 'env' in self.view_func_args:
             expected_kwargs['env'] = env
-        return self.f(**expected_kwargs)
+        return self.view_func(**expected_kwargs)
 
     def create_context(self, env, view_args):
         if self.context_creator:
@@ -180,16 +180,52 @@ class BaseView(Logable):
 
 class TemplateView(BaseView):
 
-    def __init__(self, template, context_creator=None):
+    def __init__(self, template, context_creator=None, view_func=None):
         renderer = TemplateRenderer(template)
-        super(TemplateView, self).__init__(context_creator, renderer)
+        super(TemplateView, self).__init__(context_creator, renderer, view_func)
 
 
 class PjaxView(BaseView):
 
-    def __init__(self, template, context_creator=None, block='pjax_content'):
+    def __init__(self, template, context_creator=None, block='pjax_content', view_func=None):
         renderer = PjaxRenderer(template, block)
-        super(PjaxView, self).__init__(context_creator, renderer)
+        super(PjaxView, self).__init__(context_creator, renderer, view_func)
+
+
+class ModelView(BaseView):
+
+    def __init__(self, model, response_processor, allowed_params=None, allow_all_params=False):
+        super(ModelView, self).__init__(response_processor=response_processor)
+        self.allow_all_params = allow_all_params
+        self.allowed_params = allowed_params
+        self.model = model
+
+    @staticmethod
+    def _create_endpoint(model):
+        return "{0}_view".format(model.__name__.lower())
+
+    def as_view(self, env):
+        name = self.model.__name__.lower()
+        view_method = env.api.get_model_func(self.model, 'get_single')
+        self.context_creator = ApiGetMethod(name, view_method, self.allowed_params, self.allow_all_params)
+        func = super(ModelView, self).as_view(env)
+        func.__name__ = self._create_endpoint(self.model)
+        return func
+
+
+class IndexView(ModelView):
+
+    @staticmethod
+    def _create_endpoint(model):
+        return "{0}s_view".format(model.__name__.lower())
+
+    def as_view(self, env):
+        name = "{0}s".format(self.model.__name__.lower())
+        view_method = env.api.get_model_func(self.model, 'get')
+        self.context_creator = ApiIndexMethod(name, view_method, self.allowed_params, self.allow_all_params)
+        func = super(ModelView, self).as_view(env)
+        func.__name__ = self._create_endpoint(self.model)
+        return func
 
 
 pjax_view = PjaxView

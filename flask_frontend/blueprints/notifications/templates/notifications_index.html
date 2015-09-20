@@ -3,16 +3,21 @@
 {% block content %}
   <div class="col-md-9">
     <h1>{{ gettext("Notifications") }}</h1>
-    {# we also need searching here, it's not yet implemented but template should contain it, maybe with JS? #}
-    {% for notification in notifications %}
-    <div>
+    <div class="content" id="notifications-list">
+      {% block pjax_content %}
+        {% for notification in notifications %}
         <div>
-            <b>{{ notification.title }}</b>
-            {{ notification.time }}
+            <div>
+                <b>{{ notification.title }}</b>
+                {{ notification.time }}
+            </div>
+            {{ notification.content }}
         </div>
-        {{ notification.content }}
+        {% if not loop.last %} <hr> {% endif %}
+        {%  endfor %}
+        {% from 'macros.html' import render_pagination %}
+        {{ render_pagination(pagination, '#notifications-list') }}
+      {% endblock %}
     </div>
-    {% if not loop.last %} <hr> {% endif %}
-    {%  endfor %}
   </div>
 {% endblock content %}

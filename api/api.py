@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
+import inspect
 
 import urllib
 import urlparse
@@ -8,6 +9,7 @@ import requests
 from requests import RequestException
 from requests.auth import HTTPBasicAuth
 from abc import ABCMeta, abstractmethod
+import sys
 
 from flask_frontend.common.pagination import get_pagination_params
 from models import Game as GameModel, UnableToParseException, Errors, ModelList, User as UserModel, \
@@ -130,6 +132,7 @@ class Resource(object):
 class Games(Resource):
 
     SINGLE_ENDPOINT = "/{game_id}"
+    model = GameModel
 
     def get(self, model=ModelList.For(GameModel)):
         endpoint = self.create_url_with_pagination()
@@ -144,6 +147,7 @@ class Users(Resource):
 
     SINGLE_ENDPOINT = "/{user_id}"
     LOGIN_ENDPOINT = "/login"
+    model = UserModel
 
     def get(self, token=undefined, friends_of_user_id=undefined, nickname=undefined, strangers_to_user_id=undefined,
             model=ModelList.For(UserModel)):
@@ -182,6 +186,7 @@ class Users(Resource):
 class GameOwnerships(Resource):
 
     SINGLE_ENDPOINT = "/{game_ownership_id}"
+    model = UserGameOwnership
 
     def get(self, id, token, model=ModelList.For(UserGameOwnership)):
         params = {"user_id": id, "access_token": token}
@@ -209,6 +214,7 @@ class GameOwnerships(Resource):
 class Teams(Resource):
 
     SINGLE_ENDPOINT = "/{team_id}"
+    model = TeamModel
 
     def get(self, name=undefined, model=ModelList.For(TeamModel)):
         params = dict_of_defined_keys(name=name)
@@ -234,6 +240,8 @@ class Teams(Resource):
 
 class Notifications(Resource):
 
+    model = Notification
+
     def get(self, token, user_id, model=ModelList.For(Notification)):
         params = {"access_token": token, "user_id": user_id}
         endpoint = self.create_url_with_pagination(params=params)
@@ -243,6 +251,7 @@ class Notifications(Resource):
 class TeamMemberships(Resource):
 
     SINGLE_ENDPOINT = "/{team_membership_id}"
+    model = TeamMembershipModel
 
     def get(self, team_id=undefined, user_id=undefined, model=ModelList.For(TeamMembershipModel)):
         params = dict_of_defined_keys(team_id=team_id, user_id=user_id)
@@ -269,6 +278,7 @@ class TeamInvites(Resource):
 
     SINGLE_ENDPOINT = "/{team_invite_id}"
     ACCEPT_ENDPOINT = "/{team_invite_id}/accept"
+    model = TeamInvite
 
     def get(self, to_user_id=undefined, team_id=undefined, model=ModelList.For(TeamInvite)):
         params = dict_of_defined_keys(to_user_id=to_user_id, team_id=team_id)
@@ -299,6 +309,7 @@ class FriendshipInvites(Resource):
     
     SINGLE_ENDPOINT = "/{friendship_invite_id}"
     ACCEPT_ENDPOINT = "/{friendship_invite_id}/accept"
+    model = FriendshipInviteModel
 
     def get(self, token, to_user_id, from_user_id=undefined, model=ModelList.For(FriendshipInviteModel)):
         params = dict_of_defined_keys(access_token=token, to_user_id=to_user_id, from_user_id=from_user_id)
@@ -329,6 +340,7 @@ class FriendshipInvites(Resource):
 class Friendships(Resource):
 
     SINGLE_ENDPOINT = "/{friendship_id}"
+    model = Friendship
 
     def get(self, token, user_id, to_user_id=undefined, model=ModelList.For(Friendship)):
         params = dict_of_defined_keys(access_token=token, user_id=user_id, to_user_id=to_user_id)
@@ -370,5 +382,11 @@ class PvPCenterApi(object):
         self.friendship_invites = FriendshipInvites(dispatcher, self.FRIENDSHIP_INVITES_ENDPOINT)
         self.notifications = Notifications(dispatcher, self.NOTIFICATIONS_ENDPOINT)
 
+        self.model_to_resource = {resource.model: resource for resource in vars(self).itervalues() if isinstance(resource, Resource)}
 
+    def get_model_func(self, model, funcname):
+        resource = self.model_to_resource.get(model)
+        if not resource:
+            raise ValueError("Unable to find resource to model {0}".format(model))
+        return getattr(resource, funcname)
 
