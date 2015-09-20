@@ -15,10 +15,10 @@ def route(endpoint=None, **kwargs):
     return decorator
 
 
-def register(app):
+def register(app, **kwargs):
 
     def wrapper(cls):
-        cls.register(app)
+        cls.register(app, **kwargs)
         return cls
     return wrapper
 
@@ -27,18 +27,27 @@ class BaseView(Logable):
 
     decorators = []
 
+    def __init__(self, api):
+        """
+        :type api: api.api.PvPCenterApi
+        """
+        self.api = api
+
     def create_context(self, **kwargs):
         return {}
 
     def after_request(self, name, response, context):
+        if isinstance(response, dict):
+            context.update(response)
+            return None
         return response
 
     @classmethod
-    def register(cls, app):
+    def register(cls, app, *args, **kwargs):
         members = get_interesting_members(BaseView, cls)
         prefix = cls.get_rule_prefix()
         for name, original_method in members:
-            method = cls.make_proxy_method(name)
+            method = cls.make_proxy_method(name, app, *args, **kwargs)
             rule, rule_kwargs = cls.build_rule(prefix, original_method, name)
             app.add_url_rule(rule, name, method, **rule_kwargs)
 
@@ -66,8 +75,8 @@ class BaseView(Logable):
         return re.sub(r'(/)\1+', r'\1', result), rule_kwargs
 
     @classmethod
-    def make_proxy_method(cls, name):
-        i = cls()
+    def make_proxy_method(cls, name, app, *args, **kwargs):
+        i = cls(app, *args, **kwargs)
         view = getattr(i, name)
         args = get_true_argspec(view)[0]
 
@@ -94,15 +103,20 @@ class TemplateView(BaseView):
 
     template = None
 
+    def __init__(self, api, template=None):
+        super(TemplateView, self).__init__(api)
+        self.template = template or self.template
+
     def after_request(self, name, response, context):
+        response = BaseView.after_request(self, name, response, context)
         if response is None:
             return flask.render_template(self.template, **context)
         return response
 
 
-class PjaxView(BaseView):
-
+class PjaxView(TemplateView):
     def after_request(self, name, response, context):
+        response = BaseView.after_request(self, name, response, context)
         if response is None:
             return pjax(self.template, **context)
         return response

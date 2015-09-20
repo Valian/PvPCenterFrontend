@@ -12,14 +12,16 @@ from flask_frontend.common.utils import ConfigBlueprint
 
 
 def get_api_instance(config):
-    if not config[conf_const.MOCK_API]:
-        from api.api import ApiDispatcher
-        disp = ApiDispatcher(config[conf_const.BACKEND_URL])
-    else:
+    """
+    :rtype: api.api.PvPCenterApi
+    """
+    if config[conf_const.MOCK_API] or config[conf_const.TESTING]:
         from api.mock import ApiDispatcherMock
         disp = ApiDispatcherMock(config[conf_const.BACKEND_URL])
+    else:
+        from api.api import ApiDispatcher
+        disp = ApiDispatcher(config[conf_const.BACKEND_URL])
     return PvPCenterApi(disp, config[conf_const.BACKEND_LOGIN], config[conf_const.BACKEND_PASS])
-
 
 def get_or_none(func, *args, **kwargs):
     try:
@@ -51,12 +53,11 @@ class ApiBlueprint(ConfigBlueprint, Logable):
         :type config_keys: list
         """
         super(ApiBlueprint, self).__init__(name, import_name, config_keys, *args, **kwargs)
-
         self.api = None
 
     def register(self, app, options, first_registration=False):
         super(ApiBlueprint, self).register(app, options, first_registration)
-        self.api = get_api_instance(app.config)
+        self.api = app.api
 
 
 class ApiForm(flask_wtf.Form):

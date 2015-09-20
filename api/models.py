@@ -177,6 +177,18 @@ class User(ModelBase):
             description=json.get('description'),
             image_url=json.get('image_url'),
             game_ownerships=game_ownerships)
+    
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return unicode(self.id)
 
 
 class Friendship(ModelBase):

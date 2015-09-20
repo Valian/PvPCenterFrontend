@@ -22,7 +22,7 @@ class CreateTeamForm(ApiForm):
         self.user = user
 
     def _make_request(self):
-        return self._api.teams.post(self.user.token, self.user.id, self.name.data, self.description.data, self.tag.data)
+        return self._api.teams.create(self.user.token, self.user.id, self.name.data, self.description.data, self.tag.data)
 
 
 class EditTeamInfoForm(CreateTeamForm):

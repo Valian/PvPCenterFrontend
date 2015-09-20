@@ -14,12 +14,9 @@ from flask_frontend.common.app_test_case import AppTestCase, logged_in
 class TeamTests(AppTestCase):
 
     def test_teams_view_calls_api(self, api):
-        count = 10
-        teams = create_mock_for(ModelList.For(Team), count)
-        api.teams.get.return_value = ApiResult(data=teams)
         response = self.client.get(url_for('teams.teams_view'))
         self.assertEqual(api.teams.get.call_count, 1)
-        self.assertEqual(response.context['teams'], teams)
+        self.assertEqual(response.context['teams'], )
 
     def test_teams_500_on_api_error(self, api):
         api.teams.get.side_effect = ApiException("url", "method", Exception())
@@ -45,12 +42,12 @@ class TeamTests(AppTestCase):
     @logged_in
     def test_create_new_team(self, user, api):
         team = create_mock_for(Team)
-        api.teams.post.return_value = ApiResult(data=team)
+        api.teams.create.return_value = ApiResult(data=team)
         body = {'name': 'Heheheh', 'tag': 'TAG', 'description': 'description'}
         response = self.client.post(url_for('teams.create_team_view'), params=body)
         self.assertLess(response.status_code, 400)
         expected_call = mock.call(user.token, user.id, body['name'], body['description'], body['tag'])
-        self.assertEqual(api.teams.post.call_args, expected_call)
+        self.assertEqual(api.teams.create.call_args, expected_call)
 
     @logged_in
     def test_edit_team_data(self, user, api):

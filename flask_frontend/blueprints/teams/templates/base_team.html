@@ -21,7 +21,7 @@
   {% else %}
 
     {% set side_menu = [
-      (url_for('team.team_view', team_id=team.id), 'profile', gettext('Profile'))
+      (url_for('teams.team_view', team_id=team.id), 'profile', gettext('Profile')),
       ('#', 'matches', gettext('Matches'))
     ] -%}
 

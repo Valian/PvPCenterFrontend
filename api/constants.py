@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import csv
+import os
 
 
 def load_nationalities():
-    with open('api/country_codes.csv', 'rb') as country_csv:
+    with open(os.path.abspath('api/country_codes.csv'), 'rb') as country_csv:
         reader = csv.reader(country_csv, delimiter=';')
         for row in reader:
             yield unicode(row[1], encoding='utf-8'), unicode(row[0], encoding='utf-8').capitalize()

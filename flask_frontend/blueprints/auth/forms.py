@@ -2,13 +2,11 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
 import wtforms
-
 from flask_babel import gettext
-from wtforms.validators import Length, Email, Regexp, DataRequired, EqualTo
+from wtforms.validators import Email, DataRequired, EqualTo
 
 from flask_frontend.common.api_helper import ApiForm
 from flask_frontend.common.redirect import RedirectFormMixin
-from .user import User
 
 
 class LoginForm(RedirectFormMixin, ApiForm):
@@ -18,7 +16,7 @@ class LoginForm(RedirectFormMixin, ApiForm):
     remember_me = wtforms.BooleanField(gettext('Remember me'), default=False)
 
     def _make_request(self):
-        return self._api.users.login(self.email.data, self.password.data, model=User)
+        return self._api.users.login(self.email.data, self.password.data)
 
 
 class RegisterForm(ApiForm):
@@ -33,5 +31,5 @@ class RegisterForm(ApiForm):
     spam = wtforms.BooleanField(gettext("Do you want spam"))
 
     def _make_request(self):
-        return self._api.users.post(self.nickname.data, self.email.data, self.password.data, model=User)
+        return self._api.users.create(self.nickname.data, self.email.data, self.password.data)
 

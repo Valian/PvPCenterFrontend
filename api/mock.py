@@ -17,7 +17,6 @@ from api import ApiDispatcherBase, ApiResult
 from constants import RELATION_TO_CURRENT_USER
 from constants import NATIONALITIES, TEAM_RELATION_TO_CURRENT_USER
 from flask_frontend.common.const import SEX
-from flask_frontend.blueprints.auth.user import User as AuthUser
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
     FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamInvite, TeamRelationToUser
 
@@ -33,7 +32,7 @@ def create_mock_for(model, list_count=21, **kwargs):
     if isinstance(model, ModelList.For):
         underlying_model = model.model
         fac = find_factory_in_inheritance_chain(underlying_model)
-        data = [fac(**kwargs) for _ in xrange(list_count)]
+        data = fac.create_batch(list_count, **kwargs)
         return ModelList(data, len(data))
     fac = find_factory_in_inheritance_chain(model)
     return fac(**kwargs)
@@ -138,11 +137,6 @@ class TeamRelationToUserFactory(factory.Factory):
         model = TeamRelationToUser
 
     type = factory.Iterator(vars(TEAM_RELATION_TO_CURRENT_USER).values())
-
-
-class AuthUserFactory(UserFactory):
-    class Meta:
-        model = AuthUser
 
 
 class TeamFactory(factory.Factory):

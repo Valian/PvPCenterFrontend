@@ -9,13 +9,18 @@ from flask.ext.frontend.common.api_helper import get_or_404
 from flask.ext.frontend.common.utils import CustomRoute, RestrictionDecorator
 
 
-class only_team_owner(RestrictionDecorator):
-
-    def check_restrictions(self, *args, **kwargs):
-        logged_user = flask_login.current_user
+def only_team_owner(*args, **kwargs):
+    logged_user = flask_login.current_user
+    if 'team' in kwargs:
         user_id = kwargs['team'].founder.id
-        if not logged_user.is_authenticated() or logged_user.id != user_id:
-            flask.abort(403)
+    elif 'team_id' in flask.request.view_args:
+        api = flask.current_app.api
+        team = get_or_404(api.teams.get_single(flask.request.view_args['team_id']))
+        user_id = team.founder.id
+    else:
+        raise EnvironmentError('No team or team_id in view params')
+    if not logged_user.is_authenticated() or logged_user.id != user_id:
+        flask.abort(403)
 
 
 class TeamRoute(CustomRoute):

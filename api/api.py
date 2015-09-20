@@ -4,17 +4,16 @@
 import urllib
 import urlparse
 
-from requests import RequestException
 import requests
-from abc import ABCMeta, abstractmethod
+from requests import RequestException
 from requests.auth import HTTPBasicAuth
+from abc import ABCMeta, abstractmethod
 
 from flask_frontend.common.pagination import get_pagination_params
 from models import Game as GameModel, UnableToParseException, Errors, ModelList, User as UserModel, \
     UserGameOwnership, Team as TeamModel, TeamMembership as TeamMembershipModel, FriendshipInvite as FriendshipInviteModel, \
     Friendship, DeleteResponse, Notification, TeamInvite
 from common.logable import Logable
-
 
 undefined = object()
 
@@ -155,7 +154,7 @@ class Users(Resource):
         endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
-    def post(self, login, email, password, model=UserModel):
+    def create(self, login, email, password, model=UserModel):
         endpoint = self.create_url()
         data = {'nickname': login, 'email': email, 'password': password}
         return self._post_request(endpoint, data=data, model=model)
@@ -216,7 +215,7 @@ class Teams(Resource):
         endpoint = self.create_url_with_pagination(params=params)
         return self._get_request(endpoint, model=model)
 
-    def post(self, token, founder_id, name, description, tag, model=TeamModel):
+    def create(self, token, founder_id, name, description, tag, model=TeamModel):
         endpoint = self.create_url(params={"access_token": token})
         data = {'name': name, 'description': description, 'tag': tag, 'founder_id': founder_id}
         return self._post_request(endpoint, model=model, data=data)
