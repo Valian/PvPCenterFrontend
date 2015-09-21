@@ -9,9 +9,9 @@ import flask
 import flask_login
 
 from common.logable import Logable
-from flask.ext.frontend.common.api_helper import get_or_404
-from flask.ext.frontend.common.pagination import Pagination
-from flask.ext.frontend.common.view_helpers.core import empty_func, BaseView
+from flask_frontend.common.api_helper import get_or_404
+from flask_frontend.common.pagination import Pagination
+from flask_frontend.common.view_helpers.core import empty_func, BaseView
 
 
 class ContextCreator(Logable):
@@ -19,13 +19,24 @@ class ContextCreator(Logable):
     __metaclass__ = ABCMeta
 
     def __call__(self, env, **kwargs):
+        """
+        :type env: flask_frontend.common.view_helpers.core.ViewEnvironment
+        """
         return self.create_context(env, **kwargs)
 
     def init(self, env):
+        """
+        :type env: flask_frontend.common.view_helpers.core.ViewEnvironment
+        :rtype: None
+        """
         pass
 
     @abstractmethod
     def create_context(self, env, **kwargs):
+        """
+        :type env: flask_frontend.common.view_helpers.core.ViewEnvironment
+        :rtype: dict
+        """
         return kwargs
 
 
@@ -33,6 +44,15 @@ class ApiResourceContext(ContextCreator):
 
     def __init__(self, model, method_name, out_name, allowed_params=None, allow_all_params=False, include_token=True,
                  params_translators=None):
+        """
+        :type model: subclass(api.api.ModelBase)
+        :type method_name: str
+        :type out_name: str
+        :type allowed_params: list[str]
+        :type allow_all_params: bool
+        :type include_token: bool
+        :type params_translators: dict[str:(env, **kwargs) -> Any] | dict[str: str]
+        """
         self.params_translators = params_translators or {}
         self.allowed_params = allowed_params or []
         self.include_token = include_token
@@ -93,6 +113,9 @@ class ApiResourceContext(ContextCreator):
 class ApiResourceGet(ApiResourceContext):
 
     def __init__(self, model, **kwargs):
+        """
+        :type model: subclass(api.api.ModelBase)
+        """
         name = model.__name__.lower()
         kwargs['allowed_params'] = kwargs.get('allowed_params', [])
         kwargs['allowed_params'].append(name + "_id")
@@ -102,6 +125,9 @@ class ApiResourceGet(ApiResourceContext):
 class ApiResourceIndex(ApiResourceContext):
 
     def __init__(self, model, **kwargs):
+        """
+        :type model: subclass(api.api.ModelBase)
+        """
         name = model.__name__.lower() + 's'
         super(ApiResourceIndex, self).__init__(model, 'get', name, **kwargs)
 

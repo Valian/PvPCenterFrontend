@@ -5,7 +5,7 @@ from flask import Flask
 import flask_gravatar
 
 from flask_frontend.common.api_helper import get_api_instance
-from flask.ext.frontend.common.view_helpers.core import ViewEnvironment
+from flask_frontend.common.view_helpers.core import ViewEnvironment
 from flask_frontend.filters import create_filters
 from flask_frontend.views import create_main_views
 from flask_frontend.bundles import create_bundles

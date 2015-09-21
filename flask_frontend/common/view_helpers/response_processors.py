@@ -6,8 +6,8 @@ from abc import ABCMeta, abstractmethod
 import flask
 
 from common.logable import Logable
-from flask.ext.frontend.common.utils import pjax
-from flask.ext.frontend.common.view_helpers.core import BaseView
+from flask_frontend.common.utils import pjax
+from flask_frontend.common.view_helpers.core import BaseView
 
 
 class ResponseProcessor(Logable):
@@ -15,6 +15,10 @@ class ResponseProcessor(Logable):
     __metaclass__ = ABCMeta
 
     def __call__(self, response, context):
+        """
+        :type response: flask.Response | None
+        :type context: dict
+        """
         return self.process_response(response, context)
 
     @abstractmethod
@@ -25,6 +29,9 @@ class ResponseProcessor(Logable):
 class TemplateRenderer(ResponseProcessor):
 
     def __init__(self, template):
+        """
+        :type template: str
+        """
         self.template = template
 
     def process_response(self, response, context):
@@ -34,6 +41,10 @@ class TemplateRenderer(ResponseProcessor):
 class PjaxRenderer(ResponseProcessor):
 
     def __init__(self, template, block='pjax_content'):
+        """
+        :type template: str
+        :type block: str
+        """
         self.template = template
         self.block = block
 

@@ -5,8 +5,8 @@
 import flask_login
 
 from flask_frontend.common.pagination import Pagination
-from flask.ext.frontend.common.view_helpers.response_processors import PjaxView, template_view
-from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
+from flask_frontend.common.view_helpers.response_processors import PjaxView, template_view
+from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from flask_frontend.common.api_helper import get_or_500
 
 

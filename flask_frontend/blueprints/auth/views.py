@@ -3,10 +3,10 @@
 
 import flask_login
 import flask
-from flask.ext.frontend.common.view_helpers.core import view
-from flask.ext.frontend.common.view_helpers.response_processors import template_view
+from flask_frontend.common.view_helpers.core import view
+from flask_frontend.common.view_helpers.response_processors import template_view
 
-from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
+from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from .forms import LoginForm, RegisterForm
 
 

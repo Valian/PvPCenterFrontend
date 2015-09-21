@@ -8,7 +8,7 @@ from .views import create_routes
 
 def create_blueprint(env):
     """
-    :type env: flask.ext.frontend.common.view_helpers.core.ViewEnvironment
+    :type env: flask_frontend.common.view_helpers.core.ViewEnvironment
     """
     teams_blueprint = flask.Blueprint('teams', __name__, template_folder='templates')
     create_routes().register(teams_blueprint, env)

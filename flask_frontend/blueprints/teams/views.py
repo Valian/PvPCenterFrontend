@@ -8,9 +8,9 @@ from flask_babel import gettext
 from api.models import Team
 from flask_frontend.blueprints.teams.helpers import only_team_owner
 from flask_frontend.common.utils import restrict
-from flask.ext.frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex
-from flask.ext.frontend.common.view_helpers.response_processors import pjax_view, template_view, PjaxView
-from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
+from flask_frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex
+from flask_frontend.common.view_helpers.response_processors import pjax_view, template_view, PjaxView
+from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from flask_frontend.blueprints.teams.forms import CreateTeamForm, ChangeTeamLogoForm, EditTeamInfoForm
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.pagination import Pagination

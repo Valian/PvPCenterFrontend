@@ -6,12 +6,16 @@ import inspect
 
 from common.logable import Logable
 from common.utils import to_iter
-from flask.ext.frontend.common.utils import get_true_argspec
+from flask_frontend.common.utils import get_true_argspec
 
 
 class ViewEnvironment(object):
 
     def __init__(self, api, config):
+        """
+        :type api: api.api.PvPCenterApi
+        :type config: dict
+        """
         self.config = config
         self.api = api
 
@@ -23,6 +27,12 @@ def empty_func():
 class BaseView(Logable):
 
     def __init__(self, context_creators=None, response_processor=None, view_func=None, decorators=None):
+        """
+        :type context_creators: list[ContextCreator] | list[(env, **kwargs) -> dict]
+        :type response_processor: flask_frontend.common.view_helpers.response_processors.ResponseProcessor | callable(response, dict)
+        :type view_func: (env, **kwargs) -> (dict | flask.Response)
+        :type decorators: list[(func1) -> func2]
+        """
         self.decorators = decorators or []
         self.response_processor = response_processor
         self.context_creators = to_iter(context_creators) if context_creators else []

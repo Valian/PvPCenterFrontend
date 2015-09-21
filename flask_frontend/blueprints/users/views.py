@@ -6,11 +6,11 @@ from flask_babel import gettext
 
 from api.models import User, Friendship, Team
 from flask_frontend.blueprints.users.forms import ChangeBasicDataForm, ChangeAvatarForm
-from flask.ext.frontend.common.view_helpers.core import BaseView
-from flask.ext.frontend.common.view_helpers.response_processors import PjaxRenderer, TemplateView, PjaxView, pjax_view
-from flask.ext.frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex, ModelView, IndexView, \
+from flask_frontend.common.view_helpers.core import BaseView
+from flask_frontend.common.view_helpers.response_processors import PjaxRenderer, TemplateView, PjaxView, pjax_view
+from flask_frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex, ModelView, IndexView, \
     model_view
-from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
+from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from flask_frontend.blueprints.users.helpers import only_current_user
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.utils import first_or_none, restrict
