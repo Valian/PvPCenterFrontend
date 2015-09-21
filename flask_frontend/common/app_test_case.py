@@ -7,7 +7,7 @@ import logging
 from unittest import TestCase
 
 from flask import url_for
-from flask.ext.classy import get_true_argspec
+from flask_classy import get_true_argspec
 from flask_webtest import TestApp
 import mock
 

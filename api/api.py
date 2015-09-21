@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
-import inspect
 
 import urllib
 import urlparse
@@ -9,7 +8,6 @@ import requests
 from requests import RequestException
 from requests.auth import HTTPBasicAuth
 from abc import ABCMeta, abstractmethod
-import sys
 
 from flask_frontend.common.pagination import get_pagination_params
 from models import Game as GameModel, UnableToParseException, Errors, ModelList, User as UserModel, \

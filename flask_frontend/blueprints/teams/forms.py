@@ -4,8 +4,8 @@
 import cloudinary.uploader
 import wtforms
 
-from flask.ext.babel import gettext
-from flask.ext.wtf.file import FileField, FileRequired, FileAllowed
+from flask_babel import gettext
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import Length, Regexp, DataRequired
 
 from flask_frontend.common.api_helper import ApiForm

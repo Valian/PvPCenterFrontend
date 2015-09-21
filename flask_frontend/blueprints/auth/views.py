@@ -3,8 +3,10 @@
 
 import flask_login
 import flask
+from flask.ext.frontend.common.view_helpers.core import view
+from flask.ext.frontend.common.view_helpers.response_processors import template_view
 
-from flask.ext.frontend.common.view import UrlRoutes, template_view, UrlRoute, view
+from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from .forms import LoginForm, RegisterForm
 
 
@@ -67,7 +69,7 @@ def logout():
     return flask.redirect(flask.url_for('auth.login'))
 
 
-@view()
+@template_view("register.html")
 def register(env):
     register_form = RegisterForm(env.api)
     if register_form.validate_on_submit():

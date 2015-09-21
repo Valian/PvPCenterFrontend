@@ -46,7 +46,7 @@
 
 					<ul class="nav navbar-nav navbar-right account-menu logged-in">
 						<li>
-							<a href="{{ url_for('users.profile_view', user_id=current_user.id) }}" class="navbar-avatar">
+							<a href="{{ url_for('users.user_view', user_id=current_user.id) }}" class="navbar-avatar">
                                 {% from 'user_macros.html' import user_logo_src %}
 								<img src="{{ user_logo_src(current_user, width=50) }}" />
 								<span class="sticky-hidden hidden-xs">{{ current_user.name }}</span>

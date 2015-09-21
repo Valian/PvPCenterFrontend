@@ -2,13 +2,14 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
 import flask
-from flask.ext.babel import gettext
+from flask_babel import gettext
 import flask_login
 
 from api.models import Game
 from common.utils import hash_by
-from flask.ext.frontend.common.view import UrlRoutes, IndexView, TemplateView, UrlRoute, \
-    template_view, TemplateRenderer
+from flask.ext.frontend.common.view_helpers.contexts import IndexView
+from flask.ext.frontend.common.view_helpers.response_processors import TemplateRenderer, TemplateView, template_view
+from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from flask_frontend.blueprints.games.forms import GameUpdateForm, GameJoinForm
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.api_helper import get_or_404, get_or_none

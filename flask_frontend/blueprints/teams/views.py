@@ -3,12 +3,14 @@
 
 import flask
 import flask_login
-from flask.ext.babel import gettext
+from flask_babel import gettext
 
 from api.models import Team
-from flask.ext.frontend.blueprints.teams.helpers import only_team_owner
-from flask.ext.frontend.common.utils import restrict
-from flask.ext.frontend.common.view import pjax_view, template_view, UrlRoute, UrlRoutes, ModelView, PjaxRenderer, IndexView
+from flask_frontend.blueprints.teams.helpers import only_team_owner
+from flask_frontend.common.utils import restrict
+from flask.ext.frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex
+from flask.ext.frontend.common.view_helpers.response_processors import pjax_view, template_view, PjaxView
+from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from flask_frontend.blueprints.teams.forms import CreateTeamForm, ChangeTeamLogoForm, EditTeamInfoForm
 from flask_frontend.common.flash import Flash
 from flask_frontend.common.pagination import Pagination
@@ -16,12 +18,12 @@ from flask_frontend.common.api_helper import get_or_500, get_or_404
 
 
 def create_routes():
-    team_view = ModelView(Team, PjaxRenderer('team_profile.html'), allow_all_params=True)
-    teams_view = IndexView(Team, PjaxRenderer('teams_list.html'), allow_all_params=True)
+    team_view = PjaxView('team_profile.html', ApiResourceGet(Team, allow_all_params=True))
+    teams_view = PjaxView('teams_list.html', ApiResourceIndex(Team, allow_all_params=True))
     return UrlRoutes([
-        UrlRoute('/', teams_view),
+        UrlRoute('/', teams_view, endpoint="teams_view"),
         UrlRoute('/create', create_team_view),
-        UrlRoute('/<int:team_id>', team_view),
+        UrlRoute('/<int:team_id>', team_view, endpoint="team_view"),
         UrlRoute('/<int:team_id>/edit', edit),
         UrlRoute('/<int:team_id>/change_basic', change_basic, methods=['POST']),
         UrlRoute('/<int:team_id>/upload_logo', upload_logo, methods=['POST']),
@@ -30,7 +32,7 @@ def create_routes():
     ])
 
 
-@flask_login.login_required
+@restrict(only_team_owner)
 def create_edit_context(env, team_id):
     user = flask_login.current_user
     team = get_or_404(env.api.teams.get_single, team_id=team_id)
@@ -40,23 +42,20 @@ def create_edit_context(env, team_id):
 
 
 @pjax_view('team_edit.html', create_edit_context)
-@restrict(only_team_owner)
 def edit(team, basic_form):
     basic_form.set_data(team)
 
 
 @template_view('team_edit.html', create_edit_context)
-@restrict(only_team_owner)
 def change_basic(basic_form):
     if basic_form.validate_on_submit():
         Flash.success(gettext("Team updated"))
 
 
 @template_view('team_edit.html', create_edit_context)
-@restrict(only_team_owner)
 def upload_logo(logo_form):
-        if logo_form.validate_on_submit():
-            Flash.success(gettext("Logo updated"))
+    if logo_form.validate_on_submit():
+        Flash.success(gettext("Logo updated"))
 
 
 @pjax_view('team_create.html')

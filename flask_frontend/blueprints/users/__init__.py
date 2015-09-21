@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
-from flask_frontend.config import keys
 
-from flask_frontend.common.api_helper import ApiBlueprint
+import flask
 
-users_blueprint = ApiBlueprint(
-    'users', __name__, template_folder='templates', config_keys=[keys.CLOUDINARY_SECRET, keys.CLOUDINARY_PUBLIC_KEY])
+from .views import create_routes
 
-from .views import *
+
+def create_blueprint(env):
+    users_blueprint = flask.Blueprint('users', __name__, template_folder='templates')
+    create_routes().register(users_blueprint, env)
+    return users_blueprint

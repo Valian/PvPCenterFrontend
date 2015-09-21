@@ -7,11 +7,9 @@ import wtforms
 from flask_babel import gettext
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import Email, EqualTo
-from api.api import ApiException
 
 from api.constants import NATIONALITIES
-from api.models import User
-from flask_frontend.common.const import SEX
+from api.models import User, SEX
 from flask_frontend.common.api_helper import ApiForm
 
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import flask
-from flask.ext.babel import get_locale
-from flask.ext.frontend.common.view import UrlRoutes, UrlRoute, BaseView
+from flask_babel import get_locale
+from flask.ext.frontend.common.view_helpers.core import BaseView
+from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 
 from flask_frontend.blueprints.lang.languages import init_babel, set_locale
 from flask_frontend.config import keys

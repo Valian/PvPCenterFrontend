@@ -19,7 +19,7 @@ class UsersTests(AppTestCase):
     def test_user_profile(self, api_mock):
         return_user = create_mock_for(User)
         api_mock.users.get_single.return_value = ApiResult(data=return_user)
-        self.client.get(url_for('users.profile_view', user_id=1))
+        self.client.get(url_for('users.user_view', user_id=1))
         self.assertTrue(api_mock.users.get_single.called)
 
     def test_my_profile_edit_fails_without_login(self, api_mock):

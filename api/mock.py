@@ -16,7 +16,7 @@ from faker import Factory as FakerFactory
 from api import ApiDispatcherBase, ApiResult
 from constants import RELATION_TO_CURRENT_USER
 from constants import NATIONALITIES, TEAM_RELATION_TO_CURRENT_USER
-from flask_frontend.common.const import SEX
+from .models import SEX
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
     FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamInvite, TeamRelationToUser
 

@@ -33,7 +33,7 @@
 {% macro user_listing(user) %}
   <div>
     <img class="avatar" src="{{ user_logo_src(user, width=20) }}" alt="" />
-    <a href="{{ url_for('users.profile_view', user_id=user.id) }}">{{ user.name }}</a>
+    <a href="{{ url_for('users.user_view', user_id=user.id) }}">{{ user.name }}</a>
     <a href="#">(Send message)</a>
     {{ caller () if caller else '' }}
   </div>

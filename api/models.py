@@ -141,6 +141,12 @@ class RelationToUser(ModelBase):
     def invite_received(self):
         return self.type == RELATION_TO_CURRENT_USER.RECEIVED_INVITE
 
+
+class SEX(object):
+    UNDEFINED = 0
+    MALE = "M"
+    FEMALE = "F"
+    
     
 class User(ModelBase):
 

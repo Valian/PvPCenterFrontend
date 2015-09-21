@@ -3,12 +3,10 @@
 import flask
 import flask_wtf
 from abc import abstractmethod
-from flask.ext.babel import gettext
+from flask_babel import gettext
 
-from common.logable import Logable
 import flask_frontend.config.keys as conf_const
 from api.api import PvPCenterApi, ApiException
-from flask_frontend.common.utils import ConfigBlueprint
 
 
 def get_api_instance(config):
@@ -45,20 +43,6 @@ def get_or_500(func, *args, **kwargs):
         flask.abort(500)
     return result
 
-
-class ApiBlueprint(ConfigBlueprint, Logable):
-    """:type api: PvPCenterApi"""
-
-    def __init__(self, name, import_name, config_keys=None, *args, **kwargs):
-        """
-        :type config_keys: list
-        """
-        super(ApiBlueprint, self).__init__(name, import_name, config_keys, *args, **kwargs)
-        self.api = None
-
-    def register(self, app, options, first_registration=False):
-        super(ApiBlueprint, self).register(app, options, first_registration)
-        self.api = app.api
 
 
 class ApiForm(flask_wtf.Form):

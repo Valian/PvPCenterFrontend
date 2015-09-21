@@ -4,8 +4,9 @@
 
 import flask_login
 
-from flask.ext.frontend.common.pagination import Pagination
-from flask.ext.frontend.common.view import UrlRoutes, UrlRoute, PjaxView, template_view
+from flask_frontend.common.pagination import Pagination
+from flask.ext.frontend.common.view_helpers.response_processors import PjaxView, template_view
+from flask.ext.frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from flask_frontend.common.api_helper import get_or_500
 
 
@@ -13,8 +14,9 @@ NUMBER_OF_NAVBAR_NOTIFICATIONS = 3
 
 
 def create_routes():
+    notifications_view = PjaxView('notifications_index.html', notifications_context)
     return UrlRoutes([
-        UrlRoute('/', PjaxView('notifications_index.html', notifications_context), endpoint='index_view'),
+        UrlRoute('/', notifications_view, endpoint='index_view'),
         UrlRoute('/navbar', navbar_view)
     ])
 
