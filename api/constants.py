@@ -34,3 +34,9 @@ class TEAM_RELATION_TO_CURRENT_USER(object):
     PROPOSED = 'USER_PROPOSED'
     MEMBER = 'MEMBER'
     STRANGER = 'STRANGER'
+
+
+class SEX(object):
+    UNDEFINED = 0
+    MALE = "M"
+    FEMALE = "F"

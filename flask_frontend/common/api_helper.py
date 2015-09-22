@@ -6,18 +6,19 @@ from abc import abstractmethod
 from flask_babel import gettext
 
 import flask_frontend.config.keys as conf_const
-from api.api import PvPCenterApi, ApiException
+from api.resources import PvPCenterApi
+from api.core import ApiException, ApiDispatcher
 
 
 def get_api_instance(config):
     """
-    :rtype: api.api.PvPCenterApi
+    :rtype: resources.api.PvPCenterApi
     """
     if config[conf_const.MOCK_API] or config[conf_const.TESTING]:
         from api.mock import ApiDispatcherMock
         disp = ApiDispatcherMock(config[conf_const.BACKEND_URL])
     else:
-        from api.api import ApiDispatcher
+        from api.resources import ApiDispatcher
         disp = ApiDispatcher(config[conf_const.BACKEND_URL])
     return PvPCenterApi(disp, config[conf_const.BACKEND_LOGIN], config[conf_const.BACKEND_PASS])
 

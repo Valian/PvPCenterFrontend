@@ -142,12 +142,6 @@ class RelationToUser(ModelBase):
         return self.type == RELATION_TO_CURRENT_USER.RECEIVED_INVITE
 
 
-class SEX(object):
-    UNDEFINED = 0
-    MALE = "M"
-    FEMALE = "F"
-    
-    
 class User(ModelBase):
 
     def __init__(self, id, name, email, token, ranking, nationality, sex, birthdate, description, game_ownerships,

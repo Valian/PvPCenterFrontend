@@ -16,7 +16,7 @@ class LoginForm(RedirectFormMixin, ApiForm):
     remember_me = wtforms.BooleanField(gettext('Remember me'), default=False)
 
     def _make_request(self):
-        return self._api.users.login(self.email.data, self.password.data)
+        return self._api.users.login(email=self.email.data, password=self.password.data)
 
 
 class RegisterForm(ApiForm):
@@ -31,5 +31,5 @@ class RegisterForm(ApiForm):
     spam = wtforms.BooleanField(gettext("Do you want spam"))
 
     def _make_request(self):
-        return self._api.users.create(self.nickname.data, self.email.data, self.password.data)
+        return self._api.users.create(nickname=self.nickname.data, email=self.email.data, password=self.password.data)
 

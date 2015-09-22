@@ -5,8 +5,7 @@ import urlparse
 import cloudinary
 import flask
 from flask_babel import gettext
-from api.constants import NATIONALITIES
-from api.models import SEX
+from api.constants import NATIONALITIES, SEX
 
 
 def create_filters(app):

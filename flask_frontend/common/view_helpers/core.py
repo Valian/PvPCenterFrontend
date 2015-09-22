@@ -13,7 +13,7 @@ class ViewEnvironment(object):
 
     def __init__(self, api, config):
         """
-        :type api: api.api.PvPCenterApi
+        :type api: resources.api.PvPCenterApi
         :type config: dict
         """
         self.config = config

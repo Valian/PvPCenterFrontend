@@ -5,8 +5,9 @@ import mock
 import requests
 
 from unittest import TestCase
-from api.api import ApiDispatcher, PvPCenterApi, ApiException
-from api.models import ModelList, Game, User, ModelBase, UnableToParseException
+from resources.resources import ApiDispatcher, PvPCenterApi
+from resources.core import ApiException, ApiDispatcher
+from resources.models import ModelList, Game, User, ModelBase, UnableToParseException
 from nose_parameterized import parameterized
 
 

@@ -98,13 +98,13 @@ class ApiResourceContext(ContextCreator):
         self.allowed_params = self._get_allowed_params()
 
     def _get_allowed_params(self):
-        available_params = inspect.getargspec(self.view_method).args
-        allowed = []
+        available_params = self.view_method.params.get_available() | self.view_method.data.get_available()
+        allowed = set()
         for param in available_params:
             if param in ['self', 'model', 'token']:
                 continue
-            if self.allow_all_params or param in self.allowed_params or param in self.params_translators.iteritems():
-                allowed.append(param)
+            if self.allow_all_params or param in self.allowed_params or param in self.params_translators:
+                allowed.add(param)
         if 'token' not in available_params:
             self.include_token = False
         return allowed

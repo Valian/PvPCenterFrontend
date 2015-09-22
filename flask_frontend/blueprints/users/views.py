@@ -6,10 +6,8 @@ from flask_babel import gettext
 
 from api.models import User, Friendship, Team
 from flask_frontend.blueprints.users.forms import ChangeBasicDataForm, ChangeAvatarForm
-from flask_frontend.common.view_helpers.core import BaseView
-from flask_frontend.common.view_helpers.response_processors import PjaxRenderer, TemplateView, PjaxView, pjax_view
-from flask_frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex, ModelView, IndexView, \
-    model_view
+from flask_frontend.common.view_helpers.response_processors import PjaxView, pjax_view, template_view
+from flask_frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex, model_view
 from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from flask_frontend.blueprints.users.helpers import only_current_user
 from flask_frontend.common.flash import Flash
@@ -41,13 +39,12 @@ def create_routes():
 
 @flask_login.login_required
 def user_edit_friendship_context(self, env, **kwargs):
-    token = flask_login.current_user.token if flask_login.current_user.is_authenticated() else None
     me = flask_login.current_user
     user_id = kwargs['user_id']
     return dict(
-        user=get_or_404(self.blueprint.api.users.get_single, user_id, token),
-        friendship_invite=first_or_none(get_or_500(env.api.friendship_invites.get, me.token, me.id, user_id)),
-        friendship=first_or_none(get_or_500(env.api.friendships.get, me.token, me.id, user_id)))
+        user=get_or_404(self.blueprint.api.users.get_single, user_id=user_id, token=me.token),
+        friendship_invite=first_or_none(get_or_500(env.api.friendship_invites.get, token=me.token, from_user_id=me.id, to_user_id=user_id)),
+        friendship=first_or_none(get_or_500(env.api.friendships.get, token=me.token, user_id=me.id, to_user_id=user_id)))
 
 
 @model_view(User)
@@ -62,7 +59,7 @@ def invite_to_friends(env, user):
     return flask.redirect(flask.url_for('users.user_view', user_id=user.id))
 
 
-@TemplateView('user_profile.html', user_edit_friendship_context)
+@template_view('user_profile.html', user_edit_friendship_context)
 def accept_invite(env, friendship_invite):
     if friendship_invite:
         result = env.api.friendship_invites.accept(flask_login.current_user.token, friendship_invite.id)
@@ -72,7 +69,7 @@ def accept_invite(env, friendship_invite):
     Flash.error(gettext("Unable to accept invitation"))
 
 
-@TemplateView('user_profile.html', user_edit_friendship_context)
+@template_view('user_profile.html', user_edit_friendship_context)
 def decline_invite(env, friendship_invite):
     if friendship_invite:
         result = env.api.friendship_invites.delete(flask_login.current_user.token, friendship_invite.id)
@@ -82,8 +79,7 @@ def decline_invite(env, friendship_invite):
     Flash.success(gettext("Unable to decline invitation"))
 
 
-@TemplateView('user_profile.html', user_edit_friendship_context)
-@flask_login.login_required
+@template_view('user_profile.html', user_edit_friendship_context)
 def remove_from_friends(env, friendship):
     if friendship:
         result = env.api.friendships.delete(flask_login.current_user.token, friendship.id)

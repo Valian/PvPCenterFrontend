@@ -11,9 +11,9 @@ from flask_classy import get_true_argspec
 from flask_webtest import TestApp
 import mock
 
-from api.api import ApiResult
-from api.mock import create_mock_for
-from api.models import User
+from resources.core import ApiResult
+from resources.mock import create_mock_for
+from resources.models import User
 from flask_frontend.app import create_app
 from flask_frontend.config import get_test_config
 

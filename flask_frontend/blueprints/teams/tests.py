@@ -4,9 +4,10 @@
 from flask import url_for
 import mock
 
-from api.api import ApiResult, ApiException
-from api.mock import TeamFactory, UserFactory, TeamMembershipFactory, create_mock_for
-from api.models import ModelList, TeamMembership, Team
+from resources.resources import ApiResult
+from resources.core import ApiException, ApiResult
+from resources.mock import TeamFactory, UserFactory, TeamMembershipFactory, create_mock_for
+from resources.models import ModelList, TeamMembership, Team
 from flask_frontend.common.app_test_case import AppTestCase, logged_in
 
 

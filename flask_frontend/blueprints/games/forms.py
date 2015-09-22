@@ -24,7 +24,8 @@ class GameJoinForm(ApiForm):
         self.user_id = user_id
 
     def _make_request(self):
-        return self._api.game_ownerships.create(self.token, self.user_id, self.game_id, self.nickname.data)
+        return self._api.game_ownerships.create(
+            token=self.token, user_id=self.user_id, game_id=self.game_id, nickname=self.nickname.data)
 
 
 class GameUpdateForm(ApiForm):
@@ -37,4 +38,5 @@ class GameUpdateForm(ApiForm):
         self.token = token
 
     def _make_request(self):
-        return self._api.game_ownerships.update(self.token, self.game_ownership_id, self.nickname.data)
+        return self._api.game_ownerships.update(
+            token=self.token, game_ownership_id=self.game_ownership_id, nickname=self.nickname.data)

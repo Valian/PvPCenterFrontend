@@ -33,7 +33,7 @@ def init_blueprint(blueprint, env):
             if not token:
                 return None
 
-            response = env.api.users.get_single(user_id)
+            response = env.api.users.get_single(user_id=user_id)
             if response.ok:
                 user = response.data
                 user.token = token

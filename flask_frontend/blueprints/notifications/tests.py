@@ -3,9 +3,9 @@
 import flask
 
 import mock
-from api.api import ApiResult
-from api.mock import create_mock_for
-from api.models import ModelList, Notification
+from resources.core import ApiResult
+from resources.mock import create_mock_for
+from resources.models import ModelList, Notification
 from flask_frontend.common.app_test_case import AppTestCase, logged_in
 
 

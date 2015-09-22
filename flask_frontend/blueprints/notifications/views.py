@@ -24,7 +24,7 @@ def create_routes():
 @flask_login.login_required
 def notifications_context(env):
     user = flask_login.current_user
-    notificiations = get_or_500(env.api.notifications.get, user.token, user.id)
+    notificiations = get_or_500(env.api.notifications.get, token=user.token, user_id=user.id)
     pagination = Pagination.create_from_model_list(notificiations)
     return dict(notifications=notificiations, pagination=pagination)
 

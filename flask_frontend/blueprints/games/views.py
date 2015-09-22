@@ -33,7 +33,7 @@ def init_blueprint(blueprint, env):
 
 def create_edit_context(env, game_id):
     user = flask_login.current_user
-    game = get_or_404(env.api.games.get_single, game_id)
+    game = get_or_404(env.api.games.get_single, game_id=game_id)
     game_ownership = None
     form = None
     if user.is_authenticated():
@@ -59,7 +59,7 @@ def join(form):
 def leave(env, game_ownership):
     if game_ownership:
         delete = get_or_none(
-            env.api.game_ownerships.delete, flask_login.current_user.token, game_ownership.id)
+            env.api.game_ownerships.delete, token=flask_login.current_user.token, game_ownership_id=game_ownership.id)
         if delete and delete.success:
             Flash.success("Successfully leaved game")
     else:

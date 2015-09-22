@@ -10,13 +10,12 @@ import logging
 import factory
 import factory.fuzzy as fuzzy
 import re
-
 from faker import Factory as FakerFactory
 
-from api import ApiDispatcherBase, ApiResult
+from api.core import ApiResult, ApiDispatcherBase
 from constants import RELATION_TO_CURRENT_USER
 from constants import NATIONALITIES, TEAM_RELATION_TO_CURRENT_USER
-from .models import SEX
+from api.constants import SEX
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
     FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamInvite, TeamRelationToUser
 
@@ -49,7 +48,7 @@ class ApiDispatcherMock(ApiDispatcherBase):
 
     def make_request(self, method, endpoint, model, **kwargs):
         params = self.find_props(endpoint, model)
-        logging.info('Mock {0} request to {1} endpoint'.format(method, endpoint))
+        logging.info('Mock {0} request to {1} endpoint with params {2}'.format(method, endpoint, kwargs))
         return ApiResult(data=create_mock_for(model, **params))
 
     @staticmethod

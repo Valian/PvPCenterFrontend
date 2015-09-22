@@ -8,8 +8,8 @@ from flask_babel import gettext
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import Email, EqualTo
 
-from api.constants import NATIONALITIES
-from api.models import User, SEX
+from api.constants import NATIONALITIES, SEX
+from api.models import User
 from flask_frontend.common.api_helper import ApiForm
 
 
@@ -29,7 +29,7 @@ class ChangeEmailForm(ApiForm):
         self.token = user.token
 
     def _make_request(self):
-        return self._api.users.patch(self.user_id, self.token, email=self.email.data)
+        return self._api.users.update(user_id=self.user_id, token=self.token, email=self.email.data)
 
 
 class ChangeBasicDataForm(ApiForm):
@@ -55,8 +55,9 @@ class ChangeBasicDataForm(ApiForm):
         self.description.data = user.description
 
     def _make_request(self):
-        return self._api.users.patch(
-            self.user_id, self.token,
+        return self._api.users.update(
+            user_id=self.user_id,
+            token=self.token,
             sex=self.sex.data,
             nationality=self.nationality.data,
             birthdate=self.birthdate.data,
@@ -76,4 +77,4 @@ class ChangeAvatarForm(ApiForm):
 
     def _make_request(self):
         result = cloudinary.uploader.upload_image(self.avatar.data)
-        self._api.users.patch(self.user_id, self.token, image_url=result.url)
+        self._api.users.update(user_id=self.user_id, token=self.token, image_url=result.url)

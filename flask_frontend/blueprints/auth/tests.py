@@ -5,8 +5,8 @@ import mock
 from flask import url_for
 from nose_parameterized import parameterized
 
-from api.api import ApiResult
-from api.mock import create_mock_for
+from resources.core import ApiResult
+from resources.mock import create_mock_for
 from flask_frontend.common.app_test_case import AppTestCase
 
 

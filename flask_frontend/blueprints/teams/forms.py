@@ -22,7 +22,9 @@ class CreateTeamForm(ApiForm):
         self.user = user
 
     def _make_request(self):
-        return self._api.teams.create(self.user.token, self.user.id, self.name.data, self.description.data, self.tag.data)
+        return self._api.teams.create(
+            token=self.user.token, founder_id=self.user.id, name=self.name.data, description=self.description.data,
+            tag=self.tag.data)
 
 
 class EditTeamInfoForm(CreateTeamForm):
@@ -38,7 +40,8 @@ class EditTeamInfoForm(CreateTeamForm):
 
     def _make_request(self):
         return self._api.teams.patch(
-            self.team.id, self.user.token, name=self.name.data, description=self.description.data, tag=self.tag.data)
+            team_id=self.team.id, token=self.user.token, name=self.name.data, description=self.description.data,
+            tag=self.tag.data)
 
 
 class ChangeTeamLogoForm(ApiForm):
@@ -54,4 +57,4 @@ class ChangeTeamLogoForm(ApiForm):
 
     def _make_request(self):
         result = cloudinary.uploader.upload_image(self.logo.data)
-        self._api.teams.patch(self.team_id, self.token, image_url=result.url)
+        self._api.teams.patch(team_id=self.team_id, token=self.token, image_url=result.url)
