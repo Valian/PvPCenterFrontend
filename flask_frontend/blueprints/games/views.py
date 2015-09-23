@@ -38,7 +38,7 @@ def create_edit_context(env, game_id):
     form = None
     if user.is_authenticated():
         game_ownerships_by_game_id = hash_by(lambda go: go.game.id, user.game_ownerships)
-        game_ownership = game_ownerships_by_game_id.get(game.id)
+        game_ownership = game_ownerships_by_game_id.get(game_id)
         if game_ownership:
             form = GameUpdateForm(env.api, user.token, game_ownership.id)
         else:

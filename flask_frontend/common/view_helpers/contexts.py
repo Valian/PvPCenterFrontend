@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
+from functools import wraps
 
 import inspect
 
@@ -9,6 +10,7 @@ import flask
 import flask_login
 
 from common.logable import Logable
+from flask.ext.frontend.config import keys
 from flask_frontend.common.api_helper import get_or_404
 from flask_frontend.common.pagination import Pagination
 from flask_frontend.common.view_helpers.core import empty_func, BaseView
@@ -82,6 +84,15 @@ class ApiResourceContext(ContextCreator):
                 else:
                     params[name] = translator
 
+    def _update_view_method_wrapper(self, api):
+        def decorator(f):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                self.view_method = api.get_model_func(self.model, self.method_name)
+                return f(*args, **kwargs)
+            return wrapper
+        return decorator
+
     @staticmethod
     def _add_token(params):
         user = flask_login.current_user
@@ -94,6 +105,8 @@ class ApiResourceContext(ContextCreator):
             params[name] = param
 
     def init(self, env):
+        if env.config.get(keys.TESTING, False):
+            self.create_context = self._update_view_method_wrapper(env.api)(self.create_context)
         self.view_method = env.api.get_model_func(self.model, self.method_name)
         self.allowed_params = self._get_allowed_params()
 

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 
+from unittest import TestCase
+
 import mock
 import requests
-
-from unittest import TestCase
-from resources.resources import ApiDispatcher, PvPCenterApi
-from resources.core import ApiException, ApiDispatcher
-from resources.models import ModelList, Game, User, ModelBase, UnableToParseException
 from nose_parameterized import parameterized
+from api.core import ApiDispatcher, ApiException
+from api.models import User, UnableToParseException, Game, ModelBase, ModelList
+from api.resources import PvPCenterApi
 
 
 class MockResponse(object):

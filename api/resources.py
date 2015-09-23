@@ -151,8 +151,11 @@ class PvPCenterApi(object):
                                    for resource in vars(self).itervalues() if isinstance(resource, Resource)}
 
     def get_model_func(self, model, funcname):
+        return getattr(self.get_model_resource(model), funcname)
+
+    def get_model_resource(self, model):
         resource = self._model_to_resource.get(model)
         if not resource:
             raise ValueError("Unable to find resource to model {0}".format(model))
-        return getattr(resource, funcname)
+        return resource
 
