@@ -45,7 +45,6 @@ def get_or_500(func, *args, **kwargs):
     return result
 
 
-
 class ApiForm(flask_wtf.Form):
 
     def __init__(self, api, *args, **kwargs):

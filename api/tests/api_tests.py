@@ -7,6 +7,7 @@ import mock
 import requests
 from nose_parameterized import parameterized
 from api.core import ApiDispatcher, ApiException
+from api.mock import create_mock_for
 from api.models import User, UnableToParseException, Game, ModelBase, ModelList
 from api.resources import PvPCenterApi
 
@@ -61,7 +62,7 @@ class DispatcherTests(TestCase):
         self.dispatcher = ApiDispatcher(self.url)
 
     @parameterized.expand([('GET',), ('POST',), ('DELETE',), ('PATCH',), ('PUT',)])
-    @mock.patch('api.api.requests')
+    @mock.patch('api.core.requests')
     def test_requests(self, method, requests_mock):
         mock_method = getattr(requests_mock, method.lower())
         mock_method.return_value = MockResponse({}, 200)
@@ -69,7 +70,7 @@ class DispatcherTests(TestCase):
         self.assertTrue(mock_method.called)
         self.assertIn(self.url + '/test', mock_method.call_args[0])
 
-    @mock.patch('api.api.requests')
+    @mock.patch('api.core.requests')
     def test_with_arguments(self, requests_mock):
         requests_mock.get.return_value = MockResponse({}, 200)
         args = {'arg1': '1', 'arg2': '2'}
@@ -90,10 +91,10 @@ class ApiTests(TestCase):
         self.dispatcher = ApiDispatcher(self.url)
         self.api = PvPCenterApi(self.dispatcher, self.login, self.password)
 
-    @mock.patch('api.api.requests')
+    @mock.patch('api.core.requests')
     def test_authentication(self, requests_mock):
-        requests_mock.get.return_value = MockResponse({}, 200)
-        api_response = self.api.games.get(model=mock.MagicMock(ModelList.For(Game)))
+        requests_mock.get.return_value = MockResponse({'total': 0, 'models': []}, 200)
+        api_response = self.api.games.get()
         self.assertIn('auth', requests_mock.get.call_args[1])
         auth = requests_mock.get.call_args[1]['auth']
         self.assertEqual(self.login, auth.username)
@@ -104,12 +105,12 @@ class ApiTests(TestCase):
         (requests.ConnectionError(),),
         (ValueError(),),
         (requests.HTTPError(),)])
-    @mock.patch('api.api.requests')
+    @mock.patch('api.core.requests')
     def test_various_exceptions(self, exception, requests_mock):
         requests_mock.get.side_effect = exception
         self.assertRaises(ApiException, lambda: self.api.games.get(model=mock.MagicMock(ModelList.For(Game))))
 
-    @mock.patch('api.api.requests')
+    @mock.patch('api.core.requests')
     def test_error_response(self, requests_mock):
         error_data = {'some_error': ['1', '2'], 'other_error': ['1']}
         requests_mock.get.return_value = MockResponse(error_data, 500)

@@ -11,7 +11,7 @@ import flask_login
 
 from common.logable import Logable
 from flask.ext.frontend.config import keys
-from flask_frontend.common.api_helper import get_or_404
+from flask_frontend.common.api_helper import get_or_404, get_or_500
 from flask_frontend.common.pagination import Pagination
 from flask_frontend.common.view_helpers.core import empty_func, BaseView
 
@@ -74,7 +74,7 @@ class ApiResourceContext(ContextCreator):
             self._add_from_request_args(name, params)
         if self.include_token:
             self._add_token(params)
-        return {self.out_name: get_or_404(self.view_method, **params)}
+        return {self.out_name: get_or_500(self.view_method, **params)}
 
     def _translate_params(self, env, params):
         if len(self.params_translators) > 0:
@@ -141,7 +141,7 @@ class ApiResourceIndex(ApiResourceContext):
         """
         :type model: subclass(api.api.ModelBase)
         """
-        name = model.__name__.lower() + 's'
+        name = kwargs.pop('out_name', model.__name__.lower() + 's')
         super(ApiResourceIndex, self).__init__(model, 'get', name, **kwargs)
 
     def create_context(self, env, **kwargs):

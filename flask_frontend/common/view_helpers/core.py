@@ -88,6 +88,8 @@ class BaseView(Logable):
         result_kwargs = {}
         for creator in self.context_creators:
             new = creator(env, **creators_kwargs)
+            if not isinstance(new, dict):
+                return new
             result_kwargs.update(new)
             creators_kwargs.update(new)
         return result_kwargs

@@ -38,11 +38,10 @@ def create_routes():
 
 
 @flask_login.login_required
-def user_edit_friendship_context(self, env, **kwargs):
+def user_edit_friendship_context(env, user_id):
     me = flask_login.current_user
-    user_id = kwargs['user_id']
     return dict(
-        user=get_or_404(self.blueprint.api.users.get_single, user_id=user_id, token=me.token),
+        user=get_or_404(env.api.users.get_single, user_id=user_id, token=me.token),
         friendship_invite=first_or_none(get_or_500(env.api.friendship_invites.get, token=me.token, from_user_id=me.id, to_user_id=user_id)),
         friendship=first_or_none(get_or_500(env.api.friendships.get, token=me.token, user_id=me.id, to_user_id=user_id)))
 
@@ -50,7 +49,7 @@ def user_edit_friendship_context(self, env, **kwargs):
 @model_view(User)
 def invite_to_friends(env, user):
     me = flask_login.current_user
-    result = get_or_500(env.api.friendship_invites.create, me.token, me.id, user.id)
+    result = get_or_500(env.api.friendship_invites.create, token=me.token, from_user_id=me.id, to_user_id=user.id)
     if result:
         Flash.success(gettext("Succesfully invited user to friends!"))
     else:
@@ -62,7 +61,8 @@ def invite_to_friends(env, user):
 @template_view('user_profile.html', user_edit_friendship_context)
 def accept_invite(env, friendship_invite):
     if friendship_invite:
-        result = env.api.friendship_invites.accept(flask_login.current_user.token, friendship_invite.id)
+        result = env.api.friendship_invites.accept(
+            token=flask_login.current_user.token, friendship_invite_id=friendship_invite.id)
         if result.ok:
             Flash.success(gettext("Succesfully accepted invite to friends!"))
             return
@@ -72,7 +72,8 @@ def accept_invite(env, friendship_invite):
 @template_view('user_profile.html', user_edit_friendship_context)
 def decline_invite(env, friendship_invite):
     if friendship_invite:
-        result = env.api.friendship_invites.delete(flask_login.current_user.token, friendship_invite.id)
+        result = env.api.friendship_invites.delete(
+            token=flask_login.current_user.token, friendship_invite_id=friendship_invite.id)
         if result.ok:
             Flash.success(gettext("Invitation declined"))
             return

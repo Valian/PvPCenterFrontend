@@ -5,7 +5,7 @@ import flask
 import flask_login
 from flask_babel import gettext
 
-from api.models import Team
+from api.models import Team, TeamMembership
 from flask_frontend.blueprints.teams.helpers import only_team_owner
 from flask_frontend.common.utils import restrict
 from flask_frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex
@@ -20,14 +20,15 @@ from flask_frontend.common.api_helper import get_or_500, get_or_404
 def create_routes():
     team_view = PjaxView('team_profile.html', ApiResourceGet(Team, allow_all_params=True))
     teams_view = PjaxView('teams_list.html', ApiResourceIndex(Team, allow_all_params=True))
+    team_members = PjaxView('team_members.html', [ApiResourceGet(Team), ApiResourceIndex(TeamMembership, allow_all_params=True, out_name='memberships')])
     return UrlRoutes([
         UrlRoute('/', teams_view, endpoint="teams_view"),
-        UrlRoute('/create', create_team_view),
+        UrlRoute('/create', create_team_view, methods=['GET', 'POST']),
         UrlRoute('/<int:team_id>', team_view, endpoint="team_view"),
         UrlRoute('/<int:team_id>/edit', edit),
         UrlRoute('/<int:team_id>/change_basic', change_basic, methods=['POST']),
         UrlRoute('/<int:team_id>/upload_logo', upload_logo, methods=['POST']),
-        UrlRoute('/<int:team_id>/members', members_view),
+        UrlRoute('/<int:team_id>/members', team_members, endpoint='members_view'),
         UrlRoute('/<int:team_id>/members/<int:user_id>/remove', remove_from_team, methods=['POST'])
     ])
 
@@ -68,18 +69,13 @@ def create_team_view(env):
     return dict(form=form)
 
 
-def get_team_members_context(env, team_id):
+def remove_team_member_context(env, team_id, user_id):
     team = get_or_404(env.api.teams.get_single, team_id=team_id)
     team_memberships = get_or_500(env.api.team_memberships.get, team_id=team.id)
     pagination = Pagination.create_from_model_list(team_memberships)
     return dict(team=team, memberships=team_memberships, pagination=pagination)
 
 
-@pjax_view('team_members.html', get_team_members_context)
-def members_view():
-    pass
-
-
-@pjax_view('team_members.html', get_team_members_context)
+@pjax_view('team_members.html', remove_team_member_context)
 def remove_from_team():
     pass

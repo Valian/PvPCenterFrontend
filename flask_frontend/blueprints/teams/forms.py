@@ -39,7 +39,7 @@ class EditTeamInfoForm(CreateTeamForm):
         self.description.data = team.description
 
     def _make_request(self):
-        return self._api.teams.patch(
+        return self._api.teams.update(
             team_id=self.team.id, token=self.user.token, name=self.name.data, description=self.description.data,
             tag=self.tag.data)
 
@@ -57,4 +57,4 @@ class ChangeTeamLogoForm(ApiForm):
 
     def _make_request(self):
         result = cloudinary.uploader.upload_image(self.logo.data)
-        self._api.teams.patch(team_id=self.team_id, token=self.token, image_url=result.url)
+        self._api.teams.update(team_id=self.team_id, token=self.token, image_url=result.url)
