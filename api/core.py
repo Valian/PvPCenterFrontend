@@ -3,7 +3,7 @@
 import urlparse
 from abc import ABCMeta, abstractmethod
 import requests
-from api.models import Errors
+from .models import Errors
 from common.logable import Logable
 
 

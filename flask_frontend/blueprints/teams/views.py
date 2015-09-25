@@ -7,7 +7,7 @@ from flask_babel import gettext
 
 from api.models import Team, TeamMembership
 from flask_frontend.blueprints.teams.helpers import only_team_owner
-from flask_frontend.common.utils import restrict
+from flask_frontend.common.utils import restrict, first_or_none
 from flask_frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex
 from flask_frontend.common.view_helpers.response_processors import pjax_view, template_view, PjaxView
 from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
@@ -68,14 +68,20 @@ def create_team_view(env):
         return flask.redirect(flask.url_for('teams.team_view', team_id=form.result.id))
     return dict(form=form)
 
-
+@restrict(only_team_owner)
 def remove_team_member_context(env, team_id, user_id):
     team = get_or_404(env.api.teams.get_single, team_id=team_id)
-    team_memberships = get_or_500(env.api.team_memberships.get, team_id=team.id)
-    pagination = Pagination.create_from_model_list(team_memberships)
-    return dict(team=team, memberships=team_memberships, pagination=pagination)
+    membership = first_or_none(get_or_500(env.api.team_memberships.get, team_id=team.id, user_id=user_id))
+    return dict(team=team, membership=membership)
 
 
 @pjax_view('team_members.html', remove_team_member_context)
-def remove_from_team():
-    pass
+def remove_from_team(env, membership, team):
+    if membership:
+        response = env.api.team_memberships.delete(team_membership_id=membership.id, token=flask_login.current_user.token)
+        if response.ok:
+            Flash.success(gettext("Removed %(name)s from %(team)s", name=membership.user.name, team=membership.team.name))
+            return flask.redirect(flask.url_for('teams.members_view', team_id=team.id))
+
+    Flash.warning(gettext("Unable to remove user from team."))
+    return flask.redirect(flask.url_for('teams.members_view', team_id=team.id))

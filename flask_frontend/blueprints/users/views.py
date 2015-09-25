@@ -83,7 +83,8 @@ def decline_invite(env, friendship_invite):
 @template_view('user_profile.html', user_edit_friendship_context)
 def remove_from_friends(env, friendship):
     if friendship:
-        result = env.api.friendships.delete(flask_login.current_user.token, friendship.id)
+        result = env.api.friendships.delete(
+            token=flask_login.current_user.token, friendship_id=friendship.id)
         if result.ok:
             Flash.success(gettext("Friend removed"))
             return

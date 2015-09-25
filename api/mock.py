@@ -12,13 +12,12 @@ import factory.fuzzy as fuzzy
 import re
 from faker import Factory as FakerFactory
 
-from api.core import ApiResult, ApiDispatcherBase
+from .core import ApiResult, ApiDispatcherBase
 from constants import RELATION_TO_CURRENT_USER
 from constants import NATIONALITIES, TEAM_RELATION_TO_CURRENT_USER
-from api.constants import SEX
+from .constants import SEX
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
     FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamInvite, TeamRelationToUser
-
 
 CLOUDINARY_URL = 'http://res.cloudinary.com/dihrxuryz/image/upload/v1442074482/xmhoxjbioanmd5htrl0p.png'
 

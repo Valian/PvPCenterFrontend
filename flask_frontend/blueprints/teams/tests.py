@@ -40,14 +40,15 @@ class TeamTests(AppTestCase):
         self.assertEqual(get.call_count, 1)
         self.assertEqual(response.context['memberships'], get.return_value.data)
 
-    @mock_api(TeamMembership, 'get')
+    @mock_api(TeamMembership, 'get', list_count=1, id=123)
     @mock_api(TeamMembership, 'delete')
     @mock_api(Team, 'get_single')
     @logged_in()
-    def test_remove_member_calls_api(self, get_single, delete, get, user):
+    def test_remove_member_calls_api(self, get, delete, get_single, user):
         get_single.return_value.data.founder = user
         response = self.client.post(url_for('teams.remove_from_team', team_id=1, user_id=3))
         self.assertEqual(delete.call_count, 1)
+        self.assertEqual(delete.call_args, mock.call(token=user.token, team_membership_id=123))
 
     @mock_api(Team, 'create')
     @logged_in()
