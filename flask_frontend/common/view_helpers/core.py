@@ -3,9 +3,11 @@
 
 import functools
 import inspect
+import flask
 
 from common.logable import Logable
 from common.utils import to_iter
+from flask_frontend.common.view_helpers.restrictions import RestrictionRegistry
 from flask_frontend.common.utils import get_true_argspec
 
 
@@ -51,11 +53,16 @@ class BaseView(Logable):
         func = f if inspect.ismethod(f) or inspect.isfunction(f) else f.__call__
         return func
 
-    def as_view(self, env):
+    def as_view(self, env, restrictions, menu):
         self._init_context(env)
+        if menu:
+            self.context_creators.append(menu)
 
         @functools.wraps(self.view_func)
         def proxy(**view_args):
+            can_proceed = RestrictionRegistry.can_proceed(restrictions or [], env, view_args)
+            if not can_proceed:
+                flask.abort(403)
             view_args = self.create_context(env, view_args)
             if not isinstance(view_args, dict):
                 return view_args

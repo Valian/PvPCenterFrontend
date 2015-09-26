@@ -4,9 +4,11 @@
 
 class UrlRoute(object):
 
-    def __init__(self, route, view, **kwargs):
+    def __init__(self, route, view, restrict=None, menu=None, **kwargs):
+        self.menu = menu
         self.view = view
         self.route = route
+        self.restrict = restrict or []
         self.kwargs = kwargs
 
 
@@ -26,4 +28,5 @@ class UrlRoutes(object):
         """
         for route in self.routes:
             """:type : UrlRoute"""
-            app.add_url_rule(route.route, view_func=route.view.as_view(env), **route.kwargs)
+            view_func = route.view.as_view(env, restrictions=route.restrict, menu=route.menu)
+            app.add_url_rule(route.route, view_func=view_func, **route.kwargs)

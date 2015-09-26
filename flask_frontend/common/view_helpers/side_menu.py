@@ -1,73 +1,89 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
+from flask import url_for
+import re
 
-from functools import wraps
 from werkzeug.exceptions import HTTPException
 
-from flask.ext.frontend.common.view_helpers.contexts import ContextCreator
+from flask_frontend.common.view_helpers.contexts import ContextCreator
+from flask_frontend.common.view_helpers.restrictions import RestrictionRegistry
 
 
-def check_auth_exceptions(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        try:
-            f(*args, **kwargs)
-            return True
-        except HTTPException:
-            return False
-    return wrapper
-
-
-   ###         ###
-  #   #       #   #
- #      #   #      #
- #        #        #
- #                 #
-  #               #
-    #           #
-      #       #
-        #   #
-          #
-
+def check_restriction(f, *args, **kwargs):
+    try:
+        f(*args, **kwargs)
+        return True
+    except HTTPException:
+        return False
 
 
 class MenuEntry(object):
 
-    def __init__(self, url, elem_id, name):
+    __slots__ = ['_url_constructor', 'url', 'text', 'restrictions']
+
+    def __init__(self, url_constructor, text, restrictions=None):
         """
-        :type url: str
-        :type elem_id: str
-        :type name: str
+        :type url_constructor: UrlConstructor | None
+        :type text: str
+        :type restrictions: tuple[str] | None
         """
-        self.url = url
-        self.id = elem_id
-        self.name = name
+        self._url_constructor = url_constructor
+        self.text = text
+        self.url = '#'
+        self.restrictions = restrictions or []
+
+    def update_url(self, kwargs):
+        if self._url_constructor:
+            self.url = self._url_constructor.create_url(kwargs)
+        else:
+            self.url = '#'
 
 
-class SideMenuBuilder(ContextCreator):
+class UrlConstructor(object):
+
+    def __init__(self, endpoint, *args):
+        self.endpoint = endpoint
+        self.required_args = args
+
+    def create_url(self, kwargs):
+        try:
+            url_kwargs = {name: kwargs[name] for name in self.required_args}
+            return url_for(self.endpoint, **url_kwargs)
+        except KeyError as e:
+            raise ValueError('Unable to create url for endpoint {0} using kwargs {1}, missing: {2}'.format(
+                self.endpoint, kwargs, e))
+
+
+class SideMenu(object):
 
     def __init__(self):
-        self.conditions = {}
-        self.links = []
-    
-    def add_menu_entry(self, link, conditions=None):
-        """
-        :type link: MenuEntry
-        :type conditions: list[str] | None
-        """
-        self.links.append((link, conditions))
+        self.entries = []
+        self.restrictions = set()
 
-    def add_condition(self, name, condition_func):
-        """
-        :type name: str
-        :type condition_func: (*args, **kwargs) -> raise HTTPException or not
-        """
-        self.conditions[name] = check_auth_exceptions(condition_func)
+    def add_entry(self, url_constructor, text, *restrictions):
+        self.restrictions.update(restrictions)
+        entry = MenuEntry(url_constructor, text, restrictions)
+        self.entries.append(entry)
+
+    def generate(self, env, kwargs):
+        restriction_statuses = RestrictionRegistry.get_restrictions_statuses(self.restrictions, env, kwargs)
+        menu = []
+        for menu_entry in self.entries:
+            if all((restriction_statuses.get(restriction) for restriction in menu_entry.restrictions)):
+                menu_entry.update_url(kwargs)
+                menu.append(menu_entry)
+        return menu
+
+
+class SideMenuContext(ContextCreator):
+
+    def __init__(self):
+        self.menu = SideMenu()
+        self.init_menu(self.menu)
+
+    def init_menu(self, menu):
+        pass
 
     def create_context(self, env, **kwargs):
-        condition_statuses = {name: condition(**kwargs) for name, condition in self.conditions.iteritems()}
-        menu = []
-        for menu_entry, conditions in self.links:
-            if all((condition_statuses.get(condition) for condition in conditions)):
-                menu.append(menu_entry)
-        return dict(side_menu=menu)
+        generated_menu = self.menu.generate(env, kwargs)
+        return dict(side_menu=generated_menu)

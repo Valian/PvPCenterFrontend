@@ -2,18 +2,15 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 from functools import wraps
 
-import inspect
-
 from abc import ABCMeta, abstractmethod
 import flask
-
 import flask_login
 
 from common.logable import Logable
-from flask.ext.frontend.config import keys
-from flask_frontend.common.api_helper import get_or_404, get_or_500
+from flask_frontend.config import keys
+from flask_frontend.common.api_helper import get_or_500
 from flask_frontend.common.pagination import Pagination
-from flask_frontend.common.view_helpers.core import empty_func, BaseView
+from flask_frontend.common.view_helpers.core import BaseView
 
 
 class ContextCreator(Logable):
@@ -156,9 +153,9 @@ class ModelView(BaseView):
         super(ModelView, self).__init__([ApiResourceGet(model, **kwargs)], response_processor, view_func)
         self.model = model
 
-    def as_view(self, env):
-        func = super(ModelView, self).as_view(env)
-        if func.__name__ == empty_func.__name__:
+    def as_view(self, env, **kwargs):
+        func = super(ModelView, self).as_view(env, **kwargs)
+        if func.__name__ == 'empty_func':
             func.__name__ = "{0}_view".format(self.model.__name__.lower())
         return func
 
@@ -169,9 +166,9 @@ class IndexView(BaseView):
         super(IndexView, self).__init__([ApiResourceIndex(model, **kwargs)], response_processor, view_func)
         self.model = model
 
-    def as_view(self, env):
-        func = super(IndexView, self).as_view(env)
-        if func.__name__ == empty_func.__name__:
+    def as_view(self, env, **kwargs):
+        func = super(IndexView, self).as_view(env, **kwargs)
+        if func.__name__ == 'empty_func':
             func.__name__ = "{0}s_view".format(self.model.__name__.lower())
         return func
 

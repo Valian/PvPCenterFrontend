@@ -5,39 +5,51 @@ import flask_login
 from flask_babel import gettext
 
 from api.models import User, Friendship, Team
+from flask.ext.frontend.blueprints.users.menu import UsersSideMenu
+from flask.ext.frontend.common.view_helpers.restrictions import RestrictionRegistry
 from flask_frontend.blueprints.users.forms import ChangeBasicDataForm, ChangeAvatarForm
 from flask_frontend.common.view_helpers.response_processors import PjaxView, pjax_view, template_view
 from flask_frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex, model_view
 from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
-from flask_frontend.blueprints.users.helpers import only_current_user
 from flask_frontend.common.flash import Flash
-from flask_frontend.common.utils import first_or_none, restrict
+from flask_frontend.common.utils import first_or_none
 from flask_frontend.common.api_helper import get_or_500, get_or_404
 
 
 def create_routes():
+    menu = UsersSideMenu()
     friends_context_creators = [ApiResourceGet(User), ApiResourceIndex(Friendship, allowed_params=['user_id'])]
     teams_context_creators = [ApiResourceGet(User), ApiResourceIndex(Team, allowed_params=['user_id'])]
-    friends_view = PjaxView("user_friends.html", friends_context_creators, decorators=[restrict(only_current_user)])
+    friends_view = PjaxView("user_friends.html", friends_context_creators)
     teams_view = PjaxView('user_teams.html', teams_context_creators)
     users_view = PjaxView('users_list.html', ApiResourceIndex(User, allowed_params=['nickname']))
     user_view = PjaxView('user_profile.html', ApiResourceGet(User))
     return UrlRoutes([
         UrlRoute('/', users_view, endpoint="users_view"),
-        UrlRoute('/<int:user_id>/', user_view, endpoint="user_view"),
-        UrlRoute('/<int:user_id>/teams', teams_view, endpoint='teams_view'),
-        UrlRoute('/<int:user_id>/invite', invite_to_friends, methods=['POST']),
-        UrlRoute('/<int:user_id>/accept_invitation', accept_invite, methods=["POST"]),
-        UrlRoute('/<int:user_id>/decline_invitation', decline_invite, methods=["POST"]),
-        UrlRoute('/<int:user_id>/remove_from_friends', remove_from_friends, methods=["POST"]),
-        UrlRoute('/<int:user_id>/friends', friends_view, endpoint='friends_view'),
-        UrlRoute('/<int:user_id>/edit', edit_profile_view),
-        UrlRoute('/<int:user_id>/change_basic', change_basic, methods=['POST']),
-        UrlRoute('/<int:user_id>/upload_avatar', upload_avatar, methods=['POST'])
+        UrlRoute('/<int:user_id>/', user_view, endpoint="user_view", menu=menu),
+        UrlRoute('/<int:user_id>/teams', teams_view, endpoint='teams_view', menu=menu),
+        UrlRoute('/<int:user_id>/invite', invite_to_friends, menu=menu, restrict=['logged_in'], methods=['POST']),
+        UrlRoute('/<int:user_id>/accept_invitation', accept_invite, menu=menu, restrict=['logged_in'], methods=["POST"]),
+        UrlRoute('/<int:user_id>/decline_invitation', decline_invite, menu=menu, restrict=['logged_in'], methods=["POST"]),
+        UrlRoute('/<int:user_id>/remove_from_friends', remove_from_friends, menu=menu, restrict=['logged_in'], methods=["POST"]),
+        UrlRoute('/<int:user_id>/friends', friends_view, restrict=['current_user'], endpoint='friends_view', menu=menu),
+        UrlRoute('/<int:user_id>/edit', edit_profile_view, restrict=['current_user'], menu=menu),
+        UrlRoute('/<int:user_id>/change_basic', change_basic, restrict=['current_user'], menu=menu, methods=['POST']),
+        UrlRoute('/<int:user_id>/upload_avatar', upload_avatar, restrict=['current_user'], menu=menu, methods=['POST'])
     ])
 
 
-@flask_login.login_required
+@RestrictionRegistry.register('current_user')
+def only_current_user(env, kwargs):
+    logged_user = flask_login.current_user
+    user_id = kwargs.get('user_id')
+    if user_id is None:
+        user_id = kwargs['user'].id if 'user' in kwargs else -1
+    if not logged_user.is_authenticated() or logged_user.id != user_id:
+        return False
+    return True
+
+
 def user_edit_friendship_context(env, user_id):
     me = flask_login.current_user
     return dict(
@@ -91,7 +103,6 @@ def remove_from_friends(env, friendship):
     Flash.error(gettext("Unable to remove user from friends"))
 
 
-@restrict(only_current_user)
 def user_edit_context(env, **kwargs):
     logged_user = flask_login.current_user
     change_basic_form = ChangeBasicDataForm(env.api, logged_user)

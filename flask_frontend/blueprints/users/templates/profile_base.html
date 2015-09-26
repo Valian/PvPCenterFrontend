@@ -3,33 +3,6 @@
 {% block content %}
   {%  from 'user_macros.html' import user_basic_info, user_game_ownerships %}
 
-  {% set is_my_profile = current_user.is_authenticated() and current_user.id == user.id %}
-
-  {% if is_my_profile %}
-
-    {% set side_menu = [
-      (url_for('users.user_view', user_id=user.id), 'profile', gettext('Profile')),
-      (url_for('users.friends_view', user_id=user.id), 'friends', gettext('Friends')),
-      ('#', 'messages', gettext('Messages')),
-      ('#', 'match', gettext('Matches')),
-      ('#', 'challenges', gettext('Challenges')),
-      ('#', 'leagues', gettext('Leagues')),
-      (url_for('users.edit_profile_view', user_id=user.id), 'settings', gettext('Settings')),
-      (url_for('users.teams_view', user_id=user.id), 'teams', gettext('Teams'))
-    ] -%}
-
-  {% else %}
-
-    {% set side_menu = [
-      (url_for('users.user_view', user_id=user.id), 'profile', gettext('Profile')),
-      ('#', 'match', gettext('Matches')),
-      ('#', 'challenges', gettext('Challenges')),
-      ('#', 'leagues', gettext('Leagues')),
-      (url_for('users.teams_view', user_id=user.id), 'teams', gettext('Teams'))
-    ] -%}
-
-  {% endif %}
-
   <div class="profile player col-md-9">
     <div class="row">
       <div class="menu">
