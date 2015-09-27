@@ -7,7 +7,7 @@ from abc import ABCMeta
 from .resource_endpoint import IndexResourceEndpoint, Endpoint, GetResourceEndpoint, Params, TokenParams, \
     CreateResourceEndpoint, PatchResourceEndpoint, DeleteResourceEndpoint
 from models import Game as Game, User, UserGameOwnership, Team, TeamMembership, FriendshipInvite, Friendship, \
-    Notification, TeamInvite
+    Notification, TeamProposition
 
 
 class Resource(object):
@@ -93,17 +93,17 @@ class TeamMemberships(Resource):
         self.delete = DeleteResourceEndpoint(dispatcher, single, params=TokenParams())
 
 
-class TeamInvites(Resource):
+class TeamPropositions(Resource):
 
     def __init__(self, dispatcher, url):
-        index, single, accept = self.create_endpoints(url, '/{team_invite_id}', '/{team_invite_id}/accept')
-        get_params = TokenParams('to_user_id', 'team_id')
-        create_data = Params('from_user', 'team_id')
-        self.get = IndexResourceEndpoint(dispatcher, index, TeamInvite, params=get_params)
-        self.create = CreateResourceEndpoint(dispatcher, index, TeamInvite, params=TokenParams(), data_params=create_data)
-        self.get_single = GetResourceEndpoint(dispatcher, single, TeamInvite, params=TokenParams())
+        index, single, accept = self.create_endpoints(url, '/{team_proposition_id}', '/{team_proposition_id}/accept')
+        get_params = TokenParams('team_id', 'user_id', 'type')
+        create_data = Params('team_id', 'user_id', 'type')
+        self.get = IndexResourceEndpoint(dispatcher, index, TeamProposition, params=get_params)
+        self.create = CreateResourceEndpoint(dispatcher, index, TeamProposition, params=TokenParams(), data_params=create_data)
+        self.get_single = GetResourceEndpoint(dispatcher, single, TeamProposition, params=TokenParams())
         self.delete = DeleteResourceEndpoint(dispatcher, single, params=TokenParams())
-        self.accept = CreateResourceEndpoint(dispatcher, accept, TeamInvite, params=TokenParams())
+        self.accept = CreateResourceEndpoint(dispatcher, accept, TeamProposition, params=TokenParams())
 
 
 class FriendshipInvites(Resource):
@@ -142,7 +142,7 @@ class PvPCenterApi(object):
         self.game_ownerships = GameOwnerships(dispatcher, '/game_ownerships')
         self.teams = Teams(dispatcher, '/teams')
         self.team_memberships = TeamMemberships(dispatcher, '/team_memberships')
-        self.team_invites = TeamInvites(dispatcher, '/team_membership_invite')
+        self.team_invites = TeamPropositions(dispatcher, '/team_membership_invite')
         self.friendships = Friendships(dispatcher, '/friendships')
         self.friendship_invites = FriendshipInvites(dispatcher, '/friendship_invites')
         self.notifications = Notifications(dispatcher, '/notifications')

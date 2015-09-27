@@ -36,6 +36,11 @@ class TEAM_RELATION_TO_CURRENT_USER(object):
     STRANGER = 'STRANGER'
 
 
+class TEAM_PROPOSITION_TYPE(object):
+    REQUEST = 'REQUEST'
+    INVITE = 'INVITE'
+
+
 class SEX(object):
     UNDEFINED = 0
     MALE = "M"

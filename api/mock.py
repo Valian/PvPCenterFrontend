@@ -13,11 +13,11 @@ import re
 from faker import Factory as FakerFactory
 
 from .core import ApiResult, ApiDispatcherBase
-from constants import RELATION_TO_CURRENT_USER
+from constants import RELATION_TO_CURRENT_USER, TEAM_PROPOSITION_TYPE
 from constants import NATIONALITIES, TEAM_RELATION_TO_CURRENT_USER
 from .constants import SEX
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
-    FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamInvite, TeamRelationToUser
+    FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamProposition, TeamRelationToUser
 
 CLOUDINARY_URL = 'http://res.cloudinary.com/dihrxuryz/image/upload/v1442074482/xmhoxjbioanmd5htrl0p.png'
 
@@ -160,14 +160,14 @@ class TeamMembershipFactory(factory.Factory):
     team = factory.SubFactory(TeamFactory)
 
 
-class TeamInviteFactory(factory.Factory):
+class TeamPropositionFactory(factory.Factory):
     class Meta:
-        model = TeamInvite
+        model = TeamProposition
 
     id = factory.Sequence(lambda x: x)
-    team = factory.Sequence(lambda x: x)
-    to_user = factory.Sequence(lambda x: x)
-    from_user = factory.Sequence(lambda x: x)
+    team = factory.SubFactory(TeamFactory)
+    user = factory.SubFactory(UserFactory)
+    type = factory.Iterator(vars(TEAM_PROPOSITION_TYPE))
 
 
 class FriendshipInviteFactory(factory.Factory):

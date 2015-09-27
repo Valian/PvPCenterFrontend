@@ -321,23 +321,25 @@ class TeamMembership(ModelBase):
         return cls(json['id'], user, team)
 
 
-class TeamInvite(ModelBase):
+class TeamProposition(ModelBase):
 
-    def __init__(self, id, team_id, from_user=None, to_user=None):
+    def __init__(self, id, type, user, team):
         """
         :type id: long
-        :type team_id: long
-        :type from_user: long | None
-        :type to_user: long | None
+        :type type: TEAM_PROPOSITION_TYPE
+        :type user: User
+        :type team: Team
         """
         self.id = id
-        self.team_id = team_id
-        self.from_user = from_user
-        self.to_user = to_user
+        self.type = type
+        self.user = user
+        self.team = team
 
     @classmethod
     def _from_json(cls, json):
-        return cls(json['id'], json['team_id'], json.get('from_user'), json.get('to_user'))
+        user = User.from_json(json['user'])
+        team = Team.from_json(json['to_user'])
+        return cls(json['id'], json['type'], user, team)
 
 
 class Notification(ModelBase):
