@@ -4,6 +4,7 @@
 import flask
 import flask_login
 from flask_babel import gettext
+from flask.ext.frontend.common.view_helpers.core import view
 
 import flask_frontend.blueprints.teams.helpers
 from api.models import Team, TeamMembership
@@ -56,6 +57,20 @@ def change_basic(basic_form):
 def upload_logo(logo_form):
     if logo_form.validate_on_submit():
         Flash.success(gettext("Logo updated"))
+
+
+def proposition_context_creator(env):
+    team_proposition_id = flask.request.form.get('team_proposition_id')
+    user_id = flask.request.form.get('user_id')
+    type = flask.request.form.get('type')
+    if team_proposition_id is None or user_id is None or type is None:
+        flask.abort(401)
+    return dict(team_proposition_id=team_proposition_id, user_id=user_id, type=type)
+
+
+@view(context_creators=proposition_context_creator)
+def accept_proposition(team_proposition_id, user_id, type):
+    
 
 
 @pjax_view('team_create.html')
