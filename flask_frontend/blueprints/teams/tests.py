@@ -3,10 +3,11 @@
 
 from flask import url_for
 import mock
+from api.constants import TEAM_PROPOSITION_TYPE
 
 from api.core import ApiException, ApiResult
 from api.mock import create_mock_for
-from api.models import ModelList, TeamMembership, Team
+from api.models import ModelList, TeamMembership, Team, TeamProposition
 from flask_frontend.common.app_test_case import AppTestCase, logged_in, mock_api
 
 
@@ -39,6 +40,32 @@ class TeamTests(AppTestCase):
         response = self.client.get(url_for('teams.members_view', team_id=1))
         self.assertEqual(get.call_count, 1)
         self.assertEqual(response.context['memberships'], get.return_value.data)
+
+    @mock_api(TeamProposition, 'create')
+    @logged_in()
+    def test_propose_user_to_team_calls_api(self, get_single, create, user):
+        get_single.return_value.data.founder = user
+        body = {'team_id': 5, 'user_id': 13, 'type': TEAM_PROPOSITION_TYPE.INVITE}
+        response = self.client.post(url_for('teams.propose_user'), params=body)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(create.call_args, mock.call(
+            token=user.token, team_id=body['team_id'], user_id=body['user_id'], type=body['type']))
+
+    @mock_api(TeamProposition, 'accept')
+    @logged_in()
+    def test_accept_invite_calls_api(self, accept, user):
+        data = {'team_proposition_id': 5}
+        response = self.client.post(url_for('teams.accept_proposition'), params=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(accept.call_args, mock.call(token=user.token, team_proposition_id=5))
+
+    @mock_api(TeamProposition, 'delete')
+    @logged_in()
+    def test_decline_invite_calls_api(self, delete, user):
+        data = {'team_proposition_id': 5}
+        response = self.client.post(url_for('teams.decline_proposition'), params=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(delete.call_args, mock.call(token=user.token, team_proposition_id=5))
 
     @mock_api(TeamMembership, 'get', list_count=1, id=123)
     @mock_api(TeamMembership, 'delete')
