@@ -5,35 +5,34 @@ import flask
 import flask_login
 from flask_babel import gettext
 
+import flask_frontend.blueprints.teams.helpers
 from api.models import Team, TeamMembership
-from flask_frontend.blueprints.teams.helpers import only_team_owner
-from flask_frontend.common.utils import restrict, first_or_none
+from flask.ext.frontend.blueprints.teams.menu import TeamMenu
+from flask_frontend.common.utils import first_or_none
 from flask_frontend.common.view_helpers.contexts import ApiResourceGet, ApiResourceIndex
 from flask_frontend.common.view_helpers.response_processors import pjax_view, template_view, PjaxView
 from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 from flask_frontend.blueprints.teams.forms import CreateTeamForm, ChangeTeamLogoForm, EditTeamInfoForm
 from flask_frontend.common.flash import Flash
-from flask_frontend.common.pagination import Pagination
 from flask_frontend.common.api_helper import get_or_500, get_or_404
 
 
 def create_routes():
+    menu = TeamMenu()
     team_view = PjaxView('team_profile.html', ApiResourceGet(Team, allow_all_params=True))
     teams_view = PjaxView('teams_list.html', ApiResourceIndex(Team, allow_all_params=True))
     team_members = PjaxView('team_members.html', [ApiResourceGet(Team), ApiResourceIndex(TeamMembership, allow_all_params=True, out_name='memberships')])
     return UrlRoutes([
         UrlRoute('/', teams_view, endpoint="teams_view"),
-        UrlRoute('/create', create_team_view, methods=['GET', 'POST']),
-        UrlRoute('/<int:team_id>', team_view, endpoint="team_view"),
-        UrlRoute('/<int:team_id>/edit', edit),
-        UrlRoute('/<int:team_id>/change_basic', change_basic, methods=['POST']),
-        UrlRoute('/<int:team_id>/upload_logo', upload_logo, methods=['POST']),
-        UrlRoute('/<int:team_id>/members', team_members, endpoint='members_view'),
-        UrlRoute('/<int:team_id>/members/<int:user_id>/remove', remove_from_team, methods=['POST'])
+        UrlRoute('/create', create_team_view, restrict=['logged_in'], methods=['GET', 'POST']),
+        UrlRoute('/<int:team_id>', team_view, menu=menu, endpoint="team_view"),
+        UrlRoute('/<int:team_id>/edit', edit, menu=menu, restrict=['team_owner']),
+        UrlRoute('/<int:team_id>/change_basic', change_basic, menu=menu, restrict=['team_owner'], methods=['POST']),
+        UrlRoute('/<int:team_id>/upload_logo', upload_logo, menu=menu, restrict=['team_owner'], methods=['POST']),
+        UrlRoute('/<int:team_id>/members', team_members, endpoint='members_view', menu=menu),
+        UrlRoute('/<int:team_id>/members/<int:user_id>/remove', remove_from_team, restrict=['team_owner'], methods=['POST'])
     ])
 
-
-@restrict(only_team_owner)
 def create_edit_context(env, team_id):
     user = flask_login.current_user
     team = get_or_404(env.api.teams.get_single, team_id=team_id)
@@ -60,7 +59,6 @@ def upload_logo(logo_form):
 
 
 @pjax_view('team_create.html')
-@flask_login.login_required
 def create_team_view(env):
     form = CreateTeamForm(flask_login.current_user, env.api)
     if form.validate_on_submit():
@@ -68,7 +66,6 @@ def create_team_view(env):
         return flask.redirect(flask.url_for('teams.team_view', team_id=form.result.id))
     return dict(form=form)
 
-@restrict(only_team_owner)
 def remove_team_member_context(env, team_id, user_id):
     team = get_or_404(env.api.teams.get_single, team_id=team_id)
     membership = first_or_none(get_or_500(env.api.team_memberships.get, team_id=team.id, user_id=user_id))

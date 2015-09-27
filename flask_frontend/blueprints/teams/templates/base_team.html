@@ -2,31 +2,6 @@
 
 {% block content %}
 
-  {% if current_user.is_authenticated() %}
-
-    {% set side_menu = [
-      (url_for('teams.team_view', team_id=team.id), 'profile', gettext('Profile')),
-      (url_for('teams.members_view', team_id=team.id), 'members', gettext('Members')),
-      ('#', 'divisions', gettext('Divisions')),
-      ('#', 'messages', gettext('Messages')),
-      ('#', 'matches', gettext('Matches')),
-      ('#', 'challenges', gettext('Challenges'))
-    ] -%}
-
-    {% if team.relation_to_current_user.is_founder %}
-      {{ side_menu.append((url_for('teams.EditTeamViews:edit', team_id=team.id), 'settings', gettext('Settings'))) }}
-    {%  endif %}
-
-
-  {% else %}
-
-    {% set side_menu = [
-      (url_for('teams.team_view', team_id=team.id), 'profile', gettext('Profile')),
-      ('#', 'matches', gettext('Matches'))
-    ] -%}
-
-  {% endif %}
-
   <div class="profile team col-md-9">
     <div class="row">
       <div class="menu">
