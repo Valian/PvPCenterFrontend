@@ -4,6 +4,7 @@
 import flask
 import flask_login
 from flask_babel import gettext
+from api.constants import TEAM_PROPOSITION_TYPE
 from flask.ext.frontend.common.view_helpers.core import view
 
 import flask_frontend.blueprints.teams.helpers
@@ -26,6 +27,9 @@ def create_routes():
     return UrlRoutes([
         UrlRoute('/', teams_view, endpoint="teams_view"),
         UrlRoute('/create', create_team_view, restrict=['logged_in'], methods=['GET', 'POST']),
+        UrlRoute('/propose', propose_user, restrict=['logged_in'], methods=['POST']),
+        UrlRoute('/accept_invite', accept_proposition, restrict=['logged_in'], methods=['POST']),
+        UrlRoute('/decline_proposition', decline_proposition, restrict=['logged_in'], methods=['POST']),
         UrlRoute('/<int:team_id>', team_view, menu=menu, endpoint="team_view"),
         UrlRoute('/<int:team_id>/edit', edit, menu=menu, restrict=['team_owner']),
         UrlRoute('/<int:team_id>/change_basic', change_basic, menu=menu, restrict=['team_owner'], methods=['POST']),
@@ -33,6 +37,7 @@ def create_routes():
         UrlRoute('/<int:team_id>/members', team_members, endpoint='members_view', menu=menu),
         UrlRoute('/<int:team_id>/members/<int:user_id>/remove', remove_from_team, restrict=['team_owner'], methods=['POST'])
     ])
+
 
 def create_edit_context(env, team_id):
     user = flask_login.current_user
@@ -59,18 +64,60 @@ def upload_logo(logo_form):
         Flash.success(gettext("Logo updated"))
 
 
-def proposition_context_creator(env):
-    team_proposition_id = flask.request.form.get('team_proposition_id')
-    user_id = flask.request.form.get('user_id')
+def create_proposition_context_creator(env):
+    team_id = int(flask.request.form.get('team_id'))
+    user_id = int(flask.request.form.get('user_id'))
     type = flask.request.form.get('type')
-    if team_proposition_id is None or user_id is None or type is None:
+    if team_id is None or user_id is None or type is None:
         flask.abort(401)
-    return dict(team_proposition_id=team_proposition_id, user_id=user_id, type=type)
+    return dict(team_id=team_id, user_id=user_id, type=type)
+
+
+@view(context_creators=create_proposition_context_creator)
+def propose_user(env, team_id, user_id, type):
+    # TODO - return to referrer
+    token = flask_login.current_user.token
+    response = env.api.team_propositions.create(token=token, team_id=team_id, user_id=user_id, type=type)
+    if response.ok:
+        if type == TEAM_PROPOSITION_TYPE.INVITE:
+            Flash.success(gettext("Successfully invited user to team!"))
+        else:
+            Flash.success(gettext("Request sent!"))
+    else:
+        Flash.error("Unable to proceed!")
+    return flask.redirect(flask.url_for('teams.team_view', team_id=team_id))
+
+
+def proposition_context_creator(env):
+    team_proposition_id = int(flask.request.form.get('team_proposition_id'))
+    if team_proposition_id is None:
+        flask.abort(401)
+    return dict(team_proposition_id=team_proposition_id)
 
 
 @view(context_creators=proposition_context_creator)
-def accept_proposition(team_proposition_id, user_id, type):
-    
+def accept_proposition(env, team_proposition_id):
+    # TODO - redicrect to referer
+    token = flask_login.current_user.token
+    response = env.api.team_propositions.accept(token=token, team_proposition_id=team_proposition_id)
+    if response.ok:
+        Flash.success(gettext("Operation successfull!"))
+    else:
+        Flash.error(gettext("Unable to perform operation"))
+    return flask.redirect(flask.url_for('teams.teams_view'))
+
+
+
+@view(context_creators=proposition_context_creator)
+def decline_proposition(env, team_proposition_id):
+    # TODO - redicrect to referer
+    token = flask_login.current_user.token
+    response = env.api.team_propositions.delete(token=token, team_proposition_id=team_proposition_id)
+    if response.ok:
+        Flash.success(gettext("Operation successfull!"))
+    else:
+        Flash.error(gettext("Unable to perform operation"))
+    return flask.redirect(flask.url_for('teams.teams_view'))
 
 
 @pjax_view('team_create.html')

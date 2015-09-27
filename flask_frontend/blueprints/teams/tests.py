@@ -43,10 +43,9 @@ class TeamTests(AppTestCase):
 
     @mock_api(TeamProposition, 'create')
     @logged_in()
-    def test_propose_user_to_team_calls_api(self, get_single, create, user):
-        get_single.return_value.data.founder = user
+    def test_propose_user_to_team_calls_api(self, create, user):
         body = {'team_id': 5, 'user_id': 13, 'type': TEAM_PROPOSITION_TYPE.INVITE}
-        response = self.client.post(url_for('teams.propose_user'), params=body)
+        response = self.client.post(url_for('teams.propose_user'), params=body, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(create.call_args, mock.call(
             token=user.token, team_id=body['team_id'], user_id=body['user_id'], type=body['type']))
@@ -55,7 +54,7 @@ class TeamTests(AppTestCase):
     @logged_in()
     def test_accept_invite_calls_api(self, accept, user):
         data = {'team_proposition_id': 5}
-        response = self.client.post(url_for('teams.accept_proposition'), params=data)
+        response = self.client.post(url_for('teams.accept_proposition'), params=data, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(accept.call_args, mock.call(token=user.token, team_proposition_id=5))
 
@@ -63,7 +62,7 @@ class TeamTests(AppTestCase):
     @logged_in()
     def test_decline_invite_calls_api(self, delete, user):
         data = {'team_proposition_id': 5}
-        response = self.client.post(url_for('teams.decline_proposition'), params=data)
+        response = self.client.post(url_for('teams.decline_proposition'), params=data, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(delete.call_args, mock.call(token=user.token, team_proposition_id=5))
 

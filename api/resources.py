@@ -142,7 +142,7 @@ class PvPCenterApi(object):
         self.game_ownerships = GameOwnerships(dispatcher, '/game_ownerships')
         self.teams = Teams(dispatcher, '/teams')
         self.team_memberships = TeamMemberships(dispatcher, '/team_memberships')
-        self.team_invites = TeamPropositions(dispatcher, '/team_membership_invite')
+        self.team_propositions = TeamPropositions(dispatcher, '/team_propositions')
         self.friendships = Friendships(dispatcher, '/friendships')
         self.friendship_invites = FriendshipInvites(dispatcher, '/friendship_invites')
         self.notifications = Notifications(dispatcher, '/notifications')
