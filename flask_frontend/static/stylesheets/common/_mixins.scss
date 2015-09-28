@@ -34,8 +34,8 @@
 	transform: translate($x, $y);
 }
 @mixin translateX ($x) {
-	.translate($x, 0);
+	@include translate($x, 0);
 }
 @mixin translateY ($y) {
-	.translate(0, $y);
+	@include translate(0, $y);
 }

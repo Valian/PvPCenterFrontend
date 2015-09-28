@@ -22,8 +22,8 @@
 				button {
 					border: none;
 					padding: 0;
-
-					@extend(a);
+					// @Todo: fix this #extend
+					//@extend(a);
 				}
 			}
 		}
@@ -38,7 +38,7 @@
 			> a, > p {
 				position: relative;
 				padding: 10px;
-				.transition(none);
+				@include transition(none);
 			}
 
 			>a {
@@ -103,7 +103,7 @@
 		> form {
 			button {
 				// @Todo: fix this #extend
-				@extend(#site-header .account-menu.logged-in > li > form button);
+				//@extend(#site-header .account-menu.logged-in > li > form button);
 			}
 		}
 	}
@@ -254,10 +254,10 @@
 #site-header.sticky {
 	position: fixed;
 	z-index: 9;
-	.translateY(-83px);
+	@include translateY(-83px);
 
 	.logo {
-		.translateY(75px);
+		@include translateY(75px);
 
 		img {
 			height: 35px;
@@ -265,7 +265,7 @@
 	}
 
 	.top-menu > a {
-		.translateY(68px);
+		@include translateY(68px);
 	}
 
 	.sticky-hidden {
@@ -282,11 +282,11 @@
 	}
 
 	#main-menu {
-		.translateY(55px);
+		@include translateY(55px);
 		background-color: rgba(246, 246, 246, 0.95);
 
 		@media (min-width: 992px) {
-			.translateY(0px);
+			@include translateY(0px);
 			background-color: transparent;
 		}
 	}

@@ -90,7 +90,7 @@
 			line-height: 30px;
 			font-size: 15px;
 
-			&:hover::before, &:focus::before, &.active::before {
+			&:hover:before, &:focus:before, &.active:before {
 				content: "\f105";
 				font-family: FontAwesome;
 				font-weight: normal;
@@ -105,7 +105,7 @@
 
 	> .row > .content,
 	> .content {
-		width: calc(~"100% - 150px");
+		width: calc(100% - 150px);
 		padding: 0;
 		position: relative;
 
