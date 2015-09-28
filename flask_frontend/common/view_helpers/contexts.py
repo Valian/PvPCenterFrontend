@@ -98,6 +98,8 @@ class ApiResourceContext(ContextCreator):
     @staticmethod
     def _add_from_request_args(name, params):
         param = flask.request.args.get(name)
+        if flask.request.method == 'POST':
+            param = flask.request.form.get(name, param)
         if param and param not in params:
             params[name] = param
 

@@ -2,7 +2,7 @@
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import flask
 from flask_babel import get_locale
-from flask_frontend.common.view_helpers.core import BaseView
+from flask_frontend.common.view_helpers.core import BaseView, view
 from flask_frontend.common.view_helpers.routes import UrlRoute, UrlRoutes
 
 from flask_frontend.blueprints.lang.languages import init_babel, set_locale
@@ -11,7 +11,7 @@ from flask_frontend.config import keys
 
 def create_routes():
     return UrlRoutes([
-        UrlRoute('/<string:locale>', BaseView(view_func=change_language))
+        UrlRoute('/<string:locale>', change_language)
     ])
 
 
@@ -28,6 +28,7 @@ def init_blueprint(blueprint, env):
         flask.g.current_language = get_locale()
 
 
+@view()
 def change_language(env, locale):
     if locale in env.config[keys.LANGUAGES]:
         set_locale(locale)

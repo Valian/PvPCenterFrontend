@@ -51,20 +51,22 @@ class TeamTests(AppTestCase):
             token=user.token, team_id=body['team_id'], user_id=body['user_id'], type=body['type']))
 
     @mock_api(TeamProposition, 'accept')
+    @mock_api(TeamProposition, 'get', user__id=5, team__id=10, list_count=1)
     @logged_in()
-    def test_accept_invite_calls_api(self, accept, user):
-        data = {'team_proposition_id': 5}
+    def test_accept_invite_calls_api(self, accept, get, user):
+        data = {'user_id': 5, 'team_id': 10}
         response = self.client.post(url_for('teams.accept_proposition'), params=data, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(accept.call_args, mock.call(token=user.token, team_proposition_id=5))
+        self.assertEqual(accept.call_args, mock.call(token=user.token, team_proposition_id=get.return_value.data[0].id))
 
     @mock_api(TeamProposition, 'delete')
+    @mock_api(TeamProposition, 'get', user__id=5, team__id=10, list_count=1)
     @logged_in()
-    def test_decline_invite_calls_api(self, delete, user):
-        data = {'team_proposition_id': 5}
+    def test_decline_invite_calls_api(self, delete, get, user):
+        data = {'user_id': 5, 'team_id': 10}
         response = self.client.post(url_for('teams.decline_proposition'), params=data, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(delete.call_args, mock.call(token=user.token, team_proposition_id=5))
+        self.assertEqual(delete.call_args, mock.call(token=user.token, team_proposition_id=get.return_value.data[0].id))
 
     @mock_api(TeamMembership, 'get', list_count=1, id=123)
     @mock_api(TeamMembership, 'delete')
@@ -72,7 +74,8 @@ class TeamTests(AppTestCase):
     @logged_in()
     def test_remove_member_calls_api(self, get, delete, get_single, user):
         get_single.return_value.data.founder = user
-        response = self.client.post(url_for('teams.remove_from_team', team_id=1, user_id=3))
+        data = {'team_id': 1, 'user_id': 3}
+        response = self.client.post(url_for('teams.remove_from_team'), params=data)
         self.assertEqual(delete.call_count, 1)
         self.assertEqual(delete.call_args, mock.call(token=user.token, team_membership_id=123))
 

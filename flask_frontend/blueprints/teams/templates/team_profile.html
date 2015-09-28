@@ -6,11 +6,34 @@
   </h1>
   <div class="extra-menu">
     {% if current_user.is_authenticated() and team.relation_to_current_user.is_founder %}
-      <a href="{{ url_for('teams.edit_team_view', team_id=team.id) }}" class="admin-item">
+      <a href="{{ url_for('teams.edit', team_id=team.id) }}" class="admin-item">
         <i class="fa fa-pencil-square-o"></i>
       </a>
     {% endif %}
   </div>
+  {% if current_user.is_authenticated() %}
+    {% from 'macros.html' import render_basic_form %}
+    {% if team.relation_to_current_user.is_proposed %}
+      <h3>{{ gettext('Join team') }}</h3>
+      <p>{{ gettext('You are waiting for approval.') }}</p>
+      {{ render_basic_form(url_for('teams.decline_proposition'), gettext('Decline'), {'user_id': current_user.id, 'team_id': team.id}) }}
+    {% elif team.relation_to_current_user.is_invited %}
+      <h3>{{ gettext('Join team') }}</h3>
+      <p>{{ gettext('You are invited to team') }}</p>
+      {% from 'macros.html' import render_basic_form %}
+      {{ render_basic_form(url_for('teams.accept_proposition'), gettext('Accept'), {'user_id': current_user.id, 'team_id': team.id}) }}
+      {{ render_basic_form(url_for('teams.decline_proposition'), gettext('Decline'), {'user_id': current_user.id, 'team_id': team.id}) }}
+    {% elif not team.relation_to_current_user.is_member %}
+      <h3>{{ gettext('Join team') }}</h3>
+      <p>{{ gettext('Would you like to join this team?') }}</p>
+      {{ render_basic_form(url_for('teams.propose_user'), gettext('Apply'), {'user_id': current_user.id, 'team_id': team.id, 'type': 'REQUEST'}) }}
+    {% else %}
+      <h3>{{ gettext('Team management') }}</h3>
+      <p>{{ gettext('Would you like to leave this team?') }}</p>
+      {{ render_basic_form(url_for('teams.remove_from_team'), gettext('Leave'), {'user_id': current_user.id, 'team_id': team.id}) }}
+    {% endif %}
+  {% endif %}
+
   <h3>{{ gettext('Team description') }}</h3>
   <p>{{ team.description if team.description else gettext('No description provided') }}</p>
 

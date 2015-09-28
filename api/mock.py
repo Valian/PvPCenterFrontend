@@ -167,7 +167,7 @@ class TeamPropositionFactory(factory.Factory):
     id = factory.Sequence(lambda x: x)
     team = factory.SubFactory(TeamFactory)
     user = factory.SubFactory(UserFactory)
-    type = factory.Iterator(vars(TEAM_PROPOSITION_TYPE))
+    type = factory.Iterator(vars(TEAM_PROPOSITION_TYPE).values())
 
 
 class FriendshipInviteFactory(factory.Factory):

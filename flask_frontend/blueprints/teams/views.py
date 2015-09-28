@@ -30,12 +30,12 @@ def create_routes():
         UrlRoute('/propose', propose_user, restrict=['logged_in'], methods=['POST']),
         UrlRoute('/accept_invite', accept_proposition, restrict=['logged_in'], methods=['POST']),
         UrlRoute('/decline_proposition', decline_proposition, restrict=['logged_in'], methods=['POST']),
+        UrlRoute('/remove_from_team', remove_from_team, restrict=['logged_in'], methods=['POST']),
         UrlRoute('/<int:team_id>', team_view, menu=menu, endpoint="team_view"),
         UrlRoute('/<int:team_id>/edit', edit, menu=menu, restrict=['team_owner']),
         UrlRoute('/<int:team_id>/change_basic', change_basic, menu=menu, restrict=['team_owner'], methods=['POST']),
         UrlRoute('/<int:team_id>/upload_logo', upload_logo, menu=menu, restrict=['team_owner'], methods=['POST']),
-        UrlRoute('/<int:team_id>/members', team_members, endpoint='members_view', menu=menu),
-        UrlRoute('/<int:team_id>/members/<int:user_id>/remove', remove_from_team, restrict=['team_owner'], methods=['POST'])
+        UrlRoute('/<int:team_id>/members', team_members, endpoint='members_view', menu=menu)
     ])
 
 
@@ -89,17 +89,20 @@ def propose_user(env, team_id, user_id, type):
 
 
 def proposition_context_creator(env):
-    team_proposition_id = int(flask.request.form.get('team_proposition_id'))
-    if team_proposition_id is None:
+    team_id = int(flask.request.form.get('team_id'))
+    user_id = int(flask.request.form.get('user_id'))
+    if team_id is None or user_id is None:
         flask.abort(401)
-    return dict(team_proposition_id=team_proposition_id)
+    team_proposition = first_or_none(get_or_500(
+        env.api.team_propositions.get, token=flask_login.current_user.token, team_id=team_id, user_id=user_id))
+    return dict(team_proposition=team_proposition)
 
 
 @view(context_creators=proposition_context_creator)
-def accept_proposition(env, team_proposition_id):
+def accept_proposition(env, team_proposition):
     # TODO - redicrect to referer
     token = flask_login.current_user.token
-    response = env.api.team_propositions.accept(token=token, team_proposition_id=team_proposition_id)
+    response = env.api.team_propositions.accept(token=token, team_proposition_id=team_proposition.id)
     if response.ok:
         Flash.success(gettext("Operation successfull!"))
     else:
@@ -107,12 +110,11 @@ def accept_proposition(env, team_proposition_id):
     return flask.redirect(flask.url_for('teams.teams_view'))
 
 
-
 @view(context_creators=proposition_context_creator)
-def decline_proposition(env, team_proposition_id):
+def decline_proposition(env, team_proposition):
     # TODO - redicrect to referer
     token = flask_login.current_user.token
-    response = env.api.team_propositions.delete(token=token, team_proposition_id=team_proposition_id)
+    response = env.api.team_propositions.delete(token=token, team_proposition_id=team_proposition.id)
     if response.ok:
         Flash.success(gettext("Operation successfull!"))
     else:
@@ -128,7 +130,12 @@ def create_team_view(env):
         return flask.redirect(flask.url_for('teams.team_view', team_id=form.result.id))
     return dict(form=form)
 
-def remove_team_member_context(env, team_id, user_id):
+
+def remove_team_member_context(env):
+    team_id = int(flask.request.form.get('team_id'))
+    user_id = int(flask.request.form.get('user_id'))
+    if team_id is None or user_id is None:
+        flask.abort(401)
     team = get_or_404(env.api.teams.get_single, team_id=team_id)
     membership = first_or_none(get_or_500(env.api.team_memberships.get, team_id=team.id, user_id=user_id))
     return dict(team=team, membership=membership)

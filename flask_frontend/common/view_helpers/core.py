@@ -91,6 +91,8 @@ class BaseView(Logable):
         return self.view_func(**expected_kwargs)
 
     def create_context(self, env, view_args):
+        if not self.context_creators:
+            return view_args
         creators_kwargs = view_args.copy()
         result_kwargs = {}
         for creator in self.context_creators:

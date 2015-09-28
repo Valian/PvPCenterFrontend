@@ -75,6 +75,18 @@
 {%- endmacro %}
 
 
+{% macro render_basic_form(url, submit_button_text, hidden_data) %}
+  <form action="{{ url }}" method="post">
+    {% if hidden_data %}
+      {% for name, value in hidden_data.iteritems() %}
+        <input type="hidden" name="{{ name }}" id="{{ name }}" value="{{ value }}">
+      {% endfor %}
+    {% endif %}
+    <button type="submit">{{ submit_button_text }}</button>
+  </form>
+{% endmacro %}
+
+
 {% macro flash_messages() %}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
