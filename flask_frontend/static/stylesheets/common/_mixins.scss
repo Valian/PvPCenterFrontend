@@ -1,0 +1,41 @@
+@mixin transition ($transition) {
+	-webkit-transition: $transition;
+	transition: $transition;
+}
+@mixin transition ($transform, $args) {
+	-webkit-transition: -webkit-transform $args;
+	transition: $transform $args;
+}
+@mixin transform($string){
+	-webkit-transform: $string;
+	-ms-transform: $string;
+	transform: $string;
+}
+@mixin scale ($factor) {
+	-webkit-transform: scale($factor);
+	-ms-transform: scale($factor);
+	transform: scale($factor);
+}
+@mixin rotate ($deg) {
+	$iedeg: floor( $deg / 90 );
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=$iedeg);
+	-webkit-transform: rotate(unit($deg, deg));
+	-ms-transform: rotate(unit($deg, deg));
+	transform: rotate(unit($deg, deg));
+}
+@mixin skew ($deg, $deg2) {
+	-webkit-transform: skew($deg, $deg2);
+	-ms-transform: skew($deg, $deg2);
+	transform: skew($deg, $deg2);
+}
+@mixin translate ($x, $y:0) {
+	-webkit-transform: translate($x, $y);
+	-ms-transform: translate($x, $y);
+	transform: translate($x, $y);
+}
+@mixin translateX ($x) {
+	.translate($x, 0);
+}
+@mixin translateY ($y) {
+	.translate(0, $y);
+}

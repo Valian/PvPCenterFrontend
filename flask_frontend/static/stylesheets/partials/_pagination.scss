@@ -1,0 +1,10 @@
+// Stronicowanie
+.pagination {
+	display: block;
+	text-align: right;
+
+	> p, > a {
+		display: inline-block;
+		margin: 2px;
+	}
+}

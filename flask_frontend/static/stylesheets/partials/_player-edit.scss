@@ -1,0 +1,17 @@
+// Player edit
+.edit-form .icons a {
+	display: block;
+	text-align: center;
+}
+
+.extra-info {
+	margin: 10px auto;
+
+	.new a, a.delete {
+		line-height: 34px;
+	}
+}
+
+.icons .new i {
+	font-size: 35px;
+}

@@ -1,0 +1,26 @@
+@import 'common/mixins';
+@import 'common/reset';
+
+@import 'partials/main';
+
+@import 'responsive';
+
+@import 'partials/nav';
+@import 'partials/search';
+@import 'partials/rotator';
+@import 'partials/next-events';
+@import 'partials/upcoming';
+@import 'partials/events-lists';
+@import 'partials/news-list';
+@import 'partials/registration';
+@import 'partials/profile';
+@import 'partials/comments';
+@import 'partials/pagination';
+@import 'partials/games-tabs';
+@import 'partials/market';
+@import 'partials/player-edit';
+
+/* new game modal */
+#new-game h4 {
+	margin: 0;
+}
