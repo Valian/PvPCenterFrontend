@@ -1,43 +1,43 @@
-.transition (@transition) {
-	-webkit-transition: @transition; 
-	transition: @transition;  
+@mixin transition ($transition) {
+	-webkit-transition: $transition;
+	transition: $transition;
 }
-.transition (transform, @args) {
-	-webkit-transition: -webkit-transform @args; 
-	transition: transform @args;  
+@mixin transition ($transform, $args) {
+	-webkit-transition: -webkit-transform $args;
+	transition: $transform $args;
 }
-.transform(@string){
-	-webkit-transform: @string;
-	-ms-transform: @string;
-	transform: @string;
+@mixin transform($string){
+	-webkit-transform: $string;
+	-ms-transform: $string;
+	transform: $string;
 }
-.scale (@factor) {
-	-webkit-transform: scale(@factor);
-	-ms-transform: scale(@factor);
-	transform: scale(@factor);
+@mixin scale ($factor) {
+	-webkit-transform: scale($factor);
+	-ms-transform: scale($factor);
+	transform: scale($factor);
 }
-.rotate (@deg) {
-	@iedeg: floor( @deg / 90 );
-	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=@iedeg);
-	-webkit-transform: rotate(unit(@deg, deg));
-	-ms-transform: rotate(unit(@deg, deg));
-	transform: rotate(unit(@deg, deg));
+@mixin rotate ($deg) {
+	$iedeg: floor( $deg / 90 );
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=$iedeg);
+	-webkit-transform: rotate(unit($deg, deg));
+	-ms-transform: rotate(unit($deg, deg));
+	transform: rotate(unit($deg, deg));
 }
-.skew (@deg, @deg2) {
-	-webkit-transform: skew(@deg, @deg2);
-	-ms-transform: skew(@deg, @deg2);
-	transform: skew(@deg, @deg2);
+@mixin skew ($deg, $deg2) {
+	-webkit-transform: skew($deg, $deg2);
+	-ms-transform: skew($deg, $deg2);
+	transform: skew($deg, $deg2);
 }
-.translate (@x, @y:0) {
-	-webkit-transform: translate(@x, @y);
-	-ms-transform: translate(@x, @y);
-	transform: translate(@x, @y);
+@mixin translate ($x, $y:0) {
+	-webkit-transform: translate($x, $y);
+	-ms-transform: translate($x, $y);
+	transform: translate($x, $y);
 }
-.translateX (@x) {
-	.translate(@x, 0);
+@mixin translateX ($x) {
+	.translate($x, 0);
 }
-.translateY (@y) {
-	.translate(0, @y);
+@mixin translateY ($y) {
+	.translate(0, $y);
 }
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; font-family: inherit; list-style: none;}
@@ -126,7 +126,7 @@ textarea {
 	position: absolute;
 	width: 100%;
 	top: 0;
-	
+
 	.account-menu.logged-in, &.sticky .account-menu.logged-in {
 		float: right;
 
@@ -146,7 +146,7 @@ textarea {
 					border: none;
 					padding: 0;
 
-					&:extend(a all);
+					@extend(a);
 				}
 			}
 		}
@@ -225,7 +225,7 @@ textarea {
 
 		> form {
 			button {
-				&:extend(#site-header .account-menu.logged-in > li > form button all);
+				@extend(#site-header .account-menu.logged-in > li > form button);
 			}
 		}
 	}
@@ -286,7 +286,7 @@ textarea {
 	}
 }
 
-#main-menu { 
+#main-menu {
 	> .navbar-nav {
 		float: none;
 		display: inline-block;
@@ -372,7 +372,7 @@ textarea {
 	}
 }
 
-// StickyNav 
+// StickyNav
 #site-header.sticky {
 	position: fixed;
 	z-index: 9;
@@ -446,7 +446,7 @@ textarea {
 	}
 }
 
-// ROTATOR 
+// ROTATOR
 #rotator {
 	position: relative;
 	z-index: 1;
@@ -469,7 +469,7 @@ textarea {
 	}
 }
 
-// next-events 
+// next-events
 .next-event {
 	background-color: #f6f6f6;
 	box-shadow: 0 1px 0 rgba(102,102,102,.2);
@@ -514,7 +514,7 @@ textarea {
 	}
 }
 
-// upcomingg 
+// upcomingg
 .upcoming {
 	padding: 30px 0 15px;
 
@@ -574,10 +574,10 @@ textarea {
 	}
 }
 
-// EVENTS LIST 
+// EVENTS LIST
 .events-list, .news-list {
 	margin-bottom: 45px;
-	
+
 	@media (min-width: 992px) {
 		margin-bottom: 0;
 	}
@@ -627,7 +627,7 @@ textarea {
 			}
 		}
 	}
-	
+
 	.event {
 		> div {
 			&:first-child {
@@ -685,7 +685,7 @@ textarea {
 		text-align: right;
 	}
 }
-	
+
 // NEWS LIST
 .news-list {
 	.news .img {
@@ -699,7 +699,7 @@ textarea {
 	}
 }
 
-// REJESTRACJA 
+// REJESTRACJA
 #registration {
 	h1 {
 		margin: 30px 0px;
@@ -728,14 +728,14 @@ textarea {
 	}
 }
 
-// PROFILE 
+// PROFILE
 .profile {
 	> .row {
 		margin-right: 0;
 		margin-left: 0;
 
-		> div { 
-			float: left; 
+		> div {
+			float: left;
 		}
 
 		> .content {
@@ -833,7 +833,7 @@ textarea {
 		}
 	}
 
-	> .row > .content, 
+	> .row > .content,
 	> .content {
 		width: calc(~"100% - 150px");
 		padding: 0;
@@ -847,7 +847,7 @@ textarea {
 	> .content.full-width {
 		width: 100%;
 	}
-	
+
 	.icons {
 		> div {
 			padding-top: 5px;
@@ -903,7 +903,7 @@ textarea {
 	}
 }
 
-// Komentarze 
+// Komentarze
 
 .comments {
 	.row {
@@ -945,7 +945,7 @@ textarea {
 	}
 }
 
-// Stronicowanie 
+// Stronicowanie
 .pagination {
 	display: block;
 	text-align: right;
@@ -956,12 +956,12 @@ textarea {
 	}
 }
 
-// Games tabs 
+// Games tabs
 .games {
 	.game {
 		height: 200px;
 		margin: 15px 0;
-		
+
 		a {
 			display: block;
 			width: 100%;
@@ -969,7 +969,7 @@ textarea {
 			position: relative;
 			background-size: cover;
 			background-position: center;
-			
+
 			&:hover {
 				box-shadow: 0px 0px 15px #027287;
 			}
@@ -993,7 +993,7 @@ textarea {
 	}
 }
 
-// Rynek 
+// Rynek
 .market {
 	.filter-toggle {
 		cursor: pointer;
@@ -1035,7 +1035,7 @@ textarea {
 
 			input {
 				display: none;
-			
+
 				& + img {
 					width: 100%;
 				}
