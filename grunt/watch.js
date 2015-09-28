@@ -10,7 +10,7 @@ module.exports = {
         files: [
             'flask_frontend/**/templates/*',
             'flask_frontend/static/javascripts/*.coffee',
-            'flask_frontend/static/stylesheets/*'
+            'flask_frontend/static/stylesheets/**/*'
         ]
     },
 
