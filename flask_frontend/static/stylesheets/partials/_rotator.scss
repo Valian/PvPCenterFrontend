@@ -1,0 +1,22 @@
+// ROTATOR
+#rotator {
+	position: relative;
+	z-index: 1;
+	overflow: hidden;
+
+	@include translateY(0px);
+
+	&.off {
+		height: 250px;
+
+		> div {
+			height: 100%;
+			background-position: center;
+			background-size: cover;
+		}
+
+		&.team > div {
+			background-position: top center;
+		}
+	}
+}

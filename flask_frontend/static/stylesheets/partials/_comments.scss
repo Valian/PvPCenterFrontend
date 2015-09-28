@@ -1,0 +1,40 @@
+// Komentarze
+.comments {
+	.row {
+		margin: 0;
+		margin-bottom: 20px;
+	}
+
+	.avatar {
+		padding-left: 0;
+
+		img {
+			width: 100%;
+		}
+	}
+
+	.content {
+		padding: 0;
+	}
+
+	h5 {
+		font-size: 15px;
+		margin-bottom: 5px;
+
+		.name {
+			color: #027287;
+		}
+
+		span {
+			font-size: 13px;
+		}
+
+		.delete {
+			float: right;
+		}
+	}
+
+	form .submit {
+		padding: 0;
+	}
+}

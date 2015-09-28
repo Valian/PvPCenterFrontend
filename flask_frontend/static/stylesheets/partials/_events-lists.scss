@@ -1,0 +1,111 @@
+// EVENTS LIST
+.events-list, .news-list {
+	margin-bottom: 45px;
+
+	@media (min-width: 992px) {
+		margin-bottom: 0;
+	}
+}
+
+.events-list .row.event, .news-list .news {
+	padding: 10px 0;
+	border-bottom: 1pt solid rgba(102,102,102,.2);
+	margin: 0;
+}
+
+.events-list {
+	.events-menu {
+		.row& {
+			margin-left: 0;
+			margin-right: 0;
+		}
+
+		> a {
+			color: rgba(85, 85, 85, 0.35);
+
+			&.active, &:hover {
+				color: #027287;
+			}
+		}
+
+		.item {
+			text-align: left;
+			cursor: default;
+			display: none;
+
+			.active {
+				display: inline;
+			}
+
+			@media (min-width: 768px) {
+				text-align: center;
+				display: inline;
+				cursor: pointer;
+
+				&.item-first {
+					text-align: left;
+				}
+				&.item-last {
+					text-align: right;
+				}
+			}
+		}
+	}
+
+	.event {
+		> div {
+			&:first-child {
+				padding-left: 0;
+				text-align: center;
+			}
+
+			&:last-child {
+				padding-right: 0;
+				text-align: right;
+			}
+
+		}
+
+		> div > span, .name a {
+			display: block;
+		}
+
+		.day {
+			font-size: 25px;
+			line-height: 25px;
+		}
+
+		.game {
+			color: #027287;
+			margin: 2.5px 0;
+		}
+
+		.check-in .btn {
+			margin-top: 5px;
+		}
+	}
+
+	.more {
+		text-align: right;
+		margin: 10px 0;
+	}
+
+	table {
+		margin-top: 20px;
+
+		caption {
+			text-align: center;
+			margin-bottom: 10px;
+		}
+
+		td.separator {
+			text-align: center;
+		}
+	}
+}
+
+.events-list, .team-division {
+	table tr:last-child {
+		text-align: right;
+	}
+}

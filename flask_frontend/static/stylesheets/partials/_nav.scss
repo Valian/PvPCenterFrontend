@@ -1,0 +1,293 @@
+// NAVIGATION
+#site-header {
+	position: absolute;
+	width: 100%;
+	top: 0;
+
+	.account-menu.logged-in, &.sticky .account-menu.logged-in {
+		float: right;
+
+		> li {
+			float: left;
+
+			> a, > form {
+				padding: 15px 10px;
+
+				@media (min-width: 992px) {
+					padding: 15px 15px;
+				}
+			}
+
+			> form {
+				button {
+					border: none;
+					padding: 0;
+					// @Todo: fix this #extend
+					//@extend(a);
+				}
+			}
+		}
+	}
+
+	.account-menu.logged-in .dropdown-menu {
+		background-color: rgba(246, 246, 246, 0.95);
+		padding: 0;
+		max-width: 400px;
+
+		> li {
+			> a, > p {
+				position: relative;
+				padding: 10px;
+				@include transition(none);
+			}
+
+			>a {
+				&:hover, &:focus {
+					background: #f6f6f6;
+					color: #027287;
+				}
+			}
+
+			&.navbar-avatar {
+				img {
+					width: 40px;
+					margin-right: 5px;
+				}
+
+				span {
+					font-weight: bold;
+
+					&.time {
+						font-weight: normal;
+						position: absolute;
+						right: 10px;
+						font-size: 12px;
+						line-height: 16px;
+					}
+				}
+			}
+		}
+	}
+}
+
+.top-navbar {
+	position: relative;
+	height: 80px;
+	background-color: rgba(255,255,255,.75);
+
+	z-index:10;
+	box-shadow: 0 3px 0 rgba(102,102,102,.2);
+
+	.container > .row > div:last-child {
+		padding-right: 0;
+	}
+
+	.logo {
+		display: inline-block;
+		margin: 17px 0;
+
+		> img {
+			height: 46px;
+		}
+	}
+
+	.menu-toggle {
+		font-size: 17px;
+		line-height: 17px;
+		float: right;
+		margin: 30px 10px;
+		border: none;
+		border-radius: 0;
+		padding: 0;
+
+		> form {
+			button {
+				// @Todo: fix this #extend
+				//@extend(#site-header .account-menu.logged-in > li > form button);
+			}
+		}
+	}
+}
+
+.login-register-link {
+	text-align: center;
+	margin: 5px;
+}
+
+.lost-password {
+	float: right;
+	margin: 10px 4px;
+}
+
+.social-auth {
+	p {
+		display: inline-block;
+		float: right;
+		line-height: 34px;
+		padding-right: 10px;
+	}
+
+	.tooltip-btn {
+		line-height: 34px;
+		display: inline-block;
+		float: right;
+
+		img {
+			width: 28px;
+			margin-left: 3px;
+		}
+	}
+}
+
+.main-menu-container {
+	height: 1px;
+
+	.container {
+		position: relative;
+		padding: 0;
+	}
+
+	.navigation {
+		position: absolute;
+		z-index: 2;
+
+		width: 100%;
+		text-align: center;
+		margin: 0;
+
+		background-color: rgba(246, 246, 246, 0.95);
+		border-radius: 0 0 4px 4px;
+
+		@media (min-width: 992px) {
+			max-height: 55px;
+		}
+	}
+}
+
+#main-menu {
+	> .navbar-nav {
+		float: none;
+		display: inline-block;
+		position: relative;
+
+		li.dropdown:hover .dropdown-menu {
+			display: block;
+		}
+
+		> li > a {
+			background: none;
+		}
+	}
+}
+
+.navbar-right {
+	&.account-menu {
+		margin-top: 12.5px;
+		margin-right: 0;
+		text-transform: uppercase;
+
+		.dropdown-menu::before {
+			content: '';
+			position: absolute;
+			border: 8px solid transparent;
+			border-color: transparent transparent #555 transparent;
+			right: 13px;
+			top: -16px;
+		}
+
+		> li > .dropdown-menu {
+			margin-top: -8px;
+		}
+	}
+
+	@media (max-width: 991px) {
+		.open .dropdown-menu {
+			position: absolute;
+			float: left;
+			right: 0;
+			left: auto;
+			min-width: 160px;
+			background-color: #fff;
+			border: 1px solid #ccc;
+			border: 1px solid rgba(0, 0, 0, .15);
+			-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+			box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+		}
+
+		&.account-menu .dropdown-menu::before {
+			right: 8px;
+		}
+	}
+}
+
+.nav.account-menu {
+	li > a,
+	li > a:hover,
+	li > a:focus,
+	.open > a,
+	.open > a:hover,
+	.open > a:focus {
+		background-color: transparent;
+	}
+}
+
+.navbar-nav {
+	> li {
+		> a {
+			line-height: 25px;
+		}
+	}
+}
+
+.navbar-avatar {
+	img {
+		width: 25px;
+		float: left;
+		margin-right: 3px;
+	}
+	span {
+		text-transform: none;
+	}
+}
+
+// StickyNav
+#site-header.sticky {
+	position: fixed;
+	z-index: 9;
+	@include translateY(-83px);
+
+	.logo {
+		@include translateY(75px);
+
+		img {
+			height: 35px;
+		}
+	}
+
+	.top-menu > a {
+		@include translateY(68px);
+	}
+
+	.sticky-hidden {
+		display: none;
+	}
+
+	.sticky-visible {
+		display: block !important;
+	}
+
+	.main-menu-container {
+		height: 55px;
+		background-color: rgba(246, 246, 246, 0.95);
+	}
+
+	#main-menu {
+		@include translateY(55px);
+		background-color: rgba(246, 246, 246, 0.95);
+
+		@media (min-width: 992px) {
+			@include translateY(0px);
+			background-color: transparent;
+		}
+	}
+}

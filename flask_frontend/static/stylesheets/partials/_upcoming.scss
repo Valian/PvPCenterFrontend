@@ -1,0 +1,59 @@
+// upcoming
+.upcoming {
+	padding: 30px 0 15px;
+
+	&-item {
+		position: relative;
+		display: block;
+		height: 200px;
+
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+		margin: 15px 0;
+
+		@media (min-width: 768px) {
+			margin: 0;
+		}
+
+		> span {
+			display: block;
+			position: absolute;
+			width: 100%;
+			padding: 15px;
+			text-align: center;
+			bottom: 0px;
+			background-color: rgba(2, 114, 135, 0.75);
+			color: #fff;
+
+			.fa {
+				margin-right: 5px;
+			}
+
+			.ico {
+				display: inline-block;
+				overflow-x: hidden;
+				vertical-align: bottom;
+
+				@include scale(0);
+
+				@include transition(transform, .1s linear);
+			}
+		}
+
+		&:hover > span .ico {
+			@include scale(1);
+		}
+	}
+}
+
+.content {
+	padding: 20px 0;
+
+	h1, .events-menu {
+		font-size: 27px;
+		padding: 0 0 10px 0;
+		box-shadow: 0 2px 0 rgba(102,102,102,.2);
+		margin-bottom: 10px;
+	}
+}

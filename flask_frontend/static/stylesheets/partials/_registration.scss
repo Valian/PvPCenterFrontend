@@ -1,0 +1,28 @@
+// REJESTRACJA
+#registration {
+	h1 {
+		margin: 30px 0px;
+		text-align: center;
+		color: #027287;
+	}
+
+	.submit {
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+
+	.welcome {
+		padding-top: 15px;
+	}
+}
+
+.social-registration {
+	margin: 40px 0;
+
+	.tooltip-btn {
+		&, & img {
+			width: 100%;
+			display: inline-block;
+		}
+	}
+}

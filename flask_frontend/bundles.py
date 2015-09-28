@@ -18,8 +18,8 @@ bundles = {
         bower + 'owlcar/owl-carousel/*.min.js',
         output='js/libs.min.js'),
     'css': Bundle(
-        static + 'stylesheets/*.less',
-        filters=['less'], output='stylesheets/styles.css'),
+        static + 'stylesheets/*.scss',
+        filters=['pyscss'], output='stylesheets/styles.css'),
     'libs_css': Bundle(
         bower + 'bootstrap/dist/css/bootstrap.css',
         bower + 'bootstrap/dist/css/bootstrap-theme.css',

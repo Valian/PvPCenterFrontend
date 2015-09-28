@@ -1,0 +1,30 @@
+body {
+	color: #666;
+	font-size: 14px;
+	font-weight: 400;
+	font-family: 'Roboto', serif;
+	line-height: 20px;
+
+	// Dopóki nie ma rotatora
+	margin-top: 150px;
+}
+
+a {
+	color: #555;
+	text-decoration: none;
+
+	@include transition(color .1s linear .1s);
+
+	&:hover, &:focus, &.active {
+		color: #027287;
+		text-decoration: none;
+	}
+}
+
+textarea {
+	resize: vertical;
+}
+
+.main-bg {
+	background-color: #027287;
+}
