@@ -18,7 +18,7 @@ def get_api_instance(config):
         from api.mock import ApiDispatcherMock
         disp = ApiDispatcherMock(config[conf_const.BACKEND_URL])
     else:
-        from api.resources import ApiDispatcher
+        from api.core import ApiDispatcher
         disp = ApiDispatcher(config[conf_const.BACKEND_URL])
     return PvPCenterApi(disp, config[conf_const.BACKEND_LOGIN], config[conf_const.BACKEND_PASS])
 
