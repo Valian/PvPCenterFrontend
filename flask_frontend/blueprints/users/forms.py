@@ -77,4 +77,4 @@ class ChangeAvatarForm(ApiForm):
 
     def _make_request(self):
         result = cloudinary.uploader.upload_image(self.avatar.data)
-        self._api.users.update(user_id=self.user_id, token=self.token, image_url=result.url)
+        return self._api.users.update(user_id=self.user_id, token=self.token, image_url=result.url)

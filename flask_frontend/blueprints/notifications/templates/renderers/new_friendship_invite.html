@@ -1,0 +1,5 @@
+<div>
+  <b>{{ gettext('Received new friend invite!') }}</b>
+  {{ notification.created_at }}
+</div>
+{{ gettext('You was invited to friends by %(name)s. Do you accept?', name=notification.content.from_user.nickname) }}

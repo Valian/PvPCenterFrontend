@@ -31,29 +31,41 @@ class ModelBase(object):
         return str(vars(self))
 
 
+class ListOfModel(object):
+
+    def __init__(self, model, list_class):
+        """
+        :type model: ModelBase
+        """
+        self.list_class = list_class
+        self.model = model
+
+    def from_json(self, json):
+        try:
+            data = map(self.model.from_json, json["models"])
+            return self.list_class.from_models_and_json(data, json)
+        except (TypeError, AttributeError, KeyError) as e:
+            raise UnableToParseException(ModelList, e)
+
+
 class ModelList(list):
-    def __init__(self, data, total):
-        super(ModelList, self).__init__(data)
+    def __init__(self, models, total):
+        super(ModelList, self).__init__(models)
         self.total = total
 
-    class For(object):
+    @classmethod
+    def from_models_and_json(cls, models, json):
+        return cls(models, json['total'])
 
-        TOTAL_FIELD = "total"
-        DATA_FIELD = "models"
 
-        def __init__(self, model):
-            """
-            :type model: ModelBase
-            """
-            self.model = model
+class NotificationsList(ModelList):
+    def __init__(self, models, total, unread_count):
+        super(NotificationsList, self).__init__(models, total)
+        self.unread_count = unread_count
 
-        def from_json(self, json):
-            try:
-                total = json[self.TOTAL_FIELD]
-                data = map(self.model.from_json, json[self.DATA_FIELD])
-                return ModelList(data, total)
-            except (TypeError, AttributeError, KeyError) as e:
-                raise UnableToParseException(ModelList, e)
+    @classmethod
+    def from_models_and_json(cls, models, json):
+        return cls(models, json['total'], json['total_unchecked'])
 
 
 class GameRuleEntry(ModelBase):
@@ -344,23 +356,25 @@ class TeamProposition(ModelBase):
 
 class Notification(ModelBase):
 
-    def __init__(self, title, content, notification_type, time, checked):
+    def __init__(self, id, user_id, content, notification_type, creation_time, checked):
         """
-        :type title: str
+        :type id: long
+        :type user_id: long
         :type content: str
         :type notification_type: str
-        :type time: datetime
+        :type creation_time: datetime
         :type checked: bool
         """
-        self.title = title
+        self.id = id
+        self.user_id = user_id
         self.content = content
         self.type = notification_type
-        self.time = time
+        self.created_at = creation_time
         self.checked = checked
 
     @classmethod
     def _from_json(cls, json):
-        return cls(json['title'], json['content'], json['type'], json['time'], json['checked'])
+        return cls(json['id'], json['user_id'], json['content'], json['type'], json['created_at'], json['checked'])
 
 
 class Error(ModelBase):

@@ -1,13 +1,15 @@
 {% macro team_logo_src(team) %}
   {% set size = kwargs.get('width') %}
-  {{ team.image_url | cloudinary(**kwargs) if team.image_url else team.founder.email | gravatar(size) }}
+  {{ team.image_url | cloudinary(**kwargs) if team.image_url else 'http://expo.ec.illinois.edu/assets/company_logos/placeholder.png' }}
 {% endmacro %}
 
 {% macro team_listing(team) %}
-  <img src="{{ team_logo_src(team, width=20) }}">
+  <img src="{{ team_logo_src(team, width=20) }}" width="20">
   <a href="{{ url_for('teams.team_view', team_id = team.id) }}">
     <b>{{ team.name }}</b>
-    {{ team.tag }}
+    {% if team.tag %}
+      [{{ team.tag }}]
+    {% endif %}
     {{ team.members_count }}
     {# add check if current player is already in team (??) #}
     {% if caller %}

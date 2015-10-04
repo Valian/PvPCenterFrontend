@@ -15,7 +15,7 @@
     {% elif current_user.is_authenticated() %}
 
       {% if user.relation_to_current_user.invite_send or user.relation_to_current_user.invite_received %}
-        <form action="{{ url_for('users.decline_invite_to_friends', user_id=user.id) }}" method="post">
+        <form action="{{ url_for('users.decline_invite', user_id=user.id) }}" method="post">
           <button type="submit">{{ gettext('Decline invite') }}</button>
         </form>
       {% endif %}
@@ -24,11 +24,11 @@
         <form action="{{ url_for('users.remove_from_friends', user_id=user.id) }}" method="post">
           <button type="submit">{{ gettext('Remove from friends') }}</button>
         </form>
-      {% elif user.relation_to_current_user.invite_received %}
-        <form action="{{ url_for('users.accept_invite_to_friends', user_id=user.id) }}" method="post">
+      {% elif user.relation_to_current_user.invite_send %}
+        <form action="{{ url_for('users.accept_invite', user_id=user.id) }}" method="post">
           <button type="submit">{{ gettext('Accept invite') }}</button>
         </form>
-      {% elif not user.relation_to_current_user.invite_send %}
+      {% elif not user.relation_to_current_user.invite_received %}
         <form action="{{ url_for('users.invite_to_friends', user_id=user.id) }}" method="post">
           <button type="submit">{{ gettext('Invite to friends') }}</button>
         </form>

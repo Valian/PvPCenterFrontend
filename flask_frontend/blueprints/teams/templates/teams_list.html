@@ -12,7 +12,7 @@
             <li>
               {% from 'team_macros.html' import team_listing %}
               {% call team_listing(team) %}
-                {% if current_user.is_authenticated() %}
+                {% if current_user.is_authenticated() and not team.relation_to_current_user.is_member %}
                   <a href="#">{{ gettext('Join team') }}</a>
                 {% endif %}
               {% endcall %}

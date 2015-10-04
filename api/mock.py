@@ -17,7 +17,9 @@ from constants import RELATION_TO_CURRENT_USER, TEAM_PROPOSITION_TYPE
 from constants import NATIONALITIES, TEAM_RELATION_TO_CURRENT_USER
 from .constants import SEX
 from models import User, Game, ModelList, UserGameOwnership, GameRuleEntry, GameRule, Team, TeamMembership, \
-    FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamProposition, TeamRelationToUser
+    FriendshipInvite, Friendship, RelationToUser, DeleteResponse, Notification, TeamProposition, TeamRelationToUser, \
+    ListOfModel, NotificationsList
+
 
 CLOUDINARY_URL = 'http://res.cloudinary.com/dihrxuryz/image/upload/v1442074482/xmhoxjbioanmd5htrl0p.png'
 
@@ -27,11 +29,13 @@ logger.setLevel(logging.INFO)
 
 
 def create_mock_for(model, list_count=21, **kwargs):
-    if isinstance(model, ModelList.For):
+    if isinstance(model, ListOfModel):
         underlying_model = model.model
+        underlying_list_model = model.list_class
         fac = find_factory_in_inheritance_chain(underlying_model)
+        list_fac = find_factory_in_inheritance_chain(underlying_list_model)
         data = fac.create_batch(list_count, **kwargs)
-        return ModelList(data, len(data))
+        return list_fac(models=data)
     fac = find_factory_in_inheritance_chain(model)
     return fac(**kwargs)
 
@@ -61,6 +65,23 @@ class ApiDispatcherMock(ApiDispatcherBase):
             if obj_id:
                 params['id'] = int(obj_id.group(1))
         return params
+
+
+class ModelListFactory(factory.Factory):
+    class Meta:
+        model = ModelList
+
+    models = []
+    total = factory.lazy_attribute(lambda o: len(o.models) * 3)
+
+
+class NotificationsListFactory(factory.Factory):
+    class Meta:
+        model = NotificationsList
+
+    models = []
+    total = factory.lazy_attribute(lambda o: len(o.models) * 3)
+    unread_count = factory.lazy_attribute(lambda o: len(o.models) / 2)
 
 
 class GameRuleEntryFactory(factory.Factory):
@@ -191,10 +212,11 @@ class NotificationFactory(factory.Factory):
     class Meta:
         model = Notification
 
-    title = factory.Iterator(["You got new friend invite", "You must see this", "Upcoming tournament"])
+    id = factory.Sequence(lambda x: x)
+    user_id = factory.Sequence(lambda x: x)
     content = faker.text()
     notification_type = factory.Iterator(["Info", "Event", "Unknown"])
-    time = factory.LazyAttribute(lambda o: datetime.datetime.utcnow() - datetime.timedelta(minutes=random.randint(5, 500)))
+    creation_time = factory.LazyAttribute(lambda o: datetime.datetime.utcnow() - datetime.timedelta(minutes=random.randint(5, 500)))
     checked = factory.Iterator([True, False])
 
 

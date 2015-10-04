@@ -6,9 +6,9 @@ from unittest import TestCase
 import mock
 import requests
 from nose_parameterized import parameterized
+
 from api.core import ApiDispatcher, ApiException
-from api.mock import create_mock_for
-from api.models import User, UnableToParseException, Game, ModelBase, ModelList
+from api.models import User, UnableToParseException, Game, ModelBase, ListOfModel, ModelList
 from api.resources import PvPCenterApi
 
 
@@ -108,13 +108,13 @@ class ApiTests(TestCase):
     @mock.patch('api.core.requests')
     def test_various_exceptions(self, exception, requests_mock):
         requests_mock.get.side_effect = exception
-        self.assertRaises(ApiException, lambda: self.api.games.get(model=mock.MagicMock(ModelList.For(Game))))
+        self.assertRaises(ApiException, lambda: self.api.games.get(model=mock.MagicMock(ListOfModel(Game, ModelList))))
 
     @mock.patch('api.core.requests')
     def test_error_response(self, requests_mock):
         error_data = {'some_error': ['1', '2'], 'other_error': ['1']}
         requests_mock.get.return_value = MockResponse(error_data, 500)
-        api_response = self.api.games.get(model=mock.MagicMock(ModelList.For(Game)))
+        api_response = self.api.games.get(model=mock.MagicMock(ListOfModel(Game, ModelList)))
         self.assertFalse(api_response.ok)
         self.assertEqual(len(api_response.errors), len(error_data))
         for key, errors in error_data.iteritems():

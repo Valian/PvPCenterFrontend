@@ -7,7 +7,7 @@
       <div class="menu">
         <div class="logo">
           {% from 'team_macros.html' import team_logo_src %}
-          <img src="{{ team_logo_src(team, width=130) }}">
+          <img src="{{ team_logo_src(team, width=130) }}" width="130">
           <h3>{{ team.name }}</h3>
         </div>
         {% from 'macros.html' import render_side_menu %}

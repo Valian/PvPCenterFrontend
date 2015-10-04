@@ -7,7 +7,7 @@ from abc import ABCMeta
 from .resource_endpoint import IndexResourceEndpoint, Endpoint, GetResourceEndpoint, Params, TokenParams, \
     CreateResourceEndpoint, PatchResourceEndpoint, DeleteResourceEndpoint
 from models import Game as Game, User, UserGameOwnership, Team, TeamMembership, FriendshipInvite, Friendship, \
-    Notification, TeamProposition
+    Notification, TeamProposition, NotificationsList
 
 
 class Resource(object):
@@ -77,7 +77,7 @@ class Notifications(Resource):
     def __init__(self, dispatcher, url):
         index, single = self.create_endpoints(url, '/{notification_id}')
         get_params = TokenParams('user_id')
-        self.get = IndexResourceEndpoint(dispatcher, index, Notification, params=get_params)
+        self.get = IndexResourceEndpoint(dispatcher, index, Notification, NotificationsList, params=get_params)
 
 
 class TeamMemberships(Resource):

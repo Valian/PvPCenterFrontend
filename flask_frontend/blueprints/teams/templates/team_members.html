@@ -8,11 +8,10 @@
     {% for member in memberships %}
       <li>
         {% from 'user_macros.html' import user_listing %}
+        {% from 'macros.html' import render_basic_form %}
         {% if team.relation_to_current_user.is_captain %}
           {% call user_listing(member.user) %}
-            <form action="{{ url_for('teams.remove_from_team', team_id=team.id, user_id=member.id) }}" method="post">
-              <button>Remove from team</button>
-            </form>
+            {{ render_basic_form(url_for('teams.remove_from_team'), gettext('Remove from team'), {'team_id': team.id, 'user_id': current_user.id}) }}
           {% endcall %}
         {% else %}
           {{ user_listing(member.user) }}

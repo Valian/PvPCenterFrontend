@@ -6,13 +6,7 @@
     <div class="content" id="notifications-list">
       {% block pjax_content %}
         {% for notification in notifications %}
-        <div>
-            <div>
-                <b>{{ notification.title }}</b>
-                {{ notification.time }}
-            </div>
-            {{ notification.content }}
-        </div>
+          {% include ['renderers/{0}.html'.format(notification.type.lower()), 'renderers/not_implemented.html'] %}
         {% if not loop.last %} <hr> {% endif %}
         {%  endfor %}
         {% from 'macros.html' import render_pagination %}

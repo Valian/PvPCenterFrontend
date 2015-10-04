@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import logging
-
 import urllib
 
 import re
 
-from .models import ModelList, DeleteResponse
+from .models import ModelList, DeleteResponse, ListOfModel
 from common.logable import Logable
 from flask_frontend.common.pagination import get_pagination_params
 
@@ -26,7 +25,7 @@ class Params(object):
         return params
 
     def add_param(self, name, translation=None):
-        self._params[name] = translation
+        self._params[name] = translation if translation is not None else name
 
     def extract_and_translate(self, provided_params):
         return {self._params[name]: provided_params[name] for name in self._params if name in provided_params}
@@ -113,12 +112,12 @@ class ResourceEndpoint(Logable):
         return params
 
     def __call__(self, **kwargs):
+        params = self._create_additional_params(kwargs)
         translated_params = self.params.extract_and_translate(kwargs) if self.params else {}
-        additional = self._create_additional_params(kwargs)
-        translated_params.update(additional)
+        params.update(translated_params)
         translated_data = self.data.extract_and_translate(kwargs) if self.data else {}
-        url = self.endpoint.build_url(translated_params)
-        if len(translated_data) + len(translated_params) < len(kwargs) + len(additional):
+        url = self.endpoint.build_url(params)
+        if len(translated_data) + len(params) < len(kwargs):
             logging.warning("There are some unused attributes when calling {0}: {1}. Delivered params: {2}".format(
                 self.method, self.endpoint.url, kwargs))
         request_kwargs = {}
@@ -138,9 +137,12 @@ class GetResourceEndpoint(ResourceEndpoint):
 
 class IndexResourceEndpoint(GetResourceEndpoint):
 
-    def __init__(self, dispatcher, endpoint, model_cls, **kwargs):
-        model_cls = ModelList.For(model_cls)
-        super(IndexResourceEndpoint, self).__init__(dispatcher, endpoint, model_cls, **kwargs)
+    def __init__(self, dispatcher, endpoint, model_cls, list_cls=ModelList, **kwargs):
+        model_cls = ListOfModel(model_cls, list_cls)
+        params = kwargs.pop('params', Params())
+        params.add_param('limit')
+        params.add_param('offset')
+        super(IndexResourceEndpoint, self).__init__(dispatcher, endpoint, model_cls, params=params, **kwargs)
 
     def _create_additional_params(self, kwargs):
         page, per_page = get_pagination_params()

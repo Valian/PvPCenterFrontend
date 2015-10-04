@@ -64,7 +64,10 @@ class ApiDispatcher(ApiDispatcherBase):
         return method(url, **kwargs)
 
     def _convert_to_api_result(self, model, response):
-        json = response.json()
+        try:
+            json = response.json()
+        except ValueError:
+            json = {}
         self.log_debug('Response data: {0}'.format(json))
         if not response.ok:
             return ApiResult(errors=Errors.from_json(json), status=response.status_code)

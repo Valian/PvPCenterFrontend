@@ -57,4 +57,4 @@ class ChangeTeamLogoForm(ApiForm):
 
     def _make_request(self):
         result = cloudinary.uploader.upload_image(self.logo.data)
-        self._api.teams.update(team_id=self.team_id, token=self.token, image_url=result.url)
+        return self._api.teams.update(team_id=self.team_id, token=self.token, image_url=result.url)
