@@ -51,7 +51,11 @@
       </tr>
       {% for game_ownership in game_ownerships %}
         <tr>
-          <td>{{ game_ownership.game.name }}</td>
+          <td>
+            <a href="{{ url_for('games.game_view', game_id=game_ownership.game.id) }}">
+              {{ game_ownership.game.name }}
+            </a>
+          </td>
           <td>{{ game_ownership.nickname }}</td>
         </tr>
       {% endfor %}

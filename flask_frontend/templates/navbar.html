@@ -21,24 +21,28 @@
             {{ gettext('Games') }}
           </a>
         </li>
-        <li>
-          <a href="{{ url_for('teams.teams_view') }}">
-            {{ gettext('Transfer market') }}
+        <li class="dropdown hidden-xs hidden-sm">
+          <a aria-expanded="false" href="{{ url_for('teams.teams_view') }}">
+            {{ gettext('Teams') }}
+            <span class="caret"></span>
           </a>
+          <ul class="dropdown-menu" role="menu">
+            {% if current_user.is_authenticated() %}
+              <li>
+                <a href="{{ url_for('users.teams_view', user_id=current_user.id) }}">{{ gettext('My teams') }}</a>
+              </li>
+            {% endif %}
+            <li>
+              <a href="{{ url_for('teams.teams_view') }}">{{ gettext('Browse teams') }}</a>
+            </li>
+            <li>
+              <a href="{{ url_for('teams.teams_view') }}">{{ gettext('Top teams') }}</a>
+            </li>
+          </ul>
         </li>
-        <li>
-          <a href="#">
-            {{ gettext('Media')}}
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            {{ gettext('Shop') }}
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            {{ gettext('Forum')}}
+        <li class="visible-xs-block visible-sm-block">
+          <a href="{{ url_for('games.games_view') }}">
+            {{ gettext('Teams') }}
           </a>
         </li>
         <li class="dropdown">
@@ -55,14 +59,6 @@
             </li>
             {% endfor %}
           </ul>
-        </li>
-        <li class="search-input">
-          <input class="form-control" type="text">
-        </li>
-        <li class="search-toggle">
-          <a href="#">
-            <i class="fa fa-search"></i>
-          </a>
         </li>
       </ul>
     </nav>

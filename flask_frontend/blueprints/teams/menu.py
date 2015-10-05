@@ -19,4 +19,4 @@ class TeamMenu(SideMenuContext):
         menu.add_entry(team_url, gettext('Divisions'), 'team_member')
         menu.add_entry(team_url, gettext('Matches'), 'team_member')
         menu.add_entry(team_url, gettext('Challenges'), 'team_member')
-        menu.add_entry(settings_url, gettext('Settings'), 'team_owner')
+        menu.add_entry(settings_url, gettext('Manage team'), 'team_owner')
