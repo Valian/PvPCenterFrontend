@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 # author: Jakub Skałecki (jakub.skalecki@gmail.com)
 import flask
+import flask_login
 import flask_wtf
 from abc import abstractmethod
 from flask_babel import gettext
+from api.resource_endpoint import TokenParams
+from common.logable import Logable
 
 import flask_frontend.config.keys as conf_const
 from api.resources import PvPCenterApi
@@ -43,6 +46,41 @@ def get_or_500(func, *args, **kwargs):
     if result is None:
         flask.abort(500)
     return result
+
+
+class AutoParams(Logable):
+
+    def __init__(self, method, allowed_params=None):
+        """
+        :type method: api.resource_endpoint.ResourceEndpoint
+        :type allowed_params: list[str]
+        """
+        self.method = method
+        self.allowed_params = allowed_params or method.params.get_available()
+
+    def perform_request(self, **params):
+        found_params = {}
+        for param in self.allowed_params:
+            if param == 'token':
+                self._add_token(found_params)
+            else:
+                self._add_from_request_args(param, found_params)
+        found_params.update(params)
+        return self.method(**found_params)
+
+    @staticmethod
+    def _add_from_request_args(name, params):
+        param = flask.request.args.get(name)
+        if flask.request.method == 'POST':
+            param = flask.request.form.get(name, param)
+        if param is not None:
+            params[name] = param
+
+    @staticmethod
+    def _add_token(params):
+        user = flask_login.current_user
+        if user.is_authenticated():
+            params['token'] = user.token
 
 
 class ApiForm(flask_wtf.Form):
