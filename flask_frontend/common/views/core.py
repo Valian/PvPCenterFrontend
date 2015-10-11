@@ -24,8 +24,9 @@ class View(Logable):
     def post_request(self):
         pass
 
-    def get_endpoint(self):
-        return self.endpoint
+    @classmethod
+    def get_endpoint(cls):
+        return cls.endpoint
 
     def process_params(self, **kwargs):
         return kwargs

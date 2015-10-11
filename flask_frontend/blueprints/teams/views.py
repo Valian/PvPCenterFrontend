@@ -6,6 +6,8 @@ import flask_login
 from flask_babel import gettext
 from api.constants import TEAM_PROPOSITION_TYPE
 from flask.ext.frontend.common.view_helpers.core import view
+from flask.ext.frontend.common.views.core import ApiResourceGetMixin, ApiResourceIndexMixin
+from flask.ext.frontend.common.views.core import View
 
 import flask_frontend.blueprints.teams.helpers
 from api.models import Team, TeamMembership
@@ -37,6 +39,18 @@ def create_routes():
         UrlRoute('/<int:team_id>/upload_logo', upload_logo, menu=menu, restrict=['team_owner'], methods=['POST']),
         UrlRoute('/<int:team_id>/members', team_members, endpoint='members_view', menu=menu)
     ])
+
+
+class TeamView(ApiResourceGetMixin, View):
+
+    model = Team
+    endpoint = 'teams.team_view'
+
+
+class TeamsView(ApiResourceIndexMixin, View):
+
+    model = Team
+    endpoint = 'teams.teams_view'
 
 
 def create_edit_context(env, team_id):
