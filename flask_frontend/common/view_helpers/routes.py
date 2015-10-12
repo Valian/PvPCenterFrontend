@@ -4,12 +4,14 @@
 
 class UrlRoute(object):
 
-    def __init__(self, route, view, restrict=None, menu=None, **kwargs):
-        self.menu = menu
+    def __init__(self, route, view, **kwargs):
+        """
+        :type route: str
+        :type view: flask_frontend.common.views.core.View
+        :type menu:
+        """
         self.view = view
         self.route = route
-        self.restrict = restrict or []
-        self.kwargs = kwargs
 
 
 class UrlRoutes(object):
@@ -28,5 +30,7 @@ class UrlRoutes(object):
         """
         for route in self.routes:
             """:type : UrlRoute"""
-            view_func = route.view.as_view(env, restrictions=route.restrict, menu=route.menu)
-            app.add_url_rule(route.route, view_func=view_func, **route.kwargs)
+            view_class = route.view
+            view_func = view_class.as_view(env)
+            endpoint = view_class.get_endpoint()
+            app.add_url_rule(route.route, view_func=view_func, endpoint=endpoint)

@@ -11,6 +11,7 @@ from flask.ext.frontend.common.utils import pjax
 class View(Logable):
 
     endpoint = None
+    methods = None
 
     def __init__(self, env, *args, **kwargs):
         self.env = env
@@ -27,6 +28,10 @@ class View(Logable):
     @classmethod
     def get_endpoint(cls):
         return cls.endpoint
+
+    @classmethod
+    def get_methods(cls):
+        return cls.methods if cls.methods else ['GET']
 
     def process_params(self, **kwargs):
         return kwargs
@@ -136,4 +141,9 @@ class ApiResourceIndexMixin(ApiResourceMixin):
         if name is None:
             return self.model.__name__.lower() + "s"
         return name
+
+
+class RestrictionMixin(object):
+
+    restrictions = []
 
